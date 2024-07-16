@@ -1,0 +1,172 @@
+{% extends "base_init.html" %}
+
+{% block title %}Otra Página{% endblock %}
+{% load static %}
+{% block content %}
+    <script src="{% static 'tablas.js' %}"></script>
+    <br>
+    <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/homeAdministrador">Inicio</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Usuario</li>
+            </ol>
+    </nav>
+    <br><br><br>
+    <h1>Agregar Usuarios</h1>
+    <br><br><br><br>
+    <div class="d-flex align-items-center mb-3">
+        <button class="btn">
+        <i class="bi bi-search"></i>
+        </button>
+        <div class="flex-grow-1">
+        <input type="text" class="form-control" id="buscar" name="nombres" placeholder="Buscar" style="width: 600px;">
+        </div>
+        <button type="button" class="btn btn-dark ms-2" data-bs-toggle="modal" data-bs-target="#modal1">
+        Agregar Usuario
+        </button>
+    </div>
+    <br>
+
+    <div class="modal fade" id="modal1" tabindex="-1" aria-labelledby="modal1Label" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                   <h5 class="modal-title" id="modal1Label" style="font-size: 30px;">Registro nuevo Usuario</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" style="border-top: 3px solid #8ab5ea;">
+                    <form action="{% url 'registrarUsuario' %}" method="POST" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="nombres" class="form-label">Nombres</label>
+                                    <input type="text" class="form-control1" id="nombres" name="nombres" placeholder="Ejemplo: Luis Alberto" style="width: 350px;" required>
+                                    <div class="invalid-feedback">Por favor, ingrese sus nombres.</div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="direccion" class="form-label">Dirección</label>
+                                    <input type="text" class="form-control1" id="direccion" name="direccion" placeholder="Ejemplo: Loja" style="width: 350px;" required>
+                                    <div class="invalid-feedback">Por favor, ingrese su dirección.</div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="correo" class="form-label">Correo electrónico</label>
+                                    <input type="text" class="form-control1" id="correo" name="correo" placeholder="Ejemplo: luis.a.medina.c@unl.edu.ec" style="width: 350px;" required>
+                                    <div class="invalid-feedback">Por favor, ingrese un correo electrónico válido</div>
+                                </div>
+                                <div class="form-wrapper">
+                                    <label for="tipo_cargo">Cargo</label>
+                                    <div>
+                                        <select name="tipo_cargo" id="tipo_cargo" class="form-control1" style="width: 350px;" required>
+                                            <option value="Personal Administrativo">Personal Administrativo</option>
+                                            <option value="Administrador">Administrador</option>
+                                        </select>
+                                        <div class="invalid-feedback">Por favor, seleccione un cargo.</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="dni" class="form-label">DNI</label>
+                                    <input type="text" class="form-control1" id="dni" name="dni" placeholder="Ejemplo: 1105585184" style="width: 350px;" required pattern="\d{10}">
+                                    <div class="invalid-feedback">Por favor, ingrese un DNI válido (10 dígitos).</div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="apellidos" class="form-label">Apellidos</label>
+                                    <input type="text" class="form-control1" id="apellidos" name="apellidos" placeholder="Ejemplo: Medina Chamba" style="width: 350px;" required>
+                                    <div class="invalid-feedback">Por favor, ingrese sus apellidos.</div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="telefono" class="form-label">Teléfono</label>
+                                    <input type="text" class="form-control1" id="telefono" name="telefono" placeholder="Ejemplo: 0960749867" style="width: 350px;" required pattern="\d{10}">
+                                    <div class="invalid-feedback">Por favor, ingrese un número de teléfono válido (10 dígitos).</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-dark">Guardar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+<div class="table-responsive py-2">
+    <table id="personalAdministrativoTable" class="table table-hover">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>DNI</th>
+                <th>Nombres</th>
+                <th>Apellidos</th>
+                <th>Dirección</th>
+                <th>Teléfono</th>
+                <th colspan="2">Opciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for us in personalAdministrativo %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ us.dni }}</td>
+                <td>{{ us.nombres }}</td>
+                <td>{{ us.apellidos }}</td>
+                <td>{{ us.direccion }}</td>
+                <td>{{ us.telefono }}</td>
+                <td><a href="#modal2-{{ forloop.counter }}" class="edit" data-bs-toggle="modal"> <i class="bi bi-pencil-square"></i></a></td>
+                <td><a href="{% url 'eliminarUsuario' us.id %}" class="btn"><i class="bi bi-trash"></i></a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% for us in personalAdministrativo %}
+<div class="modal fade" id="modal2-{{ forloop.counter }}" tabindex="-1" aria-labelledby="modal1Label" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modal1Label" style="font-size: 30px;">Editar campos del Usuario</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" style="border-top: 3px solid #8ab5ea;">
+                <form id="editPersonalForm-{{ forloop.counter }}" action="/editarPersonalAdmi/{{ us.id }}/" method="POST">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="nombres-{{ forloop.counter }}" class="form-label">Nombres</label>
+                                <input type="text" class="form-control"  name="nombres" value="{{ us.nombres }}"  style="width: 350px;">
+                            </div>
+                            <div class="mb-3">
+                                <label for="direccion-{{ forloop.counter }}" class="form-label">Dirección</label>
+                                <input type="text" class="form-control"  name="direccion" value="{{ us.direccion }}" style="width: 350px;">
+                            </div>
+                           <div class="mb-3">
+                                <label for="telefono-{{ forloop.counter }}" class="form-label">Teléfono</label>
+                                <input type="text" class="form-control"  name="telefono" value="{{ us.telefono }}"  style="width: 350px;">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="dni-{{ forloop.counter }}" class="form-label">DNI</label>
+                                <input type="text" class="form-control" name="dni" value="{{ us.dni }}"style="width: 350px;" disabled>
+                            </div>
+                            <div class="mb-3">
+                                <label for="apellidos-{{ forloop.counter }}" class="form-label">Apellidos</label>
+                                <input type="text" class="form-control" name="apellidos" value="{{ us.apellidos }}" style="width: 350px;">
+                            </div>
+                           
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-dark" value="Update">Guardar Cambios</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+{% endblock %}

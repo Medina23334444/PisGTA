@@ -1,0 +1,26 @@
+{% extends "base_initPersonal.html" %}
+{% block title %}Otra Página{% endblock %}
+{% load static %}
+{% block content %}
+    <div>
+        <br>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item active" aria-current="page">Inicio</li>
+            </ol>
+        </nav>
+        <br><br><br>
+        <h1>Detalles del proyecto</h1>
+        <br><br>
+        <div class="card" style="width: 75rem; height: 30rem;">
+            <img class="card-img-top" src="{% static 'unlbanner.jpg' %}" alt="Card image cap">
+            <div class="card-body">
+                <h5 class="card-title">Acerca del proyecto</h5>
+                <p class="card-text">El objetivo de esta página es predecir la deserción
+                    de los estudiantes de la carrera de Electricidad en 
+                    la Universidad Nacional de Loja. Para lograr esto, utilizamos 
+                    un modelo matemático basado en ecuaciones diferenciales.</p>
+            </div>
+        </div>
+    </div>
+{% endblock %}

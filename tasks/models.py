@@ -1,41 +1,36 @@
+from django.contrib.auth.base_user import BaseUserManager, AbstractBaseUser
 from django.contrib.auth.hashers import check_password, make_password
+from django.contrib.auth.models import AbstractUser
 from django.db import models
 from .choices import Cargos
 
-class Usuario(models.Model):
-    dni = models.CharField(max_length=11, unique=True)
+
+class Usuario(AbstractUser):
+    dni = models.CharField(max_length=10, unique=True)
     nombres = models.CharField(max_length=100)
     apellidos = models.CharField(max_length=100)
     direccion = models.CharField(max_length=100)
     telefono = models.CharField(max_length=10, unique=True)
 
-
-    def __str__(self):
+    def str(self):
         return f"{self.nombres} {self.apellidos}"
 
 
 class Rol(models.Model):
     nombre = models.CharField(max_length=20)
     estado = models.BooleanField(default=True)
+    user = models.ManyToManyField(Usuario, related_name='usuarios', through='RolPersona')
 
-    def __str__(self):
+    def str(self):
         return self.nombre
 
-class Cuenta(models.Model):
-    clave = models.CharField(max_length=128)
-    correo = models.EmailField(max_length=254, unique=True)
-    estado = models.BooleanField(default=True)
-    rol = models.ForeignKey(Rol, on_delete=models.CASCADE, related_name='cuentas')
-    usuario = models.OneToOneField(Usuario, on_delete=models.CASCADE)
+
+class RolPersona(models.Model):
+    rol = models.ForeignKey(Rol, on_delete=models.CASCADE)
+    usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.correo
-
-    def set_password(self, raw_password):
-        self.clave = make_password(raw_password)
-
-    def check_password(self, raw_password):
-        return check_password(raw_password, self.clave)
+        return f"{self.usuario} {self.rol}"
 
 
 class PeriodoAcademico(models.Model):
@@ -73,4 +68,9 @@ class Ciclo(models.Model):
     def __str__(self):
         texto = "{0} {1}"
         return texto.format(self.numero,self.idPeriodo.nombre)
-    
+
+class Sugerencia(models.Model):
+    asunto = models.CharField(max_length=100)
+    descripcion = models.TextField()
+    fecha = models.DateField(auto_now_add=True)
+    usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE)

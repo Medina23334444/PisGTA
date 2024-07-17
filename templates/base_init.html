@@ -11,51 +11,58 @@
 <body class="body-1">
     <div class="barra-lateral" id="barra-lateral">
         <div class="menu" id="menu">
-            <ion-icon name="menu-outline"></ion-icon>
+            <ion-icon name="menu-outline" aria-label="Menú"></ion-icon>
         </div>
         <div>
+            
             <div class="nombre-pagina">
-                <ion-icon id="book" name="book-outline"></ion-icon>
+                <img id="book" src="{% static 'logoUUnl.png' %}" width="60" height="70">
                 <span class="">UNLPredicts</span>
             </div>
             <button class="boton">
-                <ion-icon name="flash-outline"></ion-icon>
+                <ion-icon name="flash-outline" aria-label="Electricidad"></ion-icon>
                 <span>Electricidad</span>
             </button>
         </div>
         <nav class="navegacion">
-                <ul>
-                    <li>
-                        <a href="/homeAdministrador">
-                            <ion-icon name="home-outline"></ion-icon>
-                            <span>Inicio</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/perfilAdministrador">
-                            <ion-icon name="person-outline"></ion-icon>
-                            <span>Perfil</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/admiManage/">
-                            <ion-icon name="person-add-outline"></ion-icon>
-                            <span>Usuarios</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#">
-                            <ion-icon name="reader-outline"></ion-icon>
-                            <span>Reportes</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#">
-                            <ion-icon name="stats-chart-outline"></ion-icon>
-                            <span>Variables</span>
-                        </a>
-                    </li>
-                </ul>
+            <ul>
+                <li>
+                    <a href="/homeAdministrador">
+                        <ion-icon name="home-outline" aria-label="Inicio"></ion-icon>
+                        <span>Inicio</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/perfilAdministrador">
+                        <ion-icon name="person-outline" aria-label="Perfil"></ion-icon>
+                        <span>Perfil</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/admiManage/">
+                        <ion-icon name="person-add-outline" aria-label="Usuarios"></ion-icon>
+                        <span>Usuarios</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <ion-icon name="reader-outline" aria-label="Reportes"></ion-icon>
+                        <span>Reportes</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <ion-icon name="stats-chart-outline" aria-label="Variables"></ion-icon>
+                        <span>Variables</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/cerrar_sesion">
+                        <ion-icon name="log-out-outline" aria-label="Cerrar sesión"></ion-icon>
+                        <span>Cerrar sesión</span>
+                    </a>
+                </li>
+            </ul>
         </nav>
         <div>
             <div class="linea"></div>

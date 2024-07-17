@@ -1,0 +1,114 @@
+{% extends "base_init.html" %}
+{% block title %}Ingresando Datos Históricos{% endblock %}
+{% load static %}
+{% block content %}
+    <div class="container">
+        <br>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/homeAdministrador">Inicio</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Perfil</li>
+            </ol>
+        </nav>
+        <br><br><br>
+        <h1>Ingresando datos históricos</h1>
+        <br>
+        <div class="card" style="width: 75rem;">
+            <div class="card-body">
+                <form id="dataForm">
+                    <label for="periodoAcademico">Periodo Académico</label>
+                    <select id="periodoAcademico" class="form-control mb-3">
+                        <option value="" disabled selected>Seleccione</option>
+                        <!-- Opciones de periodo académico -->
+                    </select>
+                    <table class="table table-borderless">
+                        <thead>
+                            <tr>
+                                <th>Ciclo</th>
+                                <th class="cycle-col" data-cycle="1">1</th>
+                                <th class="cycle-col" data-cycle="2">2</th>
+                                <th class="cycle-col" data-cycle="3">3</th>
+                                <th class="cycle-col" data-cycle="4">4</th>
+                                <th class="cycle-col" data-cycle="5">5</th>
+                                <th class="cycle-col" data-cycle="6">6</th>
+                                <th class="cycle-col" data-cycle="7">7</th>
+                                <th class="cycle-col" data-cycle="8">8</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Matriculados</td>
+                                <td><input type="number" class="form-control cycle" data-type="matriculados" data-cycle="1"></td>
+                                <td><input type="number" class="form-control cycle" data-type="matriculados" data-cycle="2"></td>
+                                <td><input type="number" class="form-control cycle" data-type="matriculados" data-cycle="3"></td>
+                                <td><input type="number" class="form-control cycle" data-type="matriculados" data-cycle="4"></td>
+                                <td><input type="number" class="form-control cycle" data-type="matriculados" data-cycle="5"></td>
+                                <td><input type="number" class="form-control cycle" data-type="matriculados" data-cycle="6"></td>
+                                <td><input type="number" class="form-control cycle" data-type="matriculados" data-cycle="7"></td>
+                                <td><input type="number" class="form-control cycle" data-type="matriculados" data-cycle="8"></td>
+                                <td><input type="number" class="total" data-type="matriculados"></td>
+                            </tr>
+                            <tr>
+                                <td>Aprobados</td>
+                                <td><input type="number" class="form-control cycle" data-type="aprobados" data-cycle="1"></td>
+                                <td><input type="number" class="form-control cycle" data-type="aprobados" data-cycle="2"></td>
+                                <td><input type="number" class="form-control cycle" data-type="aprobados" data-cycle="3"></td>
+                                <td><input type="number" class="form-control cycle" data-type="aprobados" data-cycle="4"></td>
+                                <td><input type="number" class="form-control cycle" data-type="aprobados" data-cycle="5"></td>
+                                <td><input type="number" class="form-control cycle" data-type="aprobados" data-cycle="6"></td>
+                                <td><input type="number" class="form-control cycle" data-type="aprobados" data-cycle="7"></td>
+                                <td><input type="number" class="form-control cycle" data-type="aprobados" data-cycle="8"></td>
+                                <td><input type="number" class="total" data-type="aprobados"></td>
+                            </tr>
+                            <tr>
+                                <td>Reprobados</td>
+                                <td><input type="number" class="form-control cycle" data-type="reprobados" data-cycle="1"></td>
+                                <td><input type="number" class="form-control cycle" data-type="reprobados" data-cycle="2"></td>
+                                <td><input type="number" class="form-control cycle" data-type="reprobados" data-cycle="3"></td>
+                                <td><input type="number" class="form-control cycle" data-type="reprobados" data-cycle="4"></td>
+                                <td><input type="number" class="form-control cycle" data-type="reprobados" data-cycle="5"></td>
+                                <td><input type="number" class="form-control cycle" data-type="reprobados" data-cycle="6"></td>
+                                <td><input type="number" class="form-control cycle" data-type="reprobados" data-cycle="7"></td>
+                                <td><input type="number" class="form-control cycle" data-type="reprobados" data-cycle="8"></td>
+                                <td><input type="number" class="total" data-type="reprobados"></td>
+                            </tr>
+                            <tr>
+                                <td>Desertores</td>
+                                <td><input type="number" class="form-control cycle" data-type="desertores" data-cycle="1"></td>
+                                <td><input type="number" class="form-control cycle" data-type="desertores" data-cycle="2"></td>
+                                <td><input type="number" class="form-control cycle" data-type="desertores" data-cycle="3"></td>
+                                <td><input type="number" class="form-control cycle" data-type="desertores" data-cycle="4"></td>
+                                <td><input type="number" class="form-control cycle" data-type="desertores" data-cycle="5"></td>
+                                <td><input type="number" class="form-control cycle" data-type="desertores" data-cycle="6"></td>
+                                <td><input type="number" class="form-control cycle" data-type="desertores" data-cycle="7"></td>
+                                <td><input type="number" class="form-control cycle" data-type="desertores" data-cycle="8"></td>
+                                <td><input type="number" class="total" data-type="desertores"></td>
+                            </tr>
+                            <tr>
+                                <td>Foráneos</td>
+                                <td><input type="number" class="form-control cycle" data-type="foraneos" data-cycle="1"></td>
+                                <td><input type="number" class="form-control cycle" data-type="foraneos" data-cycle="2"></td>
+                                <td><input type="number" class="form-control cycle" data-type="foraneos" data-cycle="3"></td>
+                                <td><input type="number" class="form-control cycle" data-type="foraneos" data-cycle="4"></td>
+                                <td><input type="number" class="form-control cycle" data-type="foraneos" data-cycle="5"></td>
+                                <td><input type="number" class="form-control cycle" data-type="foraneos" data-cycle="6"></td>
+                                <td><input type="number" class="form-control cycle" data-type="foraneos" data-cycle="7"></td>
+                                <td><input type="number" class="form-control cycle" data-type="foraneos" data-cycle="8"></td>
+                                <td><input type="number" class="total" data-type="foraneos"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <button type="button" id="importExcel" class="btn btn-primary">Importar desde Excel</button>
+                    <input type="file" id="fileInput" accept=".xlsx, .xls" style="display: none;">
+                    <button type="button" id="toggleColumns" class="btn btn-secondary mt-3">Ocultar/Mostrar Ciclos</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.min.js" integrity="sha384-w1Q4orYjBQndcko6MimVbzY0tgp4pWB4lZ7lr30WKz0vr/aWKhXdBNmNb5D92v7s" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.2/xlsx.full.min.js"></script>
+    <script src="{% static '/agregarDatosH.js' %}"></script>
+{% endblock %}

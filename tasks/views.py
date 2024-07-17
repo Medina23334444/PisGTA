@@ -118,5 +118,8 @@ def homeAdministrador(request):
 def perfilAdministrador(request):
     return render(request, 'perfilAdministrador.html')
 
+def variablesAdministrador(request):
+    return render(request, 'agregarDatos.html')
+
 def homePersonal(request):
     return render(request, 'homePersonal.html')

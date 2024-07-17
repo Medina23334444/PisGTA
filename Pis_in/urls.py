@@ -14,6 +14,7 @@ urlpatterns = [
     path('eliminarUsuario/<id>', views.eliminarUsuario, name='eliminarUsuario'),
     path('homeAdministrador/', views.homeAdministrador, name='homeAdministrador'),
     path('perfilAdministrador/', views.perfilAdministrador, name='perfilAdministrador'),
+    path('agregarDatos/', views.variablesAdministrador, name='agregarDatos'),
     path('homePersonal/', views.homePersonal, name='homePersonal'),
     path('ordenarUsuarios/', views.ordenarUsuarios)
 ]

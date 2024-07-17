@@ -1,6 +1,6 @@
 
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 from tasks import views
 
 urlpatterns = [
@@ -15,6 +15,10 @@ urlpatterns = [
     path('homeAdministrador/', views.homeAdministrador, name='homeAdministrador'),
     path('perfilAdministrador/', views.perfilAdministrador, name='perfilAdministrador'),
     path('homePersonal/', views.homePersonal, name='homePersonal'),
-    path('ordenarUsuarios/', views.ordenarUsuarios)
+    path('ordenarUsuarios/', views.ordenarUsuarios),
+    path('Prediccion/', views.graficaPrediccion, name='GraficaPrediccion'),
+    path('api/', include('tasks.urls')),
+    path('datosHistoricos/', views.datosHistoricos, name='datosHistoricos')
+
 ]
 

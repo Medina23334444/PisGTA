@@ -8,6 +8,8 @@ from .forms import UsuarioForm
 from .models import Usuario, Cuenta, Rol
 from django.contrib import messages
 
+import tasks.RungeKutta as r
+from django.http.response import JsonResponse
 
 def home(request):
     return render(request, 'home.html')
@@ -120,3 +122,125 @@ def perfilAdministrador(request):
 
 def homePersonal(request):
     return render(request, 'homePersonal.html')
+
+def graficaPrediccion(request):
+    tiempo = r.lista_tiempo_prediccion()
+    matriculados = r.lista_matriculados_prediccion()
+    aprobados = r.lista_aprobados_prediccion()
+    reprobados = r.lista_reprobados_prediccion()
+    desertores = r.lista_desertores_prediccion()
+    foraneos = r.lista_foraneos_prediccion()
+    contexto = {'tiempo': tiempo, 'matriculados': matriculados, 'aprobados': aprobados, 'reprobados': reprobados, 'desertores': desertores, 'foraneos': foraneos}
+    return render(request, 'InterfazPrediccion.html', contexto)
+
+def index(request):   
+    return render(request,'InterfazPrediccion.html')
+
+def datosHistoricos(request):
+    tiempo = r.lista_tiempo_prediccion()
+    matriculados = r.lista_matriculados_prediccion()
+    aprobados = r.lista_aprobados_prediccion()
+    reprobados = r.lista_reprobados_prediccion()
+    desertores = r.lista_desertores_prediccion()
+    foraneos = r.lista_foraneos_prediccion()
+    contexto = {'tiempo': tiempo, 'matriculados': matriculados, 'aprobados': aprobados, 'reprobados': reprobados, 'desertores': desertores, 'foraneos': foraneos}
+    return render(request, 'datosHistoricos.html', contexto)
+
+def get_chart(request):
+    listaD = r.lista_desertores_prediccion()
+    listaT = r.lista_tiempo_prediccion()
+    listaA = r.lista_aprobados_prediccion()
+    listaR = r.lista_reprobados_prediccion()
+    listaM = r.lista_matriculados_prediccion()
+    listaF = r.lista_foraneos_prediccion()
+    tiempoI = min(listaT)
+    tiempoF = r.tiempo_final_historico()
+    chart={
+        'xAxis': [
+            {
+                'type': 'category',
+                'data': listaT
+            }
+        ],
+        'yAxis': [
+            {
+                'type': "value"
+            }
+        ],
+        
+        'title': [
+            {
+                'text': 'Grafica Prediccion',
+                'bottom':  '92%'
+            }  
+        ],
+        'tooltip': [
+            {
+                'trigger': 'axis',
+                'axisPointer': {
+                    'type': 'cross',
+                    'label': {
+                        'backgroundColor': '#6a7985'
+                    }
+                }                
+            }  
+        ],
+        'legend': [
+            {
+                'data': ['Foraneos', 'Desertores', 'Aprobados', 'Matriculados', 'Reprobados'],
+                'bottom': '87%'
+            }  
+        ],
+        'toolbox': [
+            {
+                'feature': {
+                    'saveAsImage': {}
+                }
+            }
+        ],       
+        'dataZoom': [
+            {
+                'type': 'slider', 
+                'start': 0,         
+                'end': 100 
+            }
+        ],
+        'series': [
+            {
+                'name': 'Foraneos',
+                'type': "line",
+                'smooth': True,
+                'areaStyle': {},
+                'emphasis': {
+                    'focus': 'series'
+                },
+                'data': listaF,
+                                  
+            },
+            {
+                'name': 'Desertores',
+                'data': listaD,
+                'type': "line",
+                'smooth': True   
+            },
+            {
+                'name': 'Aprobados',   
+                'data': listaA,
+                'type': "line",
+                'smooth': True   
+            },
+            {
+                'name': 'Matriculados',
+                'data': listaM,
+                'type': "line",
+                'smooth': True   
+            },
+            {
+                'name': 'Reprobados',
+                'data': listaR,
+                'type': "line",
+                'smooth': True,           
+            },
+        ]
+    }
+    return JsonResponse(chart)

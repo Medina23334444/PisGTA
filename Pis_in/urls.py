@@ -1,6 +1,6 @@
 
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 from tasks import views
 
 urlpatterns = [
@@ -22,4 +22,7 @@ urlpatterns = [
     path('obtener_eventos/', views.obtener_eventos),
     path('registrarPeriodo/',views.registrarPeriodo),
     path('cerrar_sesion', views.cerrarSesion, name='cerrar_sesion'),
+    path('Prediccion/', views.graficaPrediccion, name='GraficaPrediccion'),
+    path('api/', include('tasks.urls')),
+    path('datosHistoricos/', views.datosHistoricos, name='datosHistoricos')
 

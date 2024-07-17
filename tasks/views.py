@@ -3,9 +3,11 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
+from datetime import datetime, timedelta
+from django.http import JsonResponse
 
 from .forms import UsuarioForm
-from .models import Usuario, Cuenta, Rol
+from .models import Usuario, Cuenta, Rol, PeriodoAcademico, Ciclo
 from django.contrib import messages
 
 
@@ -120,3 +122,70 @@ def perfilAdministrador(request):
 
 def homePersonal(request):
     return render(request, 'homePersonal.html')
+
+"""Métodos de Periodo"""
+
+def mostrarPeriodos(request):#Vista general de Periodos 
+    periodos = PeriodoAcademico.objects.all()
+    #messages.success(request, '!Lista actualizada!')
+    return render(request, "gestionPeriodoHome.html",{"periodos":periodos})
+
+def guardar_editar_Periodos(request):#Vista para editar o agregar 
+    periodos = PeriodoAcademico.objects.all()
+    #messages.success(request, '!Lista actualizada!')
+    return render(request, "gestionPeriodo.html",{"periodos":periodos})
+
+def obtener_eventos(request):#Método para cargar los periodos registrados en calendar
+    periodos = PeriodoAcademico.objects.all()
+    eventos = []
+
+    for periodo in periodos:
+        eventos.append({
+            'title': periodo.nombre,
+            'start': periodo.fechaInicio.isoformat(),
+            #'end': periodo.fechaFin.isoformat(),
+            'end': (periodo.fechaFin + timedelta(days=1)).isoformat(),
+            'allDay': True,  # Para que se muestre como evento de todo el día
+        })
+
+    return JsonResponse(eventos, safe=False)
+
+#@csrf_protect
+def registrarPeriodo(request):
+    #Se los recibe como strings
+    fechaI_str = request.POST.get('fecha_inicio')
+    #fechaI = request.POST['fecha_inicio']#atributo name Objeto en HTML
+    fechaF_str = request.POST.get('fecha_fin')
+    
+    #Se los convierte
+    fechaI = datetime.strptime(fechaI_str, '%Y-%m-%d').date()
+    fechaF = datetime.strptime(fechaF_str, '%Y-%m-%d').date()
+    nombreP = PeriodoAcademico.fijarNombre(fechaI,fechaF)
+
+    #Podría analizarse condicional para guardar o editar
+    #idP = request.POST['txtId']
+    try: #Si puede convertir el id a entero, existe, debe actualizar
+        idP = int(request.POST['txtId'])
+        periodo = PeriodoAcademico.objects.get(id = idP)
+        periodo.fechaInicio = fechaI
+        periodo.fechaFin = fechaF
+        periodo.nombre = nombreP
+        periodo.save()
+    except ValueError: #Si devuelve un ID nulo, crear
+        periodo = PeriodoAcademico.objects.create(fechaInicio = fechaI, fechaFin = fechaF, nombre = nombreP)
+        #Al crear periodo, creo sus ciclos
+        #Ver si los ciclos guardo aquí o en la Clase
+        for i in range(1,9):
+            ciclo = Ciclo.objects.create(idPeriodo = periodo.id, numero = i)
+
+    """if idP is not None and isinstance(idP, int):#Si no es nulo, existe, y es un numero entero debo actualizar
+        periodo = PeriodoAcademico.objects.get(id = idP)
+        periodo.fechaInicio = fechaI
+        periodo.fechaFin = fechaF
+        periodo.nombre = nombreP
+        periodo.save()
+    else:#Si el id es nulo debe crear uno nuevo:
+        periodo = PeriodoAcademico.objects.create(fechaInicio = fechaI, fechaFin = fechaF, nombre = nombreP)"""
+    
+    messages.success(request, '!Periodo guardado correctamente¡')
+    return redirect('/')

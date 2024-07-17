@@ -15,6 +15,12 @@ urlpatterns = [
     path('homeAdministrador/', views.homeAdministrador, name='homeAdministrador'),
     path('perfilAdministrador/', views.perfilAdministrador, name='perfilAdministrador'),
     path('homePersonal/', views.homePersonal, name='homePersonal'),
-    path('ordenarUsuarios/', views.ordenarUsuarios)
+    path('ordenarUsuarios/', views.ordenarUsuarios),
+    #URLs Periodo Academico
+    path('mostrarPeriodos/',views.mostrarPeriodos, name='mostrarPeriodos'),
+    #path('mostrarRegistrarPeriodo/mostrarRegistrarPeriodo2/',views.guardar_editar_Periodos),
+    path('gestionPeriodos/',views.guardar_editar_Periodos, name='gestionPeriodos'),
+    path('obtener_eventos/', views.obtener_eventos),
+    path('registrarPeriodo/',views.registrarPeriodo),
 ]
 

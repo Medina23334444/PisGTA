@@ -87,7 +87,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const cycle = column.getAttribute('data-cycle');
             const cycleCells = document.querySelectorAll(`.cycle[data-cycle="${cycle}"]`);
             cycleCells.forEach(cell => {
-                cell.classList.toggle('hidden');
+                cell.classList.toggle('d-none'); // Usar la clase de Bootstrap para ocultar/mostrar
             });
         });
     });

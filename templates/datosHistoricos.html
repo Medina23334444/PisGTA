@@ -2,18 +2,8 @@
 {% block title %} Datos Historicos {% endblock %}
 {% load static %}   
 {% block content %}
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title> Datos Historicos </title>
-    <link rel="stylesheet" href="{% static 'style_datosH.css' %}" />
-</head>
-
-<body>
+    
+     <link rel="stylesheet" href="{% static 'styleDatos.css' %}" />
     <header>
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
@@ -21,15 +11,16 @@
                 <li class="breadcrumb-item active" aria-current="page">Datos Historicos</li>
             </ol>
         </nav>
-    <br>  </br>
+    <br> 
     <h1> Datos Historicos </h1>
+    <br>
     </header>
-
-    <section> 
-        <div class="alert alert-warning d-flex align-items-center color-detalle" role="alert">
-            <i class="bi bi-table"> </i>
-            <div>Detalle de las gráficas</div>
-        </div>
+    
+    <section>
+      <div class="alert alert-warning d-flex align-items-center color-detalle tall-alert" role="alert">
+          <i class="bi bi-table"> </i>
+          <div>Detalle de las gráficas</div>
+      </div>
             <section class="section tabla">
                 <div class="contenedorTablas">
                     <table class = "table"> 
@@ -59,7 +50,5 @@
                 </div>
             </section>
     </section>
-</body>
-</html>
 
 {% endblock %}

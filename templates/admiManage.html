@@ -4,16 +4,17 @@
 {% load static %}
 {% block content %}
     <script src="{% static 'tablas.js' %}"></script>
-    <br>
-    <nav aria-label="breadcrumb">
+    <header>
+        <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="/homeAdministrador">Inicio</a></li>
-                <li class="breadcrumb-item active" aria-current="page">Usuario</li>
+                <li class="breadcrumb-item active" aria-current="page">Usuarios</li>
             </ol>
-    </nav>
-    <br><br>
+        </nav>
+    <br>
     <h1>Agregar Usuarios</h1>
-    <br><br><br><br>
+    <br>
+    </header>
     <div class="d-flex align-items-center mb-3">
         <button class="btn">
         <i class="bi bi-search"></i>
@@ -91,35 +92,38 @@
             </div>
         </div>
     </div>
-<div class="table-responsive py-2">
-    <table id="personalAdministrativoTable" class="table table-hover">
-        <thead>
-            <tr>
-                <th>#</th>
-                <th>DNI</th>
-                <th>Nombres</th>
-                <th>Apellidos</th>
-                <th>Dirección</th>
-                <th>Teléfono</th>
-                <th colspan="2">Opciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for us in personalAdministrativo %}
-            <tr>
-                <td>{{ forloop.counter }}</td>
-                <td>{{ us.dni }}</td>
-                <td>{{ us.nombres }}</td>
-                <td>{{ us.apellidos }}</td>
-                <td>{{ us.direccion }}</td>
-                <td>{{ us.telefono }}</td>
-                <td><a href="#modal2-{{ forloop.counter }}" class="edit" data-bs-toggle="modal"> <i class="bi bi-pencil-square"></i></a></td>
-                <td><a href="{% url 'eliminarUsuario' us.id %}" class="btn"><i class="bi bi-trash"></i></a></td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
+    
+    <section class="section tabla">
+        <div class="contenedorTablas">
+            <table id="personalAdministrativoTable" class="table table-hover">
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th>DNI</th>
+                    <th>Nombres</th>
+                    <th>Apellidos</th>
+                    <th>Dirección</th>
+                    <th>Teléfono</th>
+                    <th colspan="2">Opciones</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for us in personalAdministrativo %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ us.dni }}</td>
+                        <td>{{ us.nombres }}</td>
+                        <td>{{ us.apellidos }}</td>
+                        <td>{{ us.direccion }}</td>
+                        <td>{{ us.telefono }}</td>
+                        <td><a href="#modal2-{{ forloop.counter }}" class="edit" data-bs-toggle="modal"> <i class="bi bi-pencil-square"></i></a></td>
+                        <td><a href="{% url 'eliminarUsuario' us.id %}" class="btn"><i class="bi bi-trash"></i></a></td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
 
 {% for us in personalAdministrativo %}
 <div class="modal fade" id="modal2-{{ forloop.counter }}" tabindex="-1" aria-labelledby="modal1Label" aria-hidden="true">

@@ -2,18 +2,42 @@
 {% block title %}Otra Página{% endblock %}
 {% load static %}
 {% block content %}
-    <div>
-        <br>
-        <nav aria-label="breadcrumb">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item active" aria-current="page">Inicio</li>
-            </ol>
-        </nav>
-        <br><br>
-        <h1>Sugerencias</h1>
-        <br><br>
-        <p>En este espacio, puedes agregar tus sugerencias para mejorar nuestra aplicación. Valoramos tus comentarios y
-            trabajamos constantemente para ofrecer una mejor experiencia. ¡Tu opinión es muy importante para nosotros!</p>
-        
-    </div>
+      <div class="container">
+          <header>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/homePersonal">Inicio</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Sugerencias</li>
+                </ol>
+            </nav>
+            <h1>Sugerencias</h1>
+            <br>
+          </header>
+          <div class="row">
+              <div class="col-md-6">
+                  <div class="card mb-4">
+                      <div class="card-body">
+                          <h5 class="card-title">Espacios Sugerencias</h5>
+                          <p class="card-text">
+                              En este espacio, puedes agregar tus sugerencias para mejorar nuestra aplicación. Valoramos tus comentarios y 
+                              trabajamos constantemente para ofrecer una mejor experiencia. ¡Tu opinión es muy importante para nosotros!
+                          </p>
+                      </div>
+                  </div>
+              </div>
+              
+              <div class="col-md-6">
+                  <div class="card mb-4">
+                      <div class="card-body">
+                          <h5 class="card-title">Ejemplo de Sugerencia</h5>
+                          <h6 class="card-subtitle">Asunto: Notificaciones</h6>
+                          <p class="card-text text-justify-custom">
+                              Sería genial si la aplicación pudiera enviar notificaciones automáticas cuando se detecten problemas con los 
+                              datos históricos. Esto ayudaría a responder rápidamente y mantener la integridad de los datos.
+                          </p>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
 {% endblock %}

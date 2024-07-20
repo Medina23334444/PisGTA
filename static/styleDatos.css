@@ -1,13 +1,15 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap');
+
 .color-detalle i {
     margin-right: 10px;
-         
+
 }
 
 .alert-warning {
     background-color: #eaeef3;
-    border: black;
-    border-color: black;
+    border: none;
     color: black;
+    margin-left: 32px;
 }
 
 .section{
@@ -19,12 +21,17 @@
 }
 
 .section.tabla {
-    width: 92%;
-    height: 350px;    
-    border: #000000;
-    position: relative; 
+    width: 96%;
+    height: 350px;
+    border: none;
+    position: relative;
     left: 40px;
-    border-color: rgb(73, 9, 177);
-    background-color: rgb(0, 0, 0);
+    background-color: rgb(255, 255, 255);
 }
+
+.tall-alert {
+    height: 45px;
+}
+
+
 

@@ -34,32 +34,32 @@ class RolPersona(models.Model):
 
 
 class PeriodoAcademico(models.Model):
-    id = models.AutoField(primary_key = True, max_length=6)
-    fechaInicio = models.DateTimeField(null = False)
-    fechaFin = models.DateTimeField(null = False)
-    nombre = models.CharField(max_length = 20, null = False)
-    #estado = models.BooleanField(null = False)
+    id = models.AutoField(primary_key=True, max_length=6)
+    fechaInicio = models.DateField(null=False)
+    fechaFin = models.DateField(null=False)
+    nombre = models.CharField(max_length=20, null=False)
 
-    def __str__(self):
+    def _str_(self):
         return self.nombre
-    
+
     def fijarNombre(fecha1, fecha2):
         meses_espanol = {
             1: 'ENE', 2: 'FEB', 3: 'MAR', 4: 'ABR', 5: 'MAY', 6: 'JUN',
             7: 'JUL', 8: 'AGO', 9: 'SEP', 10: 'OCT', 11: 'NOV', 12: 'DIC'
         }
-    
+
         # Extraer las partes necesarias de las fechas
         mes1 = meses_espanol[fecha1.month]
-        año1 = str(fecha1.year)[-2:]
-    
+        anio1 = str(fecha1.year)[-2:]
+
         mes2 = meses_espanol[fecha2.month]
-        año2 = str(fecha2.year)[-2:]
-    
+        anio2 = str(fecha2.year)[-2:]
+
         # Formatear el resultado
-        resultado = f"{mes1}{año1}-{mes2}{año2}"
+        resultado = f"{mes1}{anio1}-{mes2}{anio2}"
         return resultado
-    
+
+
 class Ciclo(models.Model):
     id = models.AutoField(primary_key = True, max_length=6)
     idPeriodo = models.ForeignKey(PeriodoAcademico, on_delete=models.CASCADE, related_name='ciclos')#Permite acceder a todos los ciclos de un periodo dado mediante periodo.ciclos.all().
@@ -68,6 +68,7 @@ class Ciclo(models.Model):
     def __str__(self):
         texto = "{0} {1}"
         return texto.format(self.numero,self.idPeriodo.nombre)
+
 
 class Sugerencia(models.Model):
     asunto = models.CharField(max_length=100)

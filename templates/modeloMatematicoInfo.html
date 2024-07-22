@@ -1,0 +1,64 @@
+{% extends "base_initPersonal.html" %}
+{% block title %} Modelo Matemaatico Info {% endblock %}
+{% load static %}   
+{% block content %}
+    <link rel="stylesheet" href="{% static 'modelo.css' %}" />
+    <header>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/homePersonal">Inicio</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Modelo Matematico</li>
+            </ol>
+        </nav>
+    <br>
+    <h1> Modelo Matematico </h1>
+    </header>
+    <section class="texto">
+        <div class="alert alert-success" role="alert">
+            <h4 class="alert-heading">¿Que es un Modelo Matematico?</h4>
+            <p> Un modelo matematico es una representación abstracta de un sistema real </p>
+            <hr>
+            <p class="mb-0">Los modelos matematicos son utilizados para describir, explicar y predecir el comportamiento de ciertos fenomenos
+                del mundo real.</p>
+        </div>
+    </section>
+    <section>
+        <div class="container" style="margin-left: 22px;">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card mb-3" style="max-width: 540px;" >
+                        <div class="row g-0">
+                            <div class="col-md-4">
+                                <img src="https://cdn-icons-png.freepik.com/512/14696/14696487.png" class="img-fluid rounded-start" alt="...">
+                            </div>
+                            <div class="col-md-8">
+                                <div class="card-body">
+                                    <h5 class="card-title">Modelo SIR</h5>
+                                    <p class="card-text">El modelo SIR es un modelo matemático hecho para describir la propagación de enfermedades infecciosas en una población, para el desarrollo de este proyecto se adapto nuestras variables al modelo SIR.</p>
+                                    <p class="card-text"><small class="text-muted">Se creó un sistema de ecuaciones diferenciales con 5 variables.</small></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card mb-3" style="max-width: 540px;">
+                        <div class="row g-0">
+                            <div class="col-md-4">
+                                <img src="https://cdn-icons-png.freepik.com/256/9609/9609572.png?semt=ais_hybrid.png" class="img-fluid rounded-start" alt="...">
+                            </div>
+                            <div class="col-md-8">
+                                <div class="card-body">
+                                    <h5 class="card-title">Metodo RungeKutta</h5>
+                                    <p class="card-text">El metodo RungeKutta es una familia de metodos numericos utilizados para resolver ecuaciones diferenciales ordinarias, para el desarrollo de este proyecto utilizamos el metodo de RungeKutta Orden 4.</p>
+                                    <p class="card-text"><small class="text-muted">El sistema de ecuaciones diferenciales se resolvio através de este metodo numerico</small></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+{% endblock %}

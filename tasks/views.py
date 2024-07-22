@@ -243,7 +243,7 @@ def sugerenciaPersonal(request):
     return render(request, 'sugerencia.html')
 
 
-@login_required
+
 def graficaPrediccion(request):
     tiempo = r.lista_tiempo_prediccion()
     matriculados = r.lista_matriculados_prediccion()
@@ -255,12 +255,11 @@ def graficaPrediccion(request):
     return render(request, 'InterfazPrediccion.html', contexto)
 
 
-@login_required
 def index(request):   
     return render(request,'InterfazPrediccion.html')
 
 
-@login_required
+
 def datosHistoricos(request):
     tiempo = r.lista_tiempo_prediccion()
     matriculados = r.lista_matriculados_prediccion()
@@ -272,7 +271,7 @@ def datosHistoricos(request):
     return render(request, 'datosHistoricos.html', contexto)
 
 
-@login_required
+
 def get_chart(request):
     listaD = r.lista_desertores_prediccion()
     listaT = r.lista_tiempo_prediccion()
@@ -371,3 +370,11 @@ def get_chart(request):
         ]
     }
     return JsonResponse(chart)
+
+
+def modeloMatematico(request):
+    return render(request, 'modeloMatematicoInfo.html')
+
+
+def variablesAdministrador(request):
+    return render(request, 'agregarDatos.html')

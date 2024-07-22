@@ -52,6 +52,7 @@ def cerrarSesion(request):
     return redirect('home')
 
 
+@login_required
 def registrarUsuario(request):
     if request.method == 'POST':
         data = request.POST
@@ -132,6 +133,7 @@ def ordenarUsuarios(request):
     return render(request, "manageUser.html", {"usuarios": listaU})
 
 
+@login_required
 def admiManage(request):
     personalAdministrativo = Usuario.objects.all()
     return render(request, 'admiManage.html', {"personalAdministrativo": personalAdministrativo})
@@ -225,7 +227,7 @@ def registrarPeriodo(request):
     messages.success(request, '¡Período registrado correctamente!')
     return redirect('/mostrarPeriodos/')
 
-
+@login_required
 def sugerenciaPersonal(request):
     if request.method == 'POST':
         try:
@@ -243,7 +245,7 @@ def sugerenciaPersonal(request):
     return render(request, 'sugerencia.html')
 
 
-
+@login_required
 def graficaPrediccion(request):
     tiempo = r.lista_tiempo_prediccion()
     matriculados = r.lista_matriculados_prediccion()
@@ -255,11 +257,12 @@ def graficaPrediccion(request):
     return render(request, 'InterfazPrediccion.html', contexto)
 
 
+@login_required
 def index(request):   
     return render(request,'InterfazPrediccion.html')
 
 
-
+@login_required
 def datosHistoricos(request):
     tiempo = r.lista_tiempo_prediccion()
     matriculados = r.lista_matriculados_prediccion()
@@ -271,7 +274,7 @@ def datosHistoricos(request):
     return render(request, 'datosHistoricos.html', contexto)
 
 
-
+@login_required
 def get_chart(request):
     listaD = r.lista_desertores_prediccion()
     listaT = r.lista_tiempo_prediccion()
@@ -372,9 +375,11 @@ def get_chart(request):
     return JsonResponse(chart)
 
 
+@login_required
 def modeloMatematico(request):
     return render(request, 'modeloMatematicoInfo.html')
 
 
+@login_required
 def variablesAdministrador(request):
     return render(request, 'agregarDatos.html')

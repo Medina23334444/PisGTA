@@ -1,0 +1,54 @@
+{% extends "base_initPersonal.html" %}
+{% block title %} Datos Historicos {% endblock %}
+{% load static %}   
+{% block content %}
+    
+     <link rel="stylesheet" href="{% static 'styleDatos.css' %}" />
+    <header>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/homePersonal">Inicio</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Datos Historicos</li>
+            </ol>
+        </nav>
+    <br> 
+    <h1> Datos Historicos </h1>
+    <br>
+    </header>
+    
+    <section>
+      <div class="alert alert-warning d-flex align-items-center color-detalle tall-alert" role="alert">
+          <i class="bi bi-table"> </i>
+          <div>Detalle de las gráficas</div>
+      </div>
+            <section class="section tabla">
+                <div class="contenedorTablas">
+                    <table class = "table"> 
+                        <thead>
+                            <tr>
+                                <th scope="col">Fecha </th>
+                                <th scope="col">Matriculados </th>
+                                <th scope="col">Aprobados </th>
+                                <th scope="col">Reprobados </th>
+                                <th scope="col">Desertores </th>
+                                <th scope="col">Foraneos </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for fecha in tiempo|slice:"7" %}
+                        <tr> 
+                            <td> {{ fecha }}</td>
+                            <td> {{ matriculados|slice:forloop.counter|last }}</td>
+                            <td> {{ aprobados|slice:forloop.counter|last }}</td>
+                            <td> {{ reprobados|slice:forloop.counter|last }}</td>
+                            <td> {{ desertores|slice:forloop.counter|last }}</td>
+                            <td> {{ foraneos|slice:forloop.counter|last }}</td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+    </section>
+
+{% endblock %}

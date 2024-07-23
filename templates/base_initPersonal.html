@@ -32,14 +32,14 @@
                         </a>
                     </li>
                     <li>
-                        <a href="#">
-                            <ion-icon name="person-outline"></ion-icon>
+                        <a href="/Prediccion">
+                            <ion-icon name="stats-chart-outline"></ion-icon>
                             <span>Predicciones</span>
                         </a>
                     </li>
                     <li>
                         <a href="#">
-                            <ion-icon name="person-add-outline"></ion-icon>
+                            <ion-icon name="pulse-outline"></ion-icon>
                             <span>Modelo Matematico</span>
                         </a>
                     </li>
@@ -49,11 +49,23 @@
                             <span>Variables</span>
                         </a>
                     </li>
+                    <li> 
+                        <a href="/datosHistoricos">
+                            <ion-icon name="bar-chart-outline"></ion-icon>
+                            <span>Datos Historicos</span>
+                        </a>
+                    </li>
                     <li>
                         <a href="#">
-                            <ion-icon name="stats-chart-outline"></ion-icon>
+                            <ion-icon name="information-circle-outline"></ion-icon>
                             <span>Ayuda</span>
                         </a>
+                    </li>
+                    <li>
+                    <a href="/cerrar_sesion">
+                        <ion-icon name="log-out-outline" aria-label="Cerrar sesión"></ion-icon>
+                        <span>Cerrar sesión</span>
+                    </a>
                     </li>
                 </ul>
         </nav>
@@ -66,7 +78,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
-    
+
     <div class="content">
         {% block content %}
         {% endblock %}

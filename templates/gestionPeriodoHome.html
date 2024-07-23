@@ -1,0 +1,193 @@
+{% extends 'base_init.html' %}
+
+{% block content %}
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/gestionPeriodos.css' %}">
+    <style>
+        .modal-dialog {
+            max-width: 50%;
+            width: auto;
+
+        }
+    </style>
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.14/index.global.min.js'></script>
+    <!-- FullCalendar en español -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/5.10.1/locales/es.min.js"></script>
+
+    <br>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/homeAdministrador">Inicio</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Periodos Académicos</li>
+            </ol>
+        </nav>
+
+    <br>
+    <h1>Visualización de Periodos Académicos</h1>
+    <br>
+    <div class="d-flex align-items-center justify-content-between mb-3">
+        <div class="ms-auto">
+            <button type="button" class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#modal1">
+                Registrar Período
+            </button>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modal1" tabindex="-1" role="dialog"  aria-labelledby="modal1Label" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg" >
+            <div class="modal-content" >
+                <div class="modal-header">
+                   <h5 class="modal-title" id="modal1Label" style="font-size: 30px;">Registrando Período</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" style="border-top: 3px solid #8ab5ea;">
+                    <form action="/registrarPeriodo/" method="POST">{% csrf_token %}
+                        <input type="hidden" id="txtId" name="txtId" value="{{periodo.id}}" class="form-control" placeholder="Identificador"
+                            readonly required >
+                        <div class="row">
+                            <h4><strong >Ingrese las fechas y presione guardar</strong></h4>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="fecha_inicio" class="form-label">Fecha de Inicio</label>
+                                    <input type="date" id="fecha_inicio" name="fecha_inicio" value="{{ periodo.fechaInicio|date:'Y-m-d' }}" 
+                                    class="form-control form-control-lg" min="2015-01-01" style="width: 100%;">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="fecha_fin" class="form-label">Fecha de Finalización</label>
+                                    <input type="date" id="fecha_fin" name="fecha_fin" value="{{ periodo.fechaFin|date:'Y-m-d' }}" 
+                                    class="form-control form-control-lg" min="2015-01-01" style="width: 100%;">
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="submit" class="btn btn-dark">Guardar</button>
+                            </div>
+                        </div>
+                    </form> 
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h5><strong class="card-tittle">Vista en Calendario</strong></h5>
+
+    <div id="calendar3"  class="fc-multiMonthYearGrid"> </div>
+    
+    <h5><strong class="card-tittle">Vista General</strong></h5>
+    
+    <section class="section tabla">
+        <div class="contenedorTablas">
+            <table id="personalAdministrativoTable" class="table table-hover">
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Nombre</th>
+                    <th>Fecha de Inicio</th>
+                    <th>Fecha de Fin.</th>
+                    <th>Operación</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for periodo in periodos %}
+                <tr>
+                    <td>{{forloop.counter}}</td>
+                    <td>{{periodo.nombre}}</td>
+                    <td>{{periodo.fechaInicio | date:"d-m-Y"}}</td>
+                    <td>{{periodo.fechaFin | date:"d-m-Y"}}</td>
+                    <td><a href="#modal2{{ periodo.id }}" class="edit"  data-bs-toggle="modal"> <i class="bi bi-pencil-square"></i></a></td>
+                    
+                </tr>
+                {% endfor %}
+            </tbody>
+            </table>
+        </div>
+    </section>
+
+    {% for periodo in periodos %}
+    <div class="modal fade" id="modal2{{ periodo.id }}" tabindex="-1" role="dialog"  aria-labelledby="modal1Label" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg" >
+            <div class="modal-content" >
+                <div class="modal-header">
+                   <h5 class="modal-title" id="modal1Label" style="font-size: 30px;">Actualizando Período</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" style="border-top: 3px solid #8ab5ea;">
+                    <form action="/registrarPeriodo/" method="POST">{% csrf_token %}
+                        
+                        <div class="row">
+                            <h4><strong >Corrija las fechas y presione actualizar</strong></h4>
+                            <input type="hidden" id="txtId" name="txtId" value="{{periodo.id}}" class="form-control" placeholder="Identificador"
+                            readonly required >
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="fecha_inicio" class="form-label">Fecha de Inicio</label>
+                                    <input type="date" id="fecha_inicio" name="fecha_inicio" value="{{ periodo.fechaInicio|date:'Y-m-d' }}" 
+                                    class="form-control form-control-lg" min="2015-01-01" style="width: 350px;">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="fecha_fin" class="form-label">Fecha de Finalización</label>
+                                    <input type="date" id="fecha_fin" name="fecha_fin" value="{{ periodo.fechaFin|date:'Y-m-d' }}" 
+                                    class="form-control form-control-lg" min="2015-01-01" style="width: 350px;">
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="submit" class="btn btn-dark">Actualizar</button>
+                            </div>
+                        </div>
+                    </form> 
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var calendarE3 = document.getElementById('calendar3');
+
+            var calendar3 = new FullCalendar.Calendar(calendarE3, {
+                initialView: 'dayGridMonth',
+                headerToolbar: {
+                    left: 'prevYear,prev,next,nextYear today',
+                    center: 'title',
+                    //right: 'dayGridMonth,timeGridWeek,timeGridDay,listMonth'
+                    right: ''
+                },
+                locale: 'es',
+                events: '/obtener_eventos/',
+                timeZone: 'UTC',
+                firstDay: 1,
+                buttonText: {
+                    today: 'Hoy', // Asegúrate de que el botón "today" diga "Hoy"
+                    month: 'Mes',
+                }
+            });
+
+            calendar3.render();
+
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var fechaInicioInput = document.getElementById('fecha_inicio');
+            var fechaFinInput = document.getElementById('fecha_fin');
+    
+            // Event listener para detectar cambios en la fecha de inicio
+            fechaInicioInput.addEventListener('change', function() {
+                // Obtener la fecha de inicio seleccionada
+                var fechaInicioValue = fechaInicioInput.value;
+    
+                // Se cambia la fecha mínima para la fecha de fin
+                fechaFinInput.min = fechaInicioValue;
+    
+                // Reiniciar el valor de fecha de finalización si es anterior a la nueva fecha mínima
+                if (fechaFinInput.value < fechaInicioValue) {
+                    fechaFinInput.value = fechaInicioValue + 90;
+                }
+            });
+        });
+    </script>
+{% endblock %}

@@ -1,10 +1,10 @@
-import pandas as panda  
 import numpy as np
+from sklearn.linear_model import LinearRegression
+from sklearn.utils import resample
 import datetime
 import matplotlib.dates as mdates
-from sklearn.linear_model import LinearRegression   
-from sklearn.utils import resample
-  
+import pandas as panda
+
 
 def GeneracionCoeficientes(listaY, numSimulaciones):
     listaX = np.arange(1, len(listaY) + 1).reshape(-1, 1)

@@ -5,7 +5,7 @@ from tasks import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('home', views.home, name='home'),
+    path('', views.home, name='home'),
     path('admiManage/', views.admiManage, name='admiManage'),
     path('iniciarSesion/', views.iniciarSesion, name='iniciarSesion'),
     path('editarPersonalAdmi/<str:id>/', views.editarPersonalAdmi, name='editarPersonalAdmi'),
@@ -23,5 +23,6 @@ urlpatterns = [
     path('api/', include('tasks.urls')),
     path('datosHistoricos/', views.datosHistoricos, name='datosHistoricos'),
     path('sugerencia/', views.sugerenciaPersonal, name='sugerenciaPersonal'),
+    path('modeloMatematico/', views.modeloMatematico, name='modeloMatematico'),
+    path('agregarDatos/', views.variablesAdministrador, name='agregarDatos'),
 ]
-

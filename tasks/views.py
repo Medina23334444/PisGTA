@@ -1,4 +1,4 @@
-from django.contrib.auth.decorators import login_required
+    from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError, transaction
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
@@ -52,6 +52,7 @@ def cerrarSesion(request):
     return redirect('home')
 
 
+@login_required
 def registrarUsuario(request):
     if request.method == 'POST':
         data = request.POST
@@ -132,6 +133,7 @@ def ordenarUsuarios(request):
     return render(request, "manageUser.html", {"usuarios": listaU})
 
 
+@login_required
 def admiManage(request):
     personalAdministrativo = Usuario.objects.all()
     return render(request, 'admiManage.html', {"personalAdministrativo": personalAdministrativo})
@@ -225,7 +227,7 @@ def registrarPeriodo(request):
     messages.success(request, '¡Período registrado correctamente!')
     return redirect('/mostrarPeriodos/')
 
-
+@login_required
 def sugerenciaPersonal(request):
     if request.method == 'POST':
         try:
@@ -371,3 +373,13 @@ def get_chart(request):
         ]
     }
     return JsonResponse(chart)
+
+
+@login_required
+def modeloMatematico(request):
+    return render(request, 'modeloMatematicoInfo.html')
+
+
+@login_required
+def variablesAdministrador(request):
+    return render(request, 'agregarDatos.html')

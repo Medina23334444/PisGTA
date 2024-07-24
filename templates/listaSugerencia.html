@@ -1,0 +1,42 @@
+{% extends "base_init.html" %}
+{% block title %}Otra Página{% endblock %}
+{% load static %}
+{% block content %}
+    <div class="container">
+        <header>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/homePersonal">Inicio</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Lista Sugerencias</li>
+                </ol>
+            </nav>
+              <br>
+            <h1>Lista de Sugerencias del Personal Administrativo</h1>
+            <br>
+          </header>
+        <section class="section tabla">
+            <div class="contenedorTablas">
+                <table id="tableSugerencias" class="table table-hover">
+                    <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Asunto</th>
+                        <th>Descripción</th>
+                        <th>Fecha</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for us in sugerencias %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{ us.asunto }}</td>
+                            <td>{{ us.descripcion }}</td>
+                            <td>{{ us.fecha }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+{% endblock %}

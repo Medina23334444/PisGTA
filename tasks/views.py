@@ -5,7 +5,7 @@ from django.contrib.auth import authenticate, login, logout
 from datetime import datetime, timedelta
 
 from .forms import UsuarioForm
-from .models import Usuario, Rol, RolPersona, Sugerencia, PeriodoAcademico, Ciclo
+from .models import Usuario, Rol, RolPersona, Sugerencia, PeriodoAcademico, Ciclo, Perfil
 from django.contrib import messages
 import tasks.RungeKutta as r
 from django.http.response import JsonResponse
@@ -46,13 +46,13 @@ def iniciarSesion(request):
 
     return render(request, 'iniciarSesion.html')
 
+
 @login_required
 def cerrarSesion(request):
     logout(request)
     return redirect('home')
 
 
-@login_required
 def registrarUsuario(request):
     if request.method == 'POST':
         data = request.POST
@@ -79,7 +79,6 @@ def registrarUsuario(request):
                     return redirect('admiManage')
 
                 RolPersona.objects.create(rol=rol, usuario=usuario)
-                print(RolPersona.objects.all())
 
                 messages.success(request, 'Usuario registrado correctamente!')
                 return redirect('admiManage')
@@ -125,15 +124,6 @@ def eliminarUsuario(request, id):
     return redirect('admiManage')
 
 
-@login_required
-def ordenarUsuarios(request):
-    listaU = Usuario.objects.all().order_by('nombres')
-    print(listaU)
-    messages.success(request, '!Lista ordenada!')
-    return render(request, "manageUser.html", {"usuarios": listaU})
-
-
-@login_required
 def admiManage(request):
     personalAdministrativo = Usuario.objects.all()
     return render(request, 'admiManage.html', {"personalAdministrativo": personalAdministrativo})
@@ -146,7 +136,9 @@ def homeAdministrador(request):
 
 @login_required
 def perfilAdministrador(request):
-    return render(request, 'perfilAdministrador.html')
+    usuario = request.user
+    perfil = get_object_or_404(Perfil, usuario=usuario)
+    return render(request, 'perfilAdministrador.html', {'usuario': usuario, 'perfil': perfil})
 
 
 @login_required
@@ -155,14 +147,14 @@ def homePersonal(request):
 
 
 @login_required
-def mostrarPeriodos(request):#Vista general de Periodos 
+def mostrarPeriodos(request):#Vista general de Periodos
     periodos = PeriodoAcademico.objects.all()
     #messages.success(request, '!Lista actualizada!')
-    return render(request, "gestionPeriodoHome.html",{"periodos":periodos})
+    return render(request, "gestionPeriodoHome.html",{"periodos": periodos})
 
 
 @login_required
-def guardar_editar_Periodos(request):#Vista para editar o agregar 
+def guardar_editar_Periodos(request):#Vista para editar o agregar
     periodos = PeriodoAcademico.objects.all()
     messages.success(request, '!Lista actualizada!')
     return render(request, "gestionPeriodo.html",{"periodos":periodos})
@@ -178,7 +170,7 @@ def obtener_eventos(request):#Método para cargar los periodos registrados en ca
             'title': periodo.nombre,
             'start': periodo.fechaInicio.isoformat(),
             'end': (periodo.fechaFin + timedelta(days=1)).isoformat(),
-            'allDay': True,  # Para que se muestre como evento de todo el día
+            'allDay': True,
         })
 
     return JsonResponse(eventos, safe=False)
@@ -227,7 +219,7 @@ def registrarPeriodo(request):
     messages.success(request, '¡Período registrado correctamente!')
     return redirect('/mostrarPeriodos/')
 
-@login_required
+
 def sugerenciaPersonal(request):
     if request.method == 'POST':
         try:
@@ -237,8 +229,9 @@ def sugerenciaPersonal(request):
                 usuario=request.user
             )
             messages.success(request, 'Sugerencia enviada con éxito.')
-            return redirect('nombre_de_la_vista_a_redirigir')
+            return redirect('sugerenciaPersonal')
         except Exception as e:
+            print(f'Ocurrió un error: {str(e)}')
             messages.error(request, f'Ocurrió un error: {str(e)}')
             return redirect('sugerenciaPersonal')
 
@@ -258,7 +251,7 @@ def graficaPrediccion(request):
 
 
 @login_required
-def index(request):   
+def index(request):
     return render(request,'InterfazPrediccion.html')
 
 
@@ -296,12 +289,12 @@ def get_chart(request):
                 'type': "value"
             }
         ],
-        
+
         'title': [
             {
                 'text': 'Grafica Prediccion',
                 'bottom':  '92%'
-            }  
+            }
         ],
         'tooltip': [
             {
@@ -311,14 +304,14 @@ def get_chart(request):
                     'label': {
                         'backgroundColor': '#6a7985'
                     }
-                }                
-            }  
+                }
+            }
         ],
         'legend': [
             {
                 'data': ['Foraneos', 'Desertores', 'Aprobados', 'Matriculados', 'Reprobados'],
                 'bottom': '87%'
-            }  
+            }
         ],
         'toolbox': [
             {
@@ -326,12 +319,12 @@ def get_chart(request):
                     'saveAsImage': {}
                 }
             }
-        ],       
+        ],
         'dataZoom': [
             {
-                'type': 'slider', 
-                'start': 0,         
-                'end': 100 
+                'type': 'slider',
+                'start': 0,
+                'end': 100
             }
         ],
         'series': [
@@ -344,31 +337,31 @@ def get_chart(request):
                     'focus': 'series'
                 },
                 'data': listaF,
-                                  
+
             },
             {
                 'name': 'Desertores',
                 'data': listaD,
                 'type': "line",
-                'smooth': True   
+                'smooth': True
             },
             {
-                'name': 'Aprobados',   
+                'name': 'Aprobados',
                 'data': listaA,
                 'type': "line",
-                'smooth': True   
+                'smooth': True
             },
             {
                 'name': 'Matriculados',
                 'data': listaM,
                 'type': "line",
-                'smooth': True   
+                'smooth': True
             },
             {
                 'name': 'Reprobados',
                 'data': listaR,
                 'type': "line",
-                'smooth': True,           
+                'smooth': True,
             },
         ]
     }
@@ -383,3 +376,13 @@ def modeloMatematico(request):
 @login_required
 def variablesAdministrador(request):
     return render(request, 'agregarDatos.html')
+
+
+def listaSugerencias(request):
+    sugerencias = Sugerencia.objects.all()
+    return render(request, 'listaSugerencia.html', {"sugerencias": sugerencias})
+
+
+def ayuda(request):
+    return render(request, 'ayuda.html')
+

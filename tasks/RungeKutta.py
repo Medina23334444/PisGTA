@@ -8,7 +8,7 @@ import pandas as panda
 def GeneracionCoeficientes(listaY, numSimulaciones):
     listaX = np.arange(1, len(listaY) + 1).reshape(-1, 1)
     coeficientes = []
-    for i in range (numSimulaciones):
+    for i in range(numSimulaciones):
         muestaX, muestraY = resample(listaX, listaY)
         modelo = LinearRegression().fit(muestaX, muestraY)
         coeficientes.append(modelo.coef_[0])
@@ -258,13 +258,16 @@ def lista_matriculados_prediccion():
     valoresM = [round(valor) for valor in MH]
     return valoresM    
 
+
 def lista_reprobados_prediccion():
     valoresR = [round(valor) for valor in RH]
     return valoresR
 
+
 def lista_foraneos_prediccion():
     valoresF = [round(valor) for valor in FH]
     return valoresF
+
 
 def tiempo_final_historico():
     return '2024-02-27'

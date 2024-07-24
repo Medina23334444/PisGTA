@@ -4,6 +4,7 @@ from django.contrib.auth.base_user import BaseUserManager, AbstractBaseUser
 from django.contrib.auth.hashers import check_password, make_password
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.forms import ValidationError
 from .choices import Cargos
 
 
@@ -68,7 +69,7 @@ class Ciclo(models.Model):
     numero = models.PositiveIntegerField(max_length=2, null=False)
 
     def __str__(self):
-        texto = "{0} {1}"
+        texto = "Ciclo: {0} {1}"
         return texto.format(self.numero,self.idPeriodo.nombre)
 
 
@@ -78,6 +79,36 @@ class Sugerencia(models.Model):
     fecha = models.DateField(auto_now_add=True)
     usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE)
 
+class EstadisticaPeriodo(models.Model):
+    id = models.AutoField(primary_key = True)
+    numMatriculados = models.PositiveIntegerField(max_length = 3, null = False)
+    numAprobados = models.PositiveIntegerField(max_length = 3, null = False)
+    numReprobados = models.PositiveIntegerField(max_length = 3, null = False)
+    numDesertores = models.PositiveIntegerField(max_length = 3, null = False)
+    numForaneos = models.PositiveIntegerField(max_length = 3, null = False)
+    idPeriodo = models.OneToOneField(PeriodoAcademico, null = True, blank = True, on_delete=models.CASCADE)
+    idCiclo = models.OneToOneField(Ciclo, null = True, blank = True, on_delete=models.CASCADE)
+    idAdministrador = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name='estadisticas')
+
+    def __str__(self):
+        nombre_periodo = self.idPeriodo.nombre if self.idPeriodo and self.idPeriodo.nombre else ""
+        nombre_ciclo = self.idCiclo.__str__() if self.idCiclo else ""
+    
+        texto = "Datos de {0} {1}"
+        return texto.format(nombre_periodo, nombre_ciclo)
+
+    #def validarUsuario(self):Validar que el usuario ingresado sea personal Administrativo
+    def validarPeriodo_Ciclo(self):
+        # Validar que sólo sea de PeriodoAcademico o Ciclo
+        if self.idPeriodo and self.idCiclo:
+            raise ValidationError('El grupo de estadísticas puede asociarse con Periodo Académico o Ciclo pero no con ambos')
+        if not self.idPeriodo and not self.idCiclo:
+            raise ValidationError('Debería asociarse el grupo de estadísticas con un Periodo Académico o Ciclo')
+
+    def save(self, *args, **kwargs):
+        # Validar antes de guardar
+        self.validarPeriodo_Ciclo()
+        super(EstadisticaPeriodo, self).save(*args, **kwargs)
 
 class Perfil(models.Model):
     fechaNacimiento = models.DateField(default=date.today)
@@ -87,3 +118,4 @@ class Perfil(models.Model):
     usuarioFacebook = models.CharField(max_length=30, blank=True, default='')
     usuarioTwitter = models.CharField(max_length=30, blank=True, default='')
     usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE)
+

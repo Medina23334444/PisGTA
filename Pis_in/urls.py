@@ -25,6 +25,8 @@ urlpatterns = [
     path('sugerencia/', views.sugerenciaPersonal, name='sugerenciaPersonal'),
     path('modeloMatematico/', views.modeloMatematico, name='modeloMatematico'),
     path('agregarDatos/', views.variablesAdministrador, name='agregarDatos'),
+    path('mostrarDatosHistoricos/', views.mostrarDatosHistoricos, name='mostrarDatosHistoricos'),
+    path('mostrarDatosPeriodo/<id>', views.mostrarDatosPeriodo, name='mostrarDatosPeriodo'),
     path('listaSugerencias/', views.listaSugerencias, name='listaSugerencias'),
     path('ayuda', views.ayuda, name='ayuda'),
 ]

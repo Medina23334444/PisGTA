@@ -2,8 +2,6 @@
 {% block title %}Prediccion{% endblock %}
 {% load static %}   
 {% block content %}
-
-
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -24,18 +22,17 @@
         }
         .estilo-seleccion {
             text-align: center; 
-
         }
         .custom-select-container {
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh; /* Altura del contenedor para centrar verticalmente */
+            height: 100vh; 
             background: #f7f7f7;
         }
 
         .custom-select {
-            appearance: none; /* Eliminar el estilo por defecto del navegador */
+            appearance: none;
             -webkit-appearance: none;
             -moz-appearance: none; 
             background-color: #ffffff;
@@ -85,79 +82,95 @@
                     <div>Predicción</div>
                 </div>
                 <div class="contenedor">
-                    <div class="custom-select-container" > 
-                        <select class="form-select custom-select" aria-label="Disabled select example">
-                            <option selected> Periodo </option>
-                            <option value="1">One</option>
-                            <option value="2">Two</option>
-                            <option value="3">Three</option>
+                    <div class="custom-select-container"> 
+                        <select id="yearSelect" class="form-select custom-select" aria-label="Disabled select example">
+                            <option selected>Seleccion Año Prediccion</option>
+                            <option value="1">2025</option>
+                            <option value="2">2026</option>
+                            <option value="3">2027</option>
+                            <option value="4">2025</option>
+                            <option value="5">2026</option>
+                            <option value="6">2027</option>
+                            <option value="7">2025</option>
+                            <option value="8">2026</option>
+                            <option value="9">2027</option>
+                            <option value="10">2028</option>
+                            <option value="11">2029</option>
+                            <option value="12">2030</option>
+                            <option value="13">2031</option>
+                            <option value="14">2032</option>
+                            <option value="15">2033</option>
+                            <option value="16">2034</option>
+                            <option value="17">2035</option>
+                            <option value="18">2036</option>
                         </select>
                     </div>
-                        <div class="grupo">
-                            <button class="btn btn-primary" type="button">Predicción</button> 
-                            <i class="bi bi-bar-chart-line-fill custom-icon"></i>
-                            <button class="btn btn-secondary custom-btm" type="button">Exportar</button>
-                            <i class="bi bi-filetype-pdf custom-icon"></i>
-                        </div>
+                    <div class="grupo">
+                        <button id="predictionButton" class="btn btn-primary" type="button">Predicción</button> 
+                        <i class="bi bi-bar-chart-line-fill custom-icon"></i>
+                        <button class="btn btn-secondary custom-btm" type="button">Exportar</button>
+                        <i class="bi bi-filetype-pdf custom-icon"></i>
+                    </div>
                 </div>
+                <button id="btnModal" class="btn btn-primary btm2" type="button">Ciclos </button>      
                 <div class="container chart-container">
                     <div class="row my-4">
                         <div class="col-sm-12 col-md-6 col-lg-6 col-xl-6 mx-auto"> 
                             <div id="chart" class="chart"> </div>
                         </div>
-            
                     </div>
                 </div>
                 <!--  Apache Echarts  -->
                 <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.1/echarts.min.js"> </script>
                 <!--  Custom js  -->
                 <script src="{% static 'js/main.js' %}"></script>
+
             </section>
-
-
-            <section class="detalle">
-                <div class="alert alert-warning d-flex align-items-center color-detalle" role="alert">
-                    <i class="bi bi-table"></i>
-                    <div>Detalle de las gráficas</div>
+            <dialog id="modal" class="custom-modal">
+                <div class="modal-header">
+                    <h2>Seleccione Ciclos</h2>
+                    <button id="cerrarModal" class="close-modal">X</button>
                 </div>
-
-                <div class="contenedorTablas">
-                    <h1> Fechas </h1>
-                    <table class = "table"> 
-                        <thead>
-                            <tr>
-                                <th scope="col">Fecha </th>
-                                <th scope="col">Matriculados </th>
-                                <th scope="col">Aprobados </th>
-                                <th scope="col">Reprobados </th>
-                                <th scope="col">Desertores </th>
-                                <th scope="col">Foraneos </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for fecha in tiempo|slice:"7" %}
-                        <tr> 
-                            <td> {{ fecha }}</td>
-                            <td> {{ matriculados|slice:forloop.counter|last }}</td>
-                            <td> {{ aprobados|slice:forloop.counter|last }}</td>
-                            <td> {{ reprobados|slice:forloop.counter|last }}</td>
-                            <td> {{ desertores|slice:forloop.counter|last }}</td>
-                            <td> {{ foraneos|slice:forloop.counter|last }}</td>
-                        </tr>
-                        {% endfor %}
-                        </tbody>
-                    </table>
+                <div class="modal-body">
+                    <form id="ciclosForm">
+                        <div id="modalOpciones" class="modalOpciones">
+                            {% for i in "123456789" %}
+                            <div class="option-wrapper">
+                                <input type="checkbox" id="ciclo{{ i }}" name="ciclo" value="Ciclo {{ i }}">
+                                <label for="ciclo{{ i }}">Ciclo {{ i }}</label>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </form>
                 </div>
-            </section>
+                <div class="modal-footer">
+                    <button id="aplicar" class="btn btn-primary btmAplicar" type="button">Aplicar Selección</button>      
+                </div>
+            </dialog>
         </div>
     </main>
-
     <footer>
         <div class="container">
             <p>Proyecto Integreador - Derechos reservados © 2024</p>
         </div>
     </footer>
+    <!--  JavaScript  del Modal-->
+    <script src="{% static 'js/modal.js' %}"></script>
+    <script>
+        document.getElementById('aplicar').addEventListener('click', function() {
+            const selectedCycles = [];
+            const checkboxes = document.querySelectorAll('input[name="ciclo"]:checked');
+            checkboxes.forEach((checkbox) => {
+                selectedCycles.push(checkbox.value);
+            });
+            // Almacena la lista de ciclos seleccionados en el almacenamiento local
+            localStorage.setItem('selectedCycles', JSON.stringify(selectedCycles));
+            // Redirige a la página de gráficos
+            window.location.href = "/prediccionCiclos";
+        });
+        
+    </script>
+
 </body>
 </html>
-
 {% endblock %}

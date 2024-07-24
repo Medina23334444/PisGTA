@@ -30,21 +30,21 @@
             <i class="bi bi-table"> </i>
             <div>Detalle de las gráficas</div>
         </div>
-            <section class="section tabla">
-                <div class="contenedorTablas">
-                    <table class = "table"> 
-                        <thead>
-                            <tr>
-                                <th scope="col">Fecha </th>
-                                <th scope="col">Matriculados </th>
-                                <th scope="col">Aprobados </th>
-                                <th scope="col">Reprobados </th>
-                                <th scope="col">Desertores </th>
-                                <th scope="col">Foraneos </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for fecha in tiempo|slice:"7" %}
+        <section class="section tabla">
+            <div class="contenedorTablas">
+                <table class = "table"> 
+                    <thead>
+                        <tr class="table-dark">
+                            <th scope="col ">Fecha </th>
+                            <th scope="col">Matriculados </th>
+                            <th scope="col">Aprobados </th>
+                            <th scope="col">Reprobados </th>
+                            <th scope="col">Desertores </th>
+                            <th scope="col">Foraneos </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for fecha in tiempo|slice:"7" %}
                         <tr> 
                             <td> {{ fecha }}</td>
                             <td> {{ matriculados|slice:forloop.counter|last }}</td>
@@ -54,10 +54,10 @@
                             <td> {{ foraneos|slice:forloop.counter|last }}</td>
                         </tr>
                         {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </section>
+                    </tbody>
+                </table>
+            </div>
+        </section>
     </section>
 </body>
 </html>

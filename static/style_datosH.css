@@ -10,21 +10,22 @@
     color: black;
 }
 
-.section{
+.section {
     margin-bottom: 30px;
     border-radius: 5px;
-    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
     padding: 20px;
-    size: 20cap;
 }
 
 .section.tabla {
     width: 92%;
     height: 350px;    
-    border: #000000;
-    position: relative; 
+    position: relative;
     left: 40px;
-    border-color: rgb(73, 9, 177);
-    background-color: rgb(0, 0, 0);
+    background-color: #ffffff;
+    border-radius: 15px;
+    border: 5px solid #eaeef3;
 }
 
+.table {
+    border: 2px solid #131111;
+}

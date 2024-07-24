@@ -664,4 +664,5 @@ def agregarDatos(request):
         return redirect('agregarDatos')
     else:
         periodos = PeriodoAcademico.objects.all()
+        print(periodos)
         return render(request, 'agregarDatos.html', {'periodos': periodos})

@@ -286,7 +286,7 @@ def sugerenciaPersonal(request):
     return render(request, 'sugerencia.html')
 
 
-@login_required
+
 def graficaPrediccion(request):
     tiempo = r.lista_tiempo_prediccion()
     matriculados = r.lista_matriculados_prediccion()
@@ -306,15 +306,12 @@ def index(request):
 def index1(request):   
     return render(request,'InterfazCiclos.html')
 
-@login_required
-def modeloMatematicoInfo(request):
-    return render(request, 'modeloMatematicoInfo.html')
 
 @login_required
 def variablesModelo(request):
     return render(request, 'variablesModelo.html')
 
-@login_required
+
 def datosHistoricos(request):
     tiempo = r.lista_tiempo_prediccion()
     matriculados = r.lista_matriculados_prediccion()
@@ -540,3 +537,57 @@ def get_chart9(request):
     listaF = [73, 66, 74, 84, 65, 65, 84, 76, 62, 73, 63, 63, 70, 47, 49, 61, 57, 71, 58, 52, 83, 65, 68, 52, 62, 69]
     chart = generate_chart_data(listaT, listaD, listaA, listaR, listaM, listaF)
     return JsonResponse(chart)
+
+
+
+@login_required
+def modeloMatematico(request):
+    return render(request, 'modeloMatematicoInfo.html')
+
+
+@login_required
+def variablesAdministrador(request):
+    return render(request, 'agregarDatos.html')
+
+
+def listaSugerencias(request):
+    sugerencias = Sugerencia.objects.all()
+    return render(request, 'listaSugerencia.html', {"sugerencias": sugerencias})
+
+
+def mostrarDatosHistoricos(request):
+    periodos = PeriodoAcademico.objects.all()
+
+    # Arreglo para almacenar los periodos con sus estadísticas
+    datos = []
+
+    for periodo in periodos:
+        estadisticas_ciclo = EstadisticaPeriodo.objects.filter(idCiclo__idPeriodo=periodo)# Estadísticas asociadas con ciclos específicos
+
+        # Estadística total del periodo, sin asociación con ciclos
+        estadistica_general = EstadisticaPeriodo.objects.filter(idPeriodo=periodo, idCiclo=None).first()
+
+        datos.append({
+            'periodo': periodo,
+            'estadisticas_ciclo': estadisticas_ciclo,
+            'estadistica_general': estadistica_general
+        })
+
+    context = {
+        'datos': datos
+    }
+
+    return render(request, "mostrarDatosHistoricos.html", context)
+
+
+def mostrarDatosPeriodo(request, id):
+    estadisticasPeriodo = EstadisticaPeriodo.objects.filter(idCiclo__idPeriodo = id)
+    #IDEA: Mostrar todos los periodos en tabla y mostrar error en los que no tengan datos asociados
+    """if not estadisticasPeriodo.exists():
+        messages.error(request, '¡Las fechas coinciden con períodos anteriores. Revise!')
+        return redirect('/mostrarDatosHistoricos/')"""
+    return render(request, "mostrarDatosHistoricos.html",{"estadisticasPeriodo":estadisticasPeriodo})
+
+
+def ayuda(request):
+    return render(request, 'ayuda.html')

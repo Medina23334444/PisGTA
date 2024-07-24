@@ -326,6 +326,7 @@ def datosHistoricos(request):
 def prediccionCiclos(request):
     return render(request, 'InterfazCiclos.html')
 
+
 def generate_chart_data(listaT, listaD, listaA, listaR, listaM, listaF):
     chart = {
         'xAxis': [

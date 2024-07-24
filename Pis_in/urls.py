@@ -32,4 +32,3 @@ urlpatterns = [
     path('listaSugerencias/', views.listaSugerencias, name='listaSugerencias'),
     path('ayuda', views.ayuda, name='ayuda'),
 ]
-

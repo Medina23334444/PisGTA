@@ -132,4 +132,3 @@ document.addEventListener('DOMContentLoaded', async () => {
         await updateChart(selectedYear);
     });
 });
-

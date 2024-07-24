@@ -4,6 +4,7 @@
 {% load static %}
 {% block content %}
     <script src="{% static 'tablas.js' %}"></script>
+    <section>
     <header>
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
@@ -36,14 +37,14 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body" style="border-top: 3px solid #8ab5ea;">
-                    <form action="{% url 'registrarUsuario' %}" method="POST" class="needs-validation" novalidate>
+                    <form action="{% url 'registrarUsuario' %}" method="POST" class="needs-validation" novalidate id="formulario">
                         {% csrf_token %}
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="nombres" class="form-label">Nombres</label>
                                     <input type="text" class="form-control1" id="nombres" name="nombres" placeholder="Ejemplo: Luis Alberto" style="width: 350px;" required>
-                                    <div class="invalid-feedback">Por favor, ingrese sus nombres.</div>
+                                    <div class="invalid-feedback" id="feedback-invalido">Por favor, ingrese un nombre válido (solo letras y espacios).</div>
                                 </div>
                                 <div class="mb-3">
                                     <label for="direccion" class="form-label">Dirección</label>
@@ -172,5 +173,6 @@
         </div>
     </div>
 </div>
+    </section>
 {% endfor %}
 {% endblock %}

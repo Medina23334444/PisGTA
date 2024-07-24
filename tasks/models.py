@@ -1,3 +1,5 @@
+from datetime import date
+
 from django.contrib.auth.base_user import BaseUserManager, AbstractBaseUser
 from django.contrib.auth.hashers import check_password, make_password
 from django.contrib.auth.models import AbstractUser
@@ -64,7 +66,7 @@ class PeriodoAcademico(models.Model):
 class Ciclo(models.Model):
     id = models.AutoField(primary_key = True, max_length=6)
     idPeriodo = models.ForeignKey(PeriodoAcademico, on_delete=models.CASCADE, related_name='ciclos')#Permite acceder a todos los ciclos de un periodo dado mediante periodo.ciclos.all().
-    numero = models.PositiveIntegerField(max_length = 2, null = False)
+    numero = models.PositiveIntegerField(max_length=2, null=False)
 
     def __str__(self):
         texto = "Ciclo: {0} {1}"
@@ -107,3 +109,13 @@ class EstadisticaPeriodo(models.Model):
         # Validar antes de guardar
         self.validarPeriodo_Ciclo()
         super(EstadisticaPeriodo, self).save(*args, **kwargs)
+
+class Perfil(models.Model):
+    fechaNacimiento = models.DateField(default=date.today)
+    fotoPerfil = models.ImageField(upload_to='fotos/%Y/%m/%d', blank=True, null=True)
+    descripcion = models.TextField(blank=True, default='')
+    usuarioInstagram = models.CharField(max_length=30, blank=True, default='')
+    usuarioFacebook = models.CharField(max_length=30, blank=True, default='')
+    usuarioTwitter = models.CharField(max_length=30, blank=True, default='')
+    usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE)
+

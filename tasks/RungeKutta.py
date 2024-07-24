@@ -2,7 +2,6 @@ import numpy as np
 from sklearn.linear_model import LinearRegression
 from sklearn.utils import resample
 import datetime
-import matplotlib.dates as mdates
 import pandas as panda
 
 
@@ -17,7 +16,7 @@ def GeneracionCoeficientes(listaY, numSimulaciones):
     return promedioCoeficientes
          
 Di = [4, 5, 7, 8, 7, 5]   
-Mi = [50, 51, 52, 52, 53, 53]
+Mi = [50, 51, 52, 52, 53, 53] #
 Ri = [20, 19, 20, 19, 19, 20]
 Ai = [32, 33, 34, 35, 35, 37]
 Fi = [7, 8, 8, 10, 11, 9]
@@ -27,7 +26,7 @@ MFI = [13, 14, 15, 16, 14, 14]
 
 tasa_d = GeneracionCoeficientes(Di, 500)   
 tasa_r = GeneracionCoeficientes(Ri, 500) 
-tasa_ab = GeneracionCoeficientes(TAI, 500)
+tasa_ab = GeneracionCoeficientes(TAI, 500) 
 tasa_rf = GeneracionCoeficientes(RFI, 500)
 tasa_ap = GeneracionCoeficientes(Ai, 500)
 tasa_mf = GeneracionCoeficientes(MFI, 500)

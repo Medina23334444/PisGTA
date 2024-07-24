@@ -6,7 +6,7 @@
 }
 
 .alert-warning {
-    background-color: #eaeef3;
+    background-color: #eaeef3 ;
     border: none;
     color: black;
     margin-left: 32px;
@@ -33,5 +33,9 @@
     height: 45px;
 }
 
+.modal-dialog {
+    max-width: 50%;
+    width: auto;
 
+}
 

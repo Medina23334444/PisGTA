@@ -592,3 +592,76 @@ def mostrarDatosPeriodo(request, id):
 
 def ayuda(request):
     return render(request, 'ayuda.html')
+
+
+@login_required
+def agregarDatos(request):
+    if request.method == 'POST':
+        id_periodo = request.POST.get('idPeriodo')
+
+        # Verificar si ya existen registros con el mismo idPeriodo
+        if EstadisticaPeriodo.objects.filter(idPeriodo=id_periodo).exists():
+            messages.error(request,
+                           'Ya existen datos guardados para este periodo académico. No se pueden agregar nuevos datos.')
+            return redirect('agregarDatos')
+
+        # Validar que todos los campos no estén vacíos
+        all_filled = True
+        for tipo in ['matriculados', 'aprobados', 'reprobados', 'desertores', 'foraneos']:
+            for i in range(1, 9):
+                if not request.POST.get(f'{tipo}_{i}', ''):
+                    all_filled = False
+                    break
+            if not all_filled:
+                break
+
+        if not all_filled:
+            messages.error(request, 'Todos los campos deben ser llenados. No se pueden dejar campos vacíos.')
+            return redirect('agregarDatos')
+
+        # Guardar el registro con los datos totales asociados al idPeriodo
+        total_matriculados = sum(int(request.POST.get(f'matriculados_{i}', 0)) for i in range(1, 9))
+        total_aprobados = sum(int(request.POST.get(f'aprobados_{i}', 0)) for i in range(1, 9))
+        total_reprobados = sum(int(request.POST.get(f'reprobados_{i}', 0)) for i in range(1, 9))
+        total_desertores = sum(int(request.POST.get(f'desertores_{i}', 0)) for i in range(1, 9))
+        total_foraneos = sum(int(request.POST.get(f'foraneos_{i}', 0)) for i in range(1, 9))
+
+        estadistica_total = EstadisticaPeriodo(
+            numMatriculados=total_matriculados,
+            numAprobados=total_aprobados,
+            numReprobados=total_reprobados,
+            numDesertores=total_desertores,
+            numForaneos=total_foraneos,
+            idPeriodo=PeriodoAcademico.objects.get(id=id_periodo),
+            idAdministrador=request.user
+        )
+        estadistica_total.save()
+
+        # Obtener ciclos asociados con el idPeriodo
+        ciclos = Ciclo.objects.filter(idPeriodo_id=id_periodo)
+
+        # Crear los registros para cada ciclo asociado al idPeriodo
+        for ciclo in ciclos:
+            ciclo_numero = ciclo.numero
+            num_matriculados = request.POST.get(f'matriculados_{ciclo_numero}', 0)
+            num_aprobados = request.POST.get(f'aprobados_{ciclo_numero}', 0)
+            num_reprobados = request.POST.get(f'reprobados_{ciclo_numero}', 0)
+            num_desertores = request.POST.get(f'desertores_{ciclo_numero}', 0)
+            num_foraneos = request.POST.get(f'foraneos_{ciclo_numero}', 0)
+
+            estadistica_ciclo = EstadisticaPeriodo(
+                numMatriculados=num_matriculados,
+                numAprobados=num_aprobados,
+                numReprobados=num_reprobados,
+                numDesertores=num_desertores,
+                numForaneos=num_foraneos,
+                idCiclo=ciclo,
+                idAdministrador=request.user
+            )
+            estadistica_ciclo.save()
+
+        messages.success(request, 'Datos guardados correctamente.')
+        return redirect('agregarDatos')
+    else:
+        periodos = PeriodoAcademico.objects.all()
+        return render(request, 'agregarDatos.html', {'periodos': periodos})

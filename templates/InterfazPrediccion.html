@@ -2,10 +2,8 @@
 {% load static %}
 {% block content %}
     <link rel="stylesheet" href="{% static 'stylePR.css' %}"/>
-    <link rel="stylesheet" href="{% static 'stylePR.css' %}" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.2.1/dist/css/bootstrap.min.css">
-    
-<link rel="stylesheet" href="{% static 'styleExportarPDF.css' %}">
+    <link rel="stylesheet" href="{% static 'styleExportarPDF.css' %}">
     <header>
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
@@ -53,8 +51,8 @@
                         <button id="predictionButton" class="btn btn-primary" type="button">Predicción</button>
                         <i class="bi bi-bar-chart-line-fill custom-icon"></i>
                         <button type="button" class="btn btn-primary" id="btnExport" data-toggle="modal"
-                        data-target=".bd-example-modal-lg">
-                        Exportar
+                                data-target=".bd-example-modal-lg">
+                            Exportar
                         </button>
                         <i class="bi bi-filetype-pdf custom-icon"></i>
                     </div>
@@ -68,136 +66,138 @@
                     </div>
                 </div>
             </section>
-        <div class="modal fade bd-example-modal-lg" id="exportContainer" tabindex="-1" role="dialog"
-            aria-labelledby="myLargeModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-lg">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalCenterTitle">Exportar a PDF</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <h5>Vista previa</h5>
-                        <div class="docuemnt">
+            <div class="modal fade bd-example-modal-lg" id="exportContainer" tabindex="-1" role="dialog"
+                 aria-labelledby="myLargeModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalCenterTitle">Exportar a PDF</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <h5>Vista previa</h5>
+                            <div class="docuemnt">
 
-                            <!-- Aquí iría la vista previa del documento -->
-                            <div class="containerPdf"
-                                style="display: flex; justify-content: center; align-items: center; margin: 0; border: 2px solid black; overflow-y: auto; overflow-x: hidden;">
+                                <!-- Aquí iría la vista previa del documento -->
+                                <div class="containerPdf"
+                                     style="display: flex; justify-content: center; align-items: center; margin: 0; border: 2px solid black; overflow-y: auto; overflow-x: hidden;">
 
-                                <div class="containerDocPDF" style="transform: scale(0.9); height: 190px; margin-top: 240px;">
-                                    
-                                    <!-- Aquí iría lo que se va ha exportar como documento PDF -->
-                                    <div class="pdf" id="docPDF"
-                                        style="transform: scale(0.9);">
-                                        <img src="{% static 'logo_unl copy.png' %}"
-                                            alt="Logo de la Universidad Nacional de Loja" class="logoInf">
-                                        <h1 class="facultyNameInf"><strong>Facultad de Energía, Las Industrias y Los
+                                    <div class="containerDocPDF"
+                                         style="transform: scale(0.9); height: 190px; margin-top: 240px;">
+
+                                        <!-- Aquí iría lo que se va ha exportar como documento PDF -->
+                                        <div class="pdf" id="docPDF"
+                                             style="transform: scale(0.9);">
+                                            <img src="{% static 'logo_unl copy.png' %}"
+                                                 alt="Logo de la Universidad Nacional de Loja" class="logoInf">
+                                            <h1 class="facultyNameInf"><strong>Facultad de Energía, Las Industrias y Los
                                                 Recursos Naturales No
                                                 Renovables</strong></h1>
-                                        <h2 class="careerNameInf"><strong>Carrera de Electricidad</strong></h2>
+                                            <h2 class="careerNameInf"><strong>Carrera de Electricidad</strong></h2>
 
-                                        <!-- Gráfico Clonado en el Modal -->
-                                        <div class="grafico"  style="width: 650px;">
-                                            <div class="alert alert-warning d-flex align-items-center color-detalle tall-alert"
-                                                role="alert">
-                                                <i class="bi bi-graph-up"></i>
-                                                <div>Predicción Gráfica</div>
-                                            </div>
-                                            <div class="chartCloned" id="chartImageContainer"></div>
-                                        </div>
-
-                                        <!-- Tabla Clonado en el Modal -->
-                                        <div class="datosHistoricos"  style="width: 650px;">
-                                            <section>
+                                            <!-- Gráfico Clonado en el Modal -->
+                                            <div class="grafico" style="width: 650px;">
                                                 <div class="alert alert-warning d-flex align-items-center color-detalle tall-alert"
-                                                    role="alert">
-                                                    <i class="bi bi-table"> </i>
-                                                    <div>Detalle de la gráfica</div>
+                                                     role="alert">
+                                                    <i class="bi bi-graph-up"></i>
+                                                    <div>Predicción Gráfica</div>
                                                 </div>
-                                                <section class="section tabla">
-                                                    <div class="contenedorTablas">
-                                                        <table class="table">
-                                                            <thead>
-                                                                <tr>
-                                                                    <th scope="col">Fecha </th>
-                                                                    <th scope="col">Matriculados </th>
-                                                                    <th scope="col">Aprobados </th>
-                                                                    <th scope="col">Reprobados </th>
-                                                                    <th scope="col">Desertores </th>
-                                                                    <th scope="col">Foraneos </th>
-                                                                </tr>
-                                                            </thead>
-                                                            <tbody>
-                                                                {% for fecha in tiempo|slice:"7" %}
-                                                                <tr>
-                                                                    <td> {{ fecha }}</td>
-                                                                    <td> {{ matriculados|slice:forloop.counter|last }}
-                                                                    </td>
-                                                                    <td> {{ aprobados|slice:forloop.counter|last }}</td>
-                                                                    <td> {{ reprobados|slice:forloop.counter|last }}
-                                                                    </td>
-                                                                    <td> {{ desertores|slice:forloop.counter|last }}
-                                                                    </td>
-                                                                    <td> {{ foraneos|slice:forloop.counter|last }}</td>
-                                                                </tr>
-                                                                {% endfor %}
-                                                            </tbody>
-                                                        </table>
+                                                <div class="chartCloned" id="chartImageContainer"></div>
+                                            </div>
+
+                                            <!-- Tabla Clonado en el Modal -->
+                                            <div class="datosHistoricos" style="width: 650px;">
+                                                <section>
+                                                    <div class="alert alert-warning d-flex align-items-center color-detalle tall-alert"
+                                                         role="alert">
+                                                        <i class="bi bi-table"> </i>
+                                                        <div>Detalle de la gráfica</div>
                                                     </div>
+                                                    <section class="section tabla">
+                                                        <div class="contenedorTablas">
+                                                            <table class="table">
+                                                                <thead>
+                                                                <tr>
+                                                                    <th scope="col">Fecha</th>
+                                                                    <th scope="col">Matriculados</th>
+                                                                    <th scope="col">Aprobados</th>
+                                                                    <th scope="col">Reprobados</th>
+                                                                    <th scope="col">Desertores</th>
+                                                                    <th scope="col">Foraneos</th>
+                                                                </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                {% for fecha in tiempo|slice:"7" %}
+                                                                    <tr>
+                                                                        <td> {{ fecha }}</td>
+                                                                        <td> {{ matriculados|slice:forloop.counter|last }}
+                                                                        </td>
+                                                                        <td> {{ aprobados|slice:forloop.counter|last }}</td>
+                                                                        <td> {{ reprobados|slice:forloop.counter|last }}
+                                                                        </td>
+                                                                        <td> {{ desertores|slice:forloop.counter|last }}
+                                                                        </td>
+                                                                        <td> {{ foraneos|slice:forloop.counter|last }}</td>
+                                                                    </tr>
+                                                                {% endfor %}
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </section>
                                                 </section>
-                                            </section>
+                                            </div>
+
+                                            <div class="piePagina">
+                                                <p><strong>Todos los derechos reservados @UNL Predict</strong></p>
+                                            </div>
                                         </div>
 
-                                        <div class="piePagina">
-                                            <p><strong>Todos los derechos reservados @UNL Predict</strong></p>
-                                        </div>
                                     </div>
-
                                 </div>
+                                <!---->
                             </div>
-                            <!---->
-                        </div>
-                        <hr>
+                            <hr>
 
-                        <div class="file-name">
-                            <label for="file-name">Nombre del archivo:</label>
-                            <input type="text" id="fileName" placeholder="Ingrese el nombre del archivo">
-                        </div>
+                            <div class="file-name">
+                                <label for="file-name">Nombre del archivo:</label>
+                                <input type="text" id="fileName" placeholder="Ingrese el nombre del archivo">
+                            </div>
 
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-light" data-dismiss="modal" id="cancelBtn">Cerrar</button>
-                        <button type="button" class="btn btn-dark" id="exportBtn">Exportar</button>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-light" data-dismiss="modal" id="cancelBtn">Cerrar
+                            </button>
+                            <button type="button" class="btn btn-dark" id="exportBtn">Exportar</button>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-            <dialog id="modal" class="custom-modal">
-                <div class="modal-header">
-                    <h2>Seleccione Ciclos</h2>
-                    <button id="cerrarModal" class="close-modal">X</button>
-                </div>
-                <div class="modal-body">
-                    <form id="ciclosForm">
-                        <div id="modalOpciones" class="modalOpciones">
-                            {% for i in "123456789" %}
-                                <div class="option-wrapper">
-                                    <input type="checkbox" id="ciclo{{ i }}" name="ciclo" value="Ciclo {{ i }}">
-                                    <label for="ciclo{{ i }}">Ciclo {{ i }}</label>
-                                </div>
-                            {% endfor %}
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button id="aplicar" class="btn btn-primary btmAplicar" type="button">Aplicar Selección</button>
-                </div>
-            </dialog>
+        <dialog id="modal" class="custom-modal">
+            <div class="modal-header">
+                <h2>Seleccione Ciclos</h2>
+                <button id="cerrarModal" class="close-modal">X</button>
+            </div>
+            <div class="modal-body">
+                <form id="ciclosForm">
+                    <div id="modalOpciones" class="modalOpciones">
+                        {% for i in "123456789" %}
+                            <div class="option-wrapper">
+                                <input type="checkbox" id="ciclo{{ i }}" name="ciclo" value="Ciclo {{ i }}">
+                                <label for="ciclo{{ i }}">Ciclo {{ i }}</label>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button id="aplicar" class="btn btn-primary btmAplicar" type="button">Aplicar Selección</button>
+            </div>
+        </dialog>
     </main>
-    
+
     <script src="{% static 'js/modal.js' %}"></script>
     <script>
         document.getElementById('aplicar').addEventListener('click', function () {
@@ -226,5 +226,5 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.2.1/dist/js/bootstrap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
     <script src="{% static 'scriptExportarPDF.js' %}"></script>
-    
+
 {% endblock %}

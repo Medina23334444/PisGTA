@@ -82,22 +82,78 @@
                     <div class="modal-body">
                         <h5>Vista previa</h5>
                         <div class="docuemnt">
+
                             <!-- Aquí iría la vista previa del documento -->
                             <div class="containerPdf"
-                                style="display: flex; justify-content: center; align-items: center; margin: 0; border: 2px solid black;">
+                                style="display: flex; justify-content: center; align-items: center; margin: 0; border: 2px solid black; overflow-y: auto; overflow-x: hidden;">
 
-                                <div class="containerDocPDF" id="docPDF" style="transform: scale(0.9); height: 600px;">
+                                <div class="containerDocPDF" style="transform: scale(0.9); height: 150px; margin-top: 240px;">
+                                    
                                     <!-- Aquí iría lo que se va ha exportar como documento PDF -->
-                                    <img src="{% static 'logo_unl copy.png' %}"
-                                        alt="Logo de la Universidad Nacional de Loja" class="logoInf">
-                                    <h1 class="facultyNameInf"><strong>Facultad de Energía, Las Industrias y Los
-                                            Recursos Naturales No
-                                            Renovables</strong></h1>
-                                    <h2 class="careerNameInf"><strong>Carrera de Electricidad</strong></h2>
+                                    <div class="pdf" id="docPDF"
+                                        style="transform: scale(0.9);">
+                                        <img src="{% static 'logo_unl copy.png' %}"
+                                            alt="Logo de la Universidad Nacional de Loja" class="logoInf">
+                                        <h1 class="facultyNameInf"><strong>Facultad de Energía, Las Industrias y Los
+                                                Recursos Naturales No
+                                                Renovables</strong></h1>
+                                        <h2 class="careerNameInf"><strong>Carrera de Electricidad</strong></h2>
 
-                                    <!-- Gráfico Clonado en el Modal -->
-                                    <div class="grafico">
-                                        <div id="chartImageContainer"></div>
+                                        <!-- Gráfico Clonado en el Modal -->
+                                        <div class="grafico"  style="width: 650px;">
+                                            <div class="alert alert-warning d-flex align-items-center color-detalle tall-alert"
+                                                role="alert">
+                                                <i class="bi bi-graph-up"></i>
+                                                <div>Predicción Gráfica</div>
+                                            </div>
+                                            <div class="chartCloned" id="chartImageContainer"></div>
+                                        </div>
+
+                                        <!-- Tabla Clonado en el Modal -->
+                                        <div class="datosHistoricos"  style="width: 650px;">
+                                            <section>
+                                                <div class="alert alert-warning d-flex align-items-center color-detalle tall-alert"
+                                                    role="alert">
+                                                    <i class="bi bi-table"> </i>
+                                                    <div>Detalle de la gráfica</div>
+                                                </div>
+                                                <section class="section tabla">
+                                                    <div class="contenedorTablas">
+                                                        <table class="table">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th scope="col">Fecha </th>
+                                                                    <th scope="col">Matriculados </th>
+                                                                    <th scope="col">Aprobados </th>
+                                                                    <th scope="col">Reprobados </th>
+                                                                    <th scope="col">Desertores </th>
+                                                                    <th scope="col">Foraneos </th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                {% for fecha in tiempo|slice:"7" %}
+                                                                <tr>
+                                                                    <td> {{ fecha }}</td>
+                                                                    <td> {{ matriculados|slice:forloop.counter|last }}
+                                                                    </td>
+                                                                    <td> {{ aprobados|slice:forloop.counter|last }}</td>
+                                                                    <td> {{ reprobados|slice:forloop.counter|last }}
+                                                                    </td>
+                                                                    <td> {{ desertores|slice:forloop.counter|last }}
+                                                                    </td>
+                                                                    <td> {{ foraneos|slice:forloop.counter|last }}</td>
+                                                                </tr>
+                                                                {% endfor %}
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </section>
+                                            </section>
+                                        </div>
+
+                                        <div class="piePagina">
+                                            <p><strong>Todos los derechos reservados @UNL Predict</strong></p>
+                                        </div>
                                     </div>
 
                                 </div>
@@ -113,8 +169,7 @@
 
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-light" data-dismiss="modal"
-                            id="cancelBtn">Cerrar</button>
+                        <button type="button" class="btn btn-light" data-dismiss="modal" id="cancelBtn">Cerrar</button>
                         <button type="button" class="btn btn-dark" id="exportBtn">Exportar</button>
                     </div>
                 </div>

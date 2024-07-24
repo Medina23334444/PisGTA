@@ -16,18 +16,48 @@
 }
 
 .logoInf {
-  margin-top: 30px;
   max-width: 300px;
 }
 
 .facultyNameInf {
-  margin-top: 20px;
-  font-size: 20px;
+  margin-top: 10px;
+  font-size: 15px;
 }
 
 .careerNameInf {
   margin-top: 10px;
-  font-size: 20px;
+  font-size: 15px;
+}
+
+.chartCloned {
+  margin-left: -60px;
+}
+
+.datosHistoricos {
+  margin-top: 5px;
+}
+
+.table {
+  border-collapse: collapse; /* Asegura que los bordes de la tabla se fusionen */
+  width: 100%; /* Ajusta el ancho de la tabla si es necesario */
+}
+
+.table th, .table td {
+  padding: 4px; /* Reduce el espaciado dentro de las celdas */
+  font-size: 12px; /* Ajusta el tamaño de la fuente */
+}
+
+.table th {
+  background-color: white; /* Color de fondo para los encabezados */
+}
+
+.table tr {
+  height: 50px; /* Ajusta la altura de las filas */
+}
+
+.piePagina {
+  margin-top: 10px;
+  font-size: 10px;
 }
 
 #docPDF {

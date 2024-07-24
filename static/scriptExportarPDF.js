@@ -21,7 +21,6 @@ document.addEventListener("DOMContentLoaded", function () {
 document.addEventListener('DOMContentLoaded', function () {
     const fileNameInput = document.getElementById('fileName');
     const exportBtn = document.getElementById('exportBtn');
-    const exportContainer = document.getElementById('exportContainer');
 
     const initChart = async () => {
         const myChart = echarts.init(document.getElementById('chart'));
@@ -34,6 +33,10 @@ document.addEventListener('DOMContentLoaded', function () {
                     show: false 
                 }
             }
+        };
+
+        option.title = {
+            show: false
         };
     
         myChart.setOption(option);
@@ -48,9 +51,8 @@ document.addEventListener('DOMContentLoaded', function () {
         const img = document.createElement('img');
         img.src = chartImage;
         img.style.width = '800px';
-        img.style.marginTop = '35px';
-        img.style.marginBottom = '25px';
-        img.style.marginLeft = '25px';
+        img.style.marginTop = '-15px';
+        img.style.marginBottom = '15px';
         img.style.height = '400px' ;
 
         const chartImageContainer = document.getElementById('chartImageContainer');
@@ -86,7 +88,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 quality: 0.95
             },
             html2canvas: {
-                scale: 3,
+                scale: 4,
                 useCORS: true
             },
             jsPDF: {
@@ -96,13 +98,14 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         };
 
-        html2pdf().set(opt).from(content).save().then(function () {
-            console.log('PDF generado y guardado');
-            $('#exportContainer').modal('hide');
-            fileNameInput.value = '';
-        }).catch(function (error) {
-            console.error('Error al generar el PDF:', error);
-        });
+    // Generar el PDF
+    html2pdf().set(opt).from(content).save().then(function () {
+        console.log('PDF generado y guardado');
+        $('#exportContainer').modal('hide');
+        fileNameInput.value = '';
+    }).catch(function (error) {
+        console.error('Error al generar el PDF:', error);
+    });
     }
 
     window.addEventListener('load', initChart);

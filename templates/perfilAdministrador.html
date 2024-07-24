@@ -1,18 +1,70 @@
 {% extends "base_init.html" %}
-
 {% block title %}Otra Página{% endblock %}
-
+{% load static %}
 {% block content %}
-    <div>
-        <br>
-        <nav aria-label="breadcrumb">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="/homeAdministrador">Inicio</a></li>
-                <li class="breadcrumb-item active" aria-current="page">Perfil</li>
-            </ol>
-        </nav>
-        <br><br>
-        <h1>Perfil de Usuario</h1>
+     <link rel="stylesheet" href="{% static 'perfil.css' %}" />
+     <div class="container">
+        <header>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/homeAdministrador">Inicio</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Perfil Administrador</li>
+                </ol>
+            </nav>
+            <h1 class="mt-4">Perfil Administrador</h1>
+        </header>
+
+      <div class="card mt-4">
+            <div class="card-body">
+                <div class="row">
+                    <!-- Primera columna -->
+                    <div class="col-md-6">
+                        <ul class="list-unstyled">
+                            <p><strong>Nombres:</strong> {{ usuario.nombres }}</p>
+                            <p><strong>Apellidos:</strong> {{ usuario.apellidos }}</p>
+                            <p><strong>DNI:</strong> {{ usuario.dni }}</p>
+                            <p><strong>Correo:</strong> {{ usuario.email }}</p>
+                            <p><strong>Dirección:</strong> {{ usuario.direccion }}</p>
+                            <p><strong>Teléfono:</strong> {{ usuario.telefono }}</p>
+                        </ul>
+                    </div>
+                    <!-- Segunda columna -->
+                    <div class="col-md-6">
+                        <ul class="list-unstyled">
+                            {% if perfil.fechaNacimiento %}
+                                <p><strong>Fecha de Nacimiento:</strong> {{ perfil.fechaNacimiento }}</p>
+                            {% else %}
+                                <p><strong>Fecha de Nacimiento:</strong> No disponible</p>
+                            {% endif %}
+
+                            {% if perfil.descripcion %}
+                                <p><strong>Descripción:</strong> {{ perfil.descripcion }}</p>
+                            {% else %}
+                                <p><strong>Descripción:</strong> No disponible</p>
+                            {% endif %}
+
+                            {% if perfil.usuarioInstagram %}
+                                <p><strong>Instagram:</strong> {{ perfil.usuarioInstagram }}</p>
+                            {% else %}
+                                <p><strong>Instagram:</strong> No disponible</p>
+                            {% endif %}
+
+                            {% if perfil.usuarioFacebook %}
+                                <p><strong>Facebook:</strong> {{ perfil.usuarioFacebook }}</p>
+                            {% else %}
+                                <p><strong>Facebook:</strong> No disponible</p>
+                            {% endif %}
+
+                            {% if perfil.usuarioTwitter %}
+                                <p><strong>Twitter:</strong> {{ perfil.usuarioTwitter }}</p>
+                            {% else %}
+                                <p><strong>Twitter:</strong> No disponible</p>
+                            {% endif %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
     
 {% endblock %}

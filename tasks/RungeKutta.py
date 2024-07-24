@@ -1,13 +1,10 @@
-import matplotlib.pyplot as ploted
 import numpy as np
 from sklearn.linear_model import LinearRegression
 from sklearn.utils import resample
 import datetime
-import pandas as panda
 import matplotlib.dates as mdates
+import pandas as panda
 
-
-#metodo montecarlos, para la generacion mas exacta de los coeficientes
 
 def GeneracionCoeficientes(listaY, numSimulaciones):
     listaX = np.arange(1, len(listaY) + 1).reshape(-1, 1)
@@ -44,13 +41,6 @@ tasa_m = GeneracionCoeficientes(Mi, 500)
 #tasa_mf = 0.15  # ajustado
 #tasa_m = 0.5  # ajustado
 
-print(f"Tasa_d > {tasa_d}")  
-print(f"Tasa_r > {tasa_r}")  
-print(f"Tasa_ab > {tasa_ab}")  
-print(f"Tasa_rf > {tasa_rf}")  
-print(f"Tasa_ap > {tasa_ap}")  
-print(f"Tasa_mf > {tasa_mf}")  
-print(f"Tasa_m > {tasa_m}")  
 
 def funcionM(M, R, D, A, F):
     #tasa_d = 0.23
@@ -205,7 +195,6 @@ def funcionF_1(M, R, D, A, F, h):
 
 
    #prueba del primer valor
-print("MATRICULADOS    APROBADOS     REPRROBADOS   DESERTORES    FORANEOS   TIEMPO")
 DH = [4, 5, 7, 8, 7, 7]
 MH = [50, 51, 52, 52, 53, 53]
 RH = [20, 19, 20, 19, 19, 20]
@@ -251,10 +240,8 @@ for a in range (20):
     DH.append(D1)
     tiempoD.append(t)
     #t = t+0.25  #cada 0.25 unidad representa un cuarto de año
-      
-    print(f"{round(M1)}              {round(A1)}             {round(R1)}             {round(D1)}         {round(F1)}        {t}")
 
-print(f" valores de tiempoD -_> {tiempoD} valores de DH {MH}")
+
 
 def lista_desertores_prediccion():
     ValoresD = [round(valor) for valor in DH]
@@ -283,7 +270,7 @@ def lista_foraneos_prediccion():
 def tiempo_final_historico():
     return '2024-02-27'
 
-#Cambair el valor de x de unidades a fecha con la funcion pandas, y como el t, no tiene demasiado impacto
+#Cambiar el valor de x de unidades a fecha con la funcion pandas, y como el t, no tiene demasiado impacto
 #controlar su aumento para que se ejecute correctamente - luego pasar todo el codigo a una grafica dinamica
 # e imlementarla como pagina web, donde pulire todos los detalles. 
     

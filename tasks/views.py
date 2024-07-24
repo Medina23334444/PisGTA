@@ -3,12 +3,10 @@ from django.db import IntegrityError, transaction
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from datetime import datetime, timedelta
-from django.http import JsonResponse
 
 from .forms import UsuarioForm
-from .models import Usuario, Rol, RolPersona, Sugerencia, PeriodoAcademico, Ciclo
+from .models import Usuario, Rol, RolPersona, Sugerencia, PeriodoAcademico, Ciclo, Perfil, EstadisticaPeriodo
 from django.contrib import messages
-
 import tasks.RungeKutta as r
 from django.http.response import JsonResponse
 import json
@@ -16,22 +14,21 @@ from django.views.decorators.http import require_http_methods
 import logging
 logger = logging.getLogger(__name__)
 
+
 def home(request):
-    return render(request, 'home.html')
+    return render(request, 'landingPage.html')
 
 
 def iniciarSesion(request):
     if request.method == "POST":
-        correo = request.POST['username']
-        password = request.POST['password']
+        correo = request.POST.get('username')
+        password = request.POST.get('password')
         try:
             user = authenticate(request, username=correo, password=password)
             if user is not None:
                 login(request, user)
                 roles_persona = RolPersona.objects.filter(usuario=user)
                 roles = [rp.rol for rp in roles_persona]
-                print(roles)
-
                 if any(rol.nombre == 'Personal' for rol in roles):
                     return redirect('homePersonal')
                 elif any(rol.nombre == 'Administrador' for rol in roles):
@@ -39,11 +36,16 @@ def iniciarSesion(request):
                 else:
                     return redirect('homeDefault')
             else:
-                error = 'Credenciales inválidas'
+                if Usuario.objects.filter(username=correo).exists():
+                    error = 'Contraseña incorrecta'
+                else:
+                    error = 'La cuenta no existe'
                 messages.error(request, error)
                 return render(request, 'iniciarSesion.html')
 
         except Exception as e:
+            error = f'Error: {str(e)}'
+            messages.error(request, error)
             return render(request, 'iniciarSesion.html')
 
     return render(request, 'iniciarSesion.html')
@@ -55,10 +57,16 @@ def cerrarSesion(request):
     return redirect('home')
 
 
-@login_required
 def registrarUsuario(request):
     if request.method == 'POST':
         data = request.POST
+        dni = request.POST['dni']
+
+        if not validar_cedula(dni):
+            messages.error(request, 'La cédula ingresada no es válida.')
+            return redirect('admiManage')
+
+
         try:
             with transaction.atomic():
                 usuario = Usuario.objects.create(
@@ -73,9 +81,6 @@ def registrarUsuario(request):
                 usuario.set_password(request.POST['dni'])
                 usuario.save()
 
-                print(usuario.username)
-                print(usuario.password)
-
                 if data['tipo_cargo'] == 'Administrador':
                     rol = Rol.objects.get(nombre='Administrador')
                 elif data['tipo_cargo'] == 'Personal':
@@ -85,7 +90,6 @@ def registrarUsuario(request):
                     return redirect('admiManage')
 
                 RolPersona.objects.create(rol=rol, usuario=usuario)
-                print(RolPersona.objects.all())
 
                 messages.success(request, 'Usuario registrado correctamente!')
                 return redirect('admiManage')
@@ -104,6 +108,43 @@ def registrarUsuario(request):
 
     return render(request, 'admiManage.html')
 
+def validar_cedula(cedula):
+    if len(cedula) != 10:
+        return False
+    
+    try:
+        digitos_cedula = [int(d) for d in cedula]
+    except ValueError:
+        return False
+    
+    cod_provincia = int(cedula[:2])#Validar código de provincia
+    if cod_provincia < 1 or cod_provincia > 24:
+        return False
+    
+    digito_3 = digitos_cedula[2] #Validar digito 3, este entre 0 y 6
+    if digito_3 < 0 or digito_3 > 6:
+        return False
+    
+    #coefficients = [2, 1, 2, 1, 2, 1, 2, 1, 2]
+    total = 0
+    
+    for i in range(0,9):
+        x = digitos_cedula[i]
+        if i%2 == 0:
+            x = x * 2
+            if x > 9:
+                x -= 9
+        total += x
+        """product = coefficients[i] * digitos_cedula[i]
+        if product >= 10:
+            product -= 9
+        total += product"""
+    
+    digito_verificador = 10 - (total % 10)
+    if digito_verificador == 10:
+        digito_verificador = 0
+    
+    return digito_verificador == digitos_cedula[9]
 
 @login_required
 def editarPersonalAdmi(request, id):
@@ -131,21 +172,6 @@ def eliminarUsuario(request, id):
     return redirect('admiManage')
 
 
-@login_required
-def ordenarUsuarios(request):
-    listaU = Usuario.objects.all().order_by('nombres')
-    print(listaU)
-    messages.success(request, '!Lista ordenada!')
-    return render(request, "manageUser.html", {"usuarios": listaU})
-
-
-@login_required
-def manage_user(request):
-    usuarios = Usuario.objects.all()
-    return render(request, "manageUser.html", {"usuarios": usuarios})
-
-
-@login_required
 def admiManage(request):
     personalAdministrativo = Usuario.objects.all()
     return render(request, 'admiManage.html', {"personalAdministrativo": personalAdministrativo})
@@ -158,25 +184,31 @@ def homeAdministrador(request):
 
 @login_required
 def perfilAdministrador(request):
-    return render(request, 'perfilAdministrador.html')
+    usuario = request.user
+    perfil = get_object_or_404(Perfil, usuario=usuario)
+    return render(request, 'perfilAdministrador.html', {'usuario': usuario, 'perfil': perfil})
 
 
 @login_required
 def homePersonal(request):
     return render(request, 'homePersonal.html')
 
-"""Métodos de Periodo"""
 
-def mostrarPeriodos(request):#Vista general de Periodos 
+@login_required
+def mostrarPeriodos(request):#Vista general de Periodos
     periodos = PeriodoAcademico.objects.all()
     #messages.success(request, '!Lista actualizada!')
-    return render(request, "gestionPeriodoHome.html",{"periodos":periodos})
+    return render(request, "gestionPeriodoHome.html",{"periodos": periodos})
 
-def guardar_editar_Periodos(request):#Vista para editar o agregar 
+
+@login_required
+def guardar_editar_Periodos(request):#Vista para editar o agregar
     periodos = PeriodoAcademico.objects.all()
-    #messages.success(request, '!Lista actualizada!')
+    messages.success(request, '!Lista actualizada!')
     return render(request, "gestionPeriodo.html",{"periodos":periodos})
 
+
+@login_required
 def obtener_eventos(request):#Método para cargar los periodos registrados en calendar
     periodos = PeriodoAcademico.objects.all()
     eventos = []
@@ -185,54 +217,57 @@ def obtener_eventos(request):#Método para cargar los periodos registrados en ca
         eventos.append({
             'title': periodo.nombre,
             'start': periodo.fechaInicio.isoformat(),
-            #'end': periodo.fechaFin.isoformat(),
             'end': (periodo.fechaFin + timedelta(days=1)).isoformat(),
-            'allDay': True,  # Para que se muestre como evento de todo el día
+            'allDay': True,
         })
 
     return JsonResponse(eventos, safe=False)
 
-#@csrf_protect
-def registrarPeriodo(request):
-    #Se los recibe como strings
-    fechaI_str = request.POST.get('fecha_inicio')
-    #fechaI = request.POST['fecha_inicio']#atributo name Objeto en HTML
-    fechaF_str = request.POST.get('fecha_fin')
-    
-    #Se los convierte
-    fechaI = datetime.strptime(fechaI_str, '%Y-%m-%d').date()
-    fechaF = datetime.strptime(fechaF_str, '%Y-%m-%d').date()
-    nombreP = PeriodoAcademico.fijarNombre(fechaI,fechaF)
-
-    #Podría analizarse condicional para guardar o editar
-    #idP = request.POST['txtId']
-    try: #Si puede convertir el id a entero, existe, debe actualizar
-        idP = int(request.POST['txtId'])
-        periodo = PeriodoAcademico.objects.get(id = idP)
-        periodo.fechaInicio = fechaI
-        periodo.fechaFin = fechaF
-        periodo.nombre = nombreP
-        periodo.save()
-    except ValueError: #Si devuelve un ID nulo, crear
-        periodo = PeriodoAcademico.objects.create(fechaInicio = fechaI, fechaFin = fechaF, nombre = nombreP)
-        #Al crear periodo, creo sus ciclos
-        #Ver si los ciclos guardo aquí o en la Clase
-        for i in range(1,9):
-            ciclo = Ciclo.objects.create(idPeriodo = periodo.id, numero = i)
-
-    """if idP is not None and isinstance(idP, int):#Si no es nulo, existe, y es un numero entero debo actualizar
-        periodo = PeriodoAcademico.objects.get(id = idP)
-        periodo.fechaInicio = fechaI
-        periodo.fechaFin = fechaF
-        periodo.nombre = nombreP
-        periodo.save()
-    else:#Si el id es nulo debe crear uno nuevo:
-        periodo = PeriodoAcademico.objects.create(fechaInicio = fechaI, fechaFin = fechaF, nombre = nombreP)"""
-    
-    messages.success(request, '!Periodo guardado correctamente¡')
-    return redirect('/')
 
 @login_required
+def registrarPeriodo(request):
+    # Se los recibe como strings
+    fechaI_str = request.POST.get('fecha_inicio')
+    fechaF_str = request.POST.get('fecha_fin')
+
+    # Se los convierte
+    fechaI = datetime.strptime(fechaI_str, '%Y-%m-%d').date()
+    fechaF = datetime.strptime(fechaF_str, '%Y-%m-%d').date()
+    nombreP = PeriodoAcademico.fijarNombre(fechaI, fechaF)
+
+    # Condicional para guardar o editar
+    try:  # Si puede convertir el id a entero, existe, debe actualizar
+        idP = int(request.POST['txtId'])
+
+        periodos_antiguos = PeriodoAcademico.objects.all().exclude(id=idP)
+        if periodos_antiguos.exists():
+            for periodo in periodos_antiguos:
+                if periodo.fechaInicio <= fechaI <= periodo.fechaFin or periodo.fechaInicio <= fechaF <= periodo.fechaFin:
+                    messages.error(request, '¡Las fechas coinciden con períodos anteriores. Revise!')
+                    return redirect('/mostrarPeriodos/')
+
+        periodo = PeriodoAcademico.objects.get(id=idP)
+        periodo.fechaInicio = fechaI
+        periodo.fechaFin = fechaF
+        periodo.nombre = nombreP
+        periodo.save()
+    except ValueError:  # Si devuelve un ID nulo, crear
+
+        periodos_antiguos = PeriodoAcademico.objects.all()
+        if periodos_antiguos.exists():
+            for periodo in periodos_antiguos:
+                if periodo.fechaInicio <= fechaI <= periodo.fechaFin or periodo.fechaInicio <= fechaF <= periodo.fechaFin:
+                    messages.error(request, '¡Las fechas coinciden con períodos anteriores. Revise!')
+                    return redirect('/mostrarPeriodos/')
+
+        periodo = PeriodoAcademico.objects.create(fechaInicio=fechaI, fechaFin=fechaF, nombre=nombreP)
+        for i in range(1, 9):
+            ciclo = Ciclo.objects.create(idPeriodo=periodo, numero=i)
+
+    messages.success(request, '¡Período registrado correctamente!')
+    return redirect('/mostrarPeriodos/')
+
+
 def sugerenciaPersonal(request):
     if request.method == 'POST':
         try:
@@ -242,13 +277,16 @@ def sugerenciaPersonal(request):
                 usuario=request.user
             )
             messages.success(request, 'Sugerencia enviada con éxito.')
-            return redirect('nombre_de_la_vista_a_redirigir')
+            return redirect('sugerenciaPersonal')
         except Exception as e:
+            print(f'Ocurrió un error: {str(e)}')
             messages.error(request, f'Ocurrió un error: {str(e)}')
-            return render(request, 'tu_template.html')
+            return redirect('sugerenciaPersonal')
 
-    return render(request, 'tu_template.html')
-  
+    return render(request, 'sugerencia.html')
+
+
+@login_required
 def graficaPrediccion(request):
     tiempo = r.lista_tiempo_prediccion()
     matriculados = r.lista_matriculados_prediccion()
@@ -259,18 +297,24 @@ def graficaPrediccion(request):
     contexto = {'tiempo': tiempo, 'matriculados': matriculados, 'aprobados': aprobados, 'reprobados': reprobados, 'desertores': desertores, 'foraneos': foraneos}
     return render(request, 'InterfazPrediccion.html', contexto)
 
-def index(request):   
+
+@login_required
+def index(request):
     return render(request,'InterfazPrediccion.html')
 
+@login_required
 def index1(request):   
     return render(request,'InterfazCiclos.html')
 
+@login_required
 def modeloMatematicoInfo(request):
     return render(request, 'modeloMatematicoInfo.html')
 
+@login_required
 def variablesModelo(request):
     return render(request, 'variablesModelo.html')
 
+@login_required
 def datosHistoricos(request):
     tiempo = r.lista_tiempo_prediccion()
     matriculados = r.lista_matriculados_prediccion()
@@ -281,6 +325,7 @@ def datosHistoricos(request):
     contexto = {'tiempo': tiempo, 'matriculados': matriculados, 'aprobados': aprobados, 'reprobados': reprobados, 'desertores': desertores, 'foraneos': foraneos}
     return render(request, 'datosHistoricos.html', contexto)
 
+@login_required
 def prediccionCiclos(request):
     return render(request, 'InterfazCiclos.html')
 

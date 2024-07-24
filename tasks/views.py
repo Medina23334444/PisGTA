@@ -5,7 +5,7 @@ from django.contrib.auth import authenticate, login, logout
 from datetime import datetime, timedelta
 
 from .forms import UsuarioForm
-from .models import Usuario, Rol, RolPersona, Sugerencia, PeriodoAcademico, Ciclo
+from .models import Usuario, Rol, RolPersona, Sugerencia, PeriodoAcademico, Ciclo, EstadisticaPeriodo
 from django.contrib import messages
 import tasks.RungeKutta as r
 from django.http.response import JsonResponse
@@ -56,6 +56,13 @@ def cerrarSesion(request):
 def registrarUsuario(request):
     if request.method == 'POST':
         data = request.POST
+        dni = request.POST['dni']
+
+        if not validar_cedula(dni):
+            messages.error(request, 'La cédula ingresada no es válida.')
+            return redirect('admiManage')
+
+
         try:
             with transaction.atomic():
                 usuario = Usuario.objects.create(
@@ -98,6 +105,43 @@ def registrarUsuario(request):
 
     return render(request, 'admiManage.html')
 
+def validar_cedula(cedula):
+    if len(cedula) != 10:
+        return False
+    
+    try:
+        digitos_cedula = [int(d) for d in cedula]
+    except ValueError:
+        return False
+    
+    cod_provincia = int(cedula[:2])#Validar código de provincia
+    if cod_provincia < 1 or cod_provincia > 24:
+        return False
+    
+    digito_3 = digitos_cedula[2] #Validar digito 3, este entre 0 y 6
+    if digito_3 < 0 or digito_3 > 6:
+        return False
+    
+    #coefficients = [2, 1, 2, 1, 2, 1, 2, 1, 2]
+    total = 0
+    
+    for i in range(0,9):
+        x = digitos_cedula[i]
+        if i%2 == 0:
+            x = x * 2
+            if x > 9:
+                x -= 9
+        total += x
+        """product = coefficients[i] * digitos_cedula[i]
+        if product >= 10:
+            product -= 9
+        total += product"""
+    
+    digito_verificador = 10 - (total % 10)
+    if digito_verificador == 10:
+        digito_verificador = 0
+    
+    return digito_verificador == digitos_cedula[9]
 
 @login_required
 def editarPersonalAdmi(request, id):
@@ -383,3 +427,37 @@ def modeloMatematico(request):
 @login_required
 def variablesAdministrador(request):
     return render(request, 'agregarDatos.html')
+
+def mostrarDatosHistoricos(request):
+    periodos = PeriodoAcademico.objects.all()
+
+    # Arreglo para almacenar los periodos con sus estadísticas
+    datos = []
+
+    for periodo in periodos:
+        estadisticas_ciclo = EstadisticaPeriodo.objects.filter(idCiclo__idPeriodo=periodo)# Estadísticas asociadas con ciclos específicos
+
+        # Estadística total del periodo, sin asociación con ciclos
+        estadistica_general = EstadisticaPeriodo.objects.filter(idPeriodo=periodo, idCiclo=None).first()
+
+        datos.append({
+            'periodo': periodo,
+            'estadisticas_ciclo': estadisticas_ciclo,
+            'estadistica_general': estadistica_general
+        })
+
+    context = {
+        'datos': datos
+    }
+
+    return render(request, "mostrarDatosHistoricos.html", context)
+
+
+
+def mostrarDatosPeriodo(request, id):
+    estadisticasPeriodo = EstadisticaPeriodo.objects.filter(idCiclo__idPeriodo = id)
+    #IDEA: Mostrar todos los periodos en tabla y mostrar error en los que no tengan datos asociados
+    """if not estadisticasPeriodo.exists():
+        messages.error(request, '¡Las fechas coinciden con períodos anteriores. Revise!')
+        return redirect('/mostrarDatosHistoricos/')"""
+    return render(request, "mostrarDatosHistoricos.html",{"estadisticasPeriodo":estadisticasPeriodo})

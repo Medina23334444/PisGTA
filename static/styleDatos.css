@@ -33,5 +33,9 @@
     height: 45px;
 }
 
+.modal-dialog {
+    max-width: 50%;
+    width: auto;
 
+}
 

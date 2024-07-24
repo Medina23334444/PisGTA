@@ -9,6 +9,10 @@ from .models import Usuario, Rol, RolPersona, Sugerencia, PeriodoAcademico, Cicl
 from django.contrib import messages
 import tasks.RungeKutta as r
 from django.http.response import JsonResponse
+import json
+from django.views.decorators.http import require_http_methods
+import logging
+logger = logging.getLogger(__name__)
 
 
 def home(request):
@@ -298,6 +302,17 @@ def graficaPrediccion(request):
 def index(request):
     return render(request,'InterfazPrediccion.html')
 
+@login_required
+def index1(request):   
+    return render(request,'InterfazCiclos.html')
+
+@login_required
+def modeloMatematicoInfo(request):
+    return render(request, 'modeloMatematicoInfo.html')
+
+@login_required
+def variablesModelo(request):
+    return render(request, 'variablesModelo.html')
 
 @login_required
 def datosHistoricos(request):
@@ -310,34 +325,34 @@ def datosHistoricos(request):
     contexto = {'tiempo': tiempo, 'matriculados': matriculados, 'aprobados': aprobados, 'reprobados': reprobados, 'desertores': desertores, 'foraneos': foraneos}
     return render(request, 'datosHistoricos.html', contexto)
 
-
 @login_required
-def get_chart(request):
-    listaD = r.lista_desertores_prediccion()
-    listaT = r.lista_tiempo_prediccion()
-    listaA = r.lista_aprobados_prediccion()
-    listaR = r.lista_reprobados_prediccion()
-    listaM = r.lista_matriculados_prediccion()
-    listaF = r.lista_foraneos_prediccion()
-    tiempoI = min(listaT)
-    tiempoF = r.tiempo_final_historico()
-    chart={
+def prediccionCiclos(request):
+    return render(request, 'InterfazCiclos.html')
+
+def generate_chart_data(listaT, listaD, listaA, listaR, listaM, listaF):
+    chart = {
         'xAxis': [
             {
                 'type': 'category',
-                'data': listaT
+                'data': listaT,
+                'name': 'tiempo'
             }
         ],
         'yAxis': [
             {
-                'type': "value"
+                'type': "value",
+                'name': 'Nro Estudiantes',
+                'nameTextStyle': {
+                    'left': '25%',
+                    'padding': [0, 0, 0, -20], 
+                    'fontSize': 12 
+                }
             }
         ],
-
         'title': [
             {
                 'text': 'Grafica Prediccion',
-                'bottom':  '92%'
+                'bottom': '92%'
             }
         ],
         'tooltip': [
@@ -371,6 +386,8 @@ def get_chart(request):
                 'end': 100
             }
         ],
+        'animationDuration': 2000,
+        'animationEasing': 'cubicInOut',
         'series': [
             {
                 'name': 'Foraneos',
@@ -380,8 +397,7 @@ def get_chart(request):
                 'emphasis': {
                     'focus': 'series'
                 },
-                'data': listaF,
-
+                'data': listaF
             },
             {
                 'name': 'Desertores',
@@ -405,60 +421,122 @@ def get_chart(request):
                 'name': 'Reprobados',
                 'data': listaR,
                 'type': "line",
-                'smooth': True,
+                'smooth': True
             },
         ]
     }
+    return chart
+
+@require_http_methods(["GET", "POST"])
+def get_chart(request):
+    if request.method == "POST":
+        logger.info("Recibida solicitud POST")
+        data = json.loads(request.body)
+        selected_year = int(data.get('year'))
+        logger.info(f"Año seleccionado: {selected_year}")
+        listaD = r.lista_desertores_prediccion()
+        listaT = r.lista_tiempo_prediccion()
+        listaA = r.lista_aprobados_prediccion()
+        listaR = r.lista_reprobados_prediccion()
+        listaM = r.lista_matriculados_prediccion()
+        listaF = r.lista_foraneos_prediccion()
+    else:
+        logger.info("Recibida solicitud GET")
+        listaD =[73, 66, 74, 84, 65, 65, 84, 76, 62, 73, 63, 63, 70, 47, 49, 61, 57, 71, 58, 52, 83, 65, 68, 52, 62, 69]
+        listaT = ['2023-04-29', '2020-07-24', '2022-07-02', '2022-08-28', '2021-06-15', '2022-01-03', '2022-04-17', '2022-10-02', '2022-12-31', '2022-05-25', '2021-08-24', '2021-05-14', '2020-01-28', '2022-03-08', '2022-10-05', '2020-04-19', '2023-08-19', '2023-11-08', '2021-02-26', '2020-03-02', '2021-10-22', '2023-03-11', '2023-10-16', '2022-07-01', '2023-10-06', '2020-10-27']
+        listaA =[55, 71, 61, 64, 61, 87, 67, 56, 76, 55, 70, 47, 53, 70, 75, 69, 66, 64, 52, 60, 63, 79, 71, 49, 71, 63]
+        listaR =[60, 74, 78, 77, 59, 64, 71, 78, 62, 65, 56, 55, 76, 82, 67, 78, 71, 61, 71, 84, 67, 84, 40, 76, 68, 64]
+        listaM =[60, 74, 78, 77, 59, 64, 71, 78, 62, 65, 56, 55, 76, 82, 67, 78, 71, 61, 71, 84, 67, 84, 40, 76, 68, 64]
+        listaF =[73, 66, 74, 84, 65, 65, 84, 76, 62, 73, 63, 63, 70, 47, 49, 61, 57, 71, 58, 52, 83, 65, 68, 52, 62, 69]
+    chart = generate_chart_data(listaT, listaD, listaA, listaR, listaM, listaF)
     return JsonResponse(chart)
 
+def get_chart1(request):
+    listaD = [73, 66, 74, 84, 65, 65, 84, 76, 62, 73, 63, 63, 70, 47, 49, 61, 57, 71, 58, 52, 83, 65, 68, 52, 62, 69]
+    listaT = ['2023-04-29', '2020-07-24', '2022-07-02', '2022-08-28', '2021-06-15', '2022-01-03', '2022-04-17', '2022-10-02', '2022-12-31', '2022-05-25', '2021-08-24', '2021-05-14', '2020-01-28', '2022-03-08', '2022-10-05', '2020-04-19', '2023-08-19', '2023-11-08', '2021-02-26', '2020-03-02', '2021-10-22', '2023-03-11', '2023-10-16', '2022-07-01', '2023-10-06', '2020-10-27']
+    listaA = [55, 71, 61, 64, 61, 87, 67, 56, 76, 55, 70, 47, 53, 70, 75, 69, 66, 64, 52, 60, 63, 79, 71, 49, 71, 63]
+    listaR = [60, 74, 78, 77, 59, 64, 71, 78, 62, 65, 56, 55, 76, 82, 67, 78, 71, 61, 71, 84, 67, 84, 40, 76, 68, 64]
+    listaM = [60, 74, 78, 77, 59, 64, 71, 78, 62, 65, 56, 55, 76, 82, 67, 78, 71, 61, 71, 84, 67, 84, 40, 76, 68, 64]
+    listaF = [73, 66, 74, 84, 65, 65, 84, 76, 62, 73, 63, 63, 70, 47, 49, 61, 57, 71, 58, 52, 83, 65, 68, 52, 62, 69]
+    chart = generate_chart_data(listaT, listaD, listaA, listaR, listaM, listaF)
+    return JsonResponse(chart)
 
-@login_required
-def modeloMatematico(request):
-    return render(request, 'modeloMatematicoInfo.html')
+def get_chart2(request):
+    listaD = [73, 66, 74, 84, 65, 65, 84, 76, 62, 73, 63, 63, 70, 47, 49, 61, 57, 71, 58, 52, 83, 65, 68, 52, 62, 69]
+    listaT = ['2023-04-29', '2020-07-24', '2022-07-02', '2022-08-28', '2021-06-15', '2022-01-03', '2022-04-17', '2022-10-02', '2022-12-31', '2022-05-25', '2021-08-24', '2021-05-14', '2020-01-28', '2022-03-08', '2022-10-05', '2020-04-19', '2023-08-19', '2023-11-08', '2021-02-26', '2020-03-02', '2021-10-22', '2023-03-11', '2023-10-16', '2022-07-01', '2023-10-06', '2020-10-27']
+    listaA = [55, 71, 61, 64, 61, 87, 67, 56, 76, 55, 70, 47, 53, 70, 75, 69, 66, 64, 52, 60, 63, 79, 71, 49, 71, 63]
+    listaR = [60, 74, 78, 77, 59, 64, 71, 78, 62, 65, 56, 55, 76, 82, 67, 78, 71, 61, 71, 84, 67, 84, 40, 76, 68, 64]
+    listaM = [60, 74, 78, 77, 59, 64, 71, 78, 62, 65, 56, 55, 76, 82, 67, 78, 71, 61, 71, 84, 67, 84, 40, 76, 68, 64]
+    listaF = [73, 66, 74, 84, 65, 65, 84, 76, 62, 73, 63, 63, 70, 47, 49, 61, 57, 71, 58, 52, 83, 65, 68, 52, 62, 69]
+    chart = generate_chart_data(listaT, listaD, listaA, listaR, listaM, listaF)
+    return JsonResponse(chart)
 
+def get_chart3(request):
+    listaD = [73, 66, 74, 84, 65, 65, 84, 76, 62, 73, 63, 63, 70, 47, 49, 61, 57, 71, 58, 52, 83, 65, 68, 52, 62, 69]
+    listaT = ['2023-04-29', '2020-07-24', '2022-07-02', '2022-08-28', '2021-06-15', '2022-01-03', '2022-04-17', '2022-10-02', '2022-12-31', '2022-05-25', '2021-08-24', '2021-05-14', '2020-01-28', '2022-03-08', '2022-10-05', '2020-04-19', '2023-08-19', '2023-11-08', '2021-02-26', '2020-03-02', '2021-10-22', '2023-03-11', '2023-10-16', '2022-07-01', '2023-10-06', '2020-10-27']
+    listaA = [55, 71, 61, 64, 61, 87, 67, 56, 76, 55, 70, 47, 53, 70, 75, 69, 66, 64, 52, 60, 63, 79, 71, 49, 71, 63]
+    listaR = [60, 74, 78, 77, 59, 64, 71, 78, 62, 65, 56, 55, 76, 82, 67, 78, 71, 61, 71, 84, 67, 84, 40, 76, 68, 64]
+    listaM = [60, 74, 78, 77, 59, 64, 71, 78, 62, 65, 56, 55, 76, 82, 67, 78, 71, 61, 71, 84, 67, 84, 40, 76, 68, 64]
+    listaF = [73, 66, 74, 84, 65, 65, 84, 76, 62, 73, 63, 63, 70, 47, 49, 61, 57, 71, 58, 52, 83, 65, 68, 52, 62, 69]
+    chart = generate_chart_data(listaT, listaD, listaA, listaR, listaM, listaF)
+    return JsonResponse(chart)
 
-@login_required
-def variablesAdministrador(request):
-    return render(request, 'agregarDatos.html')
+def get_chart4(request):
+    listaD = [73, 66, 74, 84, 65, 65, 84, 76, 62, 73, 63, 63, 70, 47, 49, 61, 57, 71, 58, 52, 83, 65, 68, 52, 62, 69]
+    listaT = ['2023-04-29', '2020-07-24', '2022-07-02', '2022-08-28', '2021-06-15', '2022-01-03', '2022-04-17', '2022-10-02', '2022-12-31', '2022-05-25', '2021-08-24', '2021-05-14', '2020-01-28', '2022-03-08', '2022-10-05', '2020-04-19', '2023-08-19', '2023-11-08', '2021-02-26', '2020-03-02', '2021-10-22', '2023-03-11', '2023-10-16', '2022-07-01', '2023-10-06', '2020-10-27']
+    listaA = [55, 71, 61, 64, 61, 87, 67, 56, 76, 55, 70, 47, 53, 70, 75, 69, 66, 64, 52, 60, 63, 79, 71, 49, 71, 63]
+    listaR = [60, 74, 78, 77, 59, 64, 71, 78, 62, 65, 56, 55, 76, 82, 67, 78, 71, 61, 71, 84, 67, 84, 40, 76, 68, 64]
+    listaM = [60, 74, 78, 77, 59, 64, 71, 78, 62, 65, 56, 55, 76, 82, 67, 78, 71, 61, 71, 84, 67, 84, 40, 76, 68, 64]
+    listaF = [73, 66, 74, 84, 65, 65, 84, 76, 62, 73, 63, 63, 70, 47, 49, 61, 57, 71, 58, 52, 83, 65, 68, 52, 62, 69]
+    chart = generate_chart_data(listaT, listaD, listaA, listaR, listaM, listaF)
+    return JsonResponse(chart)
 
-def mostrarDatosHistoricos(request):
-    periodos = PeriodoAcademico.objects.all()
+def get_chart5(request):
+    listaD = [73, 66, 74, 84, 65, 65, 84, 76, 62, 73, 63, 63, 70, 47, 49, 61, 57, 71, 58, 52, 83, 65, 68, 52, 62, 69]
+    listaT = ['2023-04-29', '2020-07-24', '2022-07-02', '2022-08-28', '2021-06-15', '2022-01-03', '2022-04-17', '2022-10-02', '2022-12-31', '2022-05-25', '2021-08-24', '2021-05-14', '2020-01-28', '2022-03-08', '2022-10-05', '2020-04-19', '2023-08-19', '2023-11-08', '2021-02-26', '2020-03-02', '2021-10-22', '2023-03-11', '2023-10-16', '2022-07-01', '2023-10-06', '2020-10-27']
+    listaA = [55, 71, 61, 64, 61, 87, 67, 56, 76, 55, 70, 47, 53, 70, 75, 69, 66, 64, 52, 60, 63, 79, 71, 49, 71, 63]
+    listaR = [60, 74, 78, 77, 59, 64, 71, 78, 62, 65, 56, 55, 76, 82, 67, 78, 71, 61, 71, 84, 67, 84, 40, 76, 68, 64]
+    listaM = [60, 74, 78, 77, 59, 64, 71, 78, 62, 65, 56, 55, 76, 82, 67, 78, 71, 61, 71, 84, 67, 84, 40, 76, 68, 64]
+    listaF = [73, 66, 74, 84, 65, 65, 84, 76, 62, 73, 63, 63, 70, 47, 49, 61, 57, 71, 58, 52, 83, 65, 68, 52, 62, 69]
+    chart = generate_chart_data(listaT, listaD, listaA, listaR, listaM, listaF)
+    return JsonResponse(chart)
 
-    # Arreglo para almacenar los periodos con sus estadísticas
-    datos = []
+def get_chart6(request):
+    listaD = [73, 66, 74, 84, 65, 65, 84, 76, 62, 73, 63, 63, 70, 47, 49, 61, 57, 71, 58, 52, 83, 65, 68, 52, 62, 69]
+    listaT = ['2023-04-29', '2020-07-24', '2022-07-02', '2022-08-28', '2021-06-15', '2022-01-03', '2022-04-17', '2022-10-02', '2022-12-31', '2022-05-25', '2021-08-24', '2021-05-14', '2020-01-28', '2022-03-08', '2022-10-05', '2020-04-19', '2023-08-19', '2023-11-08', '2021-02-26', '2020-03-02', '2021-10-22', '2023-03-11', '2023-10-16', '2022-07-01', '2023-10-06', '2020-10-27']
+    listaA = [55, 71, 61, 64, 61, 87, 67, 56, 76, 55, 70, 47, 53, 70, 75, 69, 66, 64, 52, 60, 63, 79, 71, 49, 71, 63]
+    listaR = [60, 74, 78, 77, 59, 64, 71, 78, 62, 65, 56, 55, 76, 82, 67, 78, 71, 61, 71, 84, 67, 84, 40, 76, 68, 64]
+    listaM = [60, 74, 78, 77, 59, 64, 71, 78, 62, 65, 56, 55, 76, 82, 67, 78, 71, 61, 71, 84, 67, 84, 40, 76, 68, 64]
+    listaF = [73, 66, 74, 84, 65, 65, 84, 76, 62, 73, 63, 63, 70, 47, 49, 61, 57, 71, 58, 52, 83, 65, 68, 52, 62, 69]
+    chart = generate_chart_data(listaT, listaD, listaA, listaR, listaM, listaF)
+    return JsonResponse(chart)
 
-    for periodo in periodos:
-        estadisticas_ciclo = EstadisticaPeriodo.objects.filter(idCiclo__idPeriodo=periodo)# Estadísticas asociadas con ciclos específicos
+def get_chart7(request):
+    listaD = [73, 66, 74, 84, 65, 65, 84, 76, 62, 73, 63, 63, 70, 47, 49, 61, 57, 71, 58, 52, 83, 65, 68, 52, 62, 69]
+    listaT = ['2023-04-29', '2020-07-24', '2022-07-02', '2022-08-28', '2021-06-15', '2022-01-03', '2022-04-17', '2022-10-02', '2022-12-31', '2022-05-25', '2021-08-24', '2021-05-14', '2020-01-28', '2022-03-08', '2022-10-05', '2020-04-19', '2023-08-19', '2023-11-08', '2021-02-26', '2020-03-02', '2021-10-22', '2023-03-11', '2023-10-16', '2022-07-01', '2023-10-06', '2020-10-27']
+    listaA = [55, 71, 61, 64, 61, 87, 67, 56, 76, 55, 70, 47, 53, 70, 75, 69, 66, 64, 52, 60, 63, 79, 71, 49, 71, 63]
+    listaR = [60, 74, 78, 77, 59, 64, 71, 78, 62, 65, 56, 55, 76, 82, 67, 78, 71, 61, 71, 84, 67, 84, 40, 76, 68, 64]
+    listaM = [60, 74, 78, 77, 59, 64, 71, 78, 62, 65, 56, 55, 76, 82, 67, 78, 71, 61, 71, 84, 67, 84, 40, 76, 68, 64]
+    listaF = [73, 66, 74, 84, 65, 65, 84, 76, 62, 73, 63, 63, 70, 47, 49, 61, 57, 71, 58, 52, 83, 65, 68, 52, 62, 69]
+    chart = generate_chart_data(listaT, listaD, listaA, listaR, listaM, listaF)
+    return JsonResponse(chart)
 
-        # Estadística total del periodo, sin asociación con ciclos
-        estadistica_general = EstadisticaPeriodo.objects.filter(idPeriodo=periodo, idCiclo=None).first()
+def get_chart8(request):
+    listaD = [73, 66, 74, 84, 65, 65, 84, 76, 62, 73, 63, 63, 70, 47, 49, 61, 57, 71, 58, 52, 83, 65, 68, 52, 62, 69]
+    listaT = ['2023-04-29', '2020-07-24', '2022-07-02', '2022-08-28', '2021-06-15', '2022-01-03', '2022-04-17', '2022-10-02', '2022-12-31', '2022-05-25', '2021-08-24', '2021-05-14', '2020-01-28', '2022-03-08', '2022-10-05', '2020-04-19', '2023-08-19', '2023-11-08', '2021-02-26', '2020-03-02', '2021-10-22', '2023-03-11', '2023-10-16', '2022-07-01', '2023-10-06', '2020-10-27']
+    listaA = [55, 71, 61, 64, 61, 87, 67, 56, 76, 55, 70, 47, 53, 70, 75, 69, 66, 64, 52, 60, 63, 79, 71, 49, 71, 63]
+    listaR = [60, 74, 78, 77, 59, 64, 71, 78, 62, 65, 56, 55, 76, 82, 67, 78, 71, 61, 71, 84, 67, 84, 40, 76, 68, 64]
+    listaM = [60, 74, 78, 77, 59, 64, 71, 78, 62, 65, 56, 55, 76, 82, 67, 78, 71, 61, 71, 84, 67, 84, 40, 76, 68, 64]
+    listaF = [73, 66, 74, 84, 65, 65, 84, 76, 62, 73, 63, 63, 70, 47, 49, 61, 57, 71, 58, 52, 83, 65, 68, 52, 62, 69]
+    chart = generate_chart_data(listaT, listaD, listaA, listaR, listaM, listaF)
+    return JsonResponse(chart)
 
-        datos.append({
-            'periodo': periodo,
-            'estadisticas_ciclo': estadisticas_ciclo,
-            'estadistica_general': estadistica_general
-        })
-
-    context = {
-        'datos': datos
-    }
-
-    return render(request, "mostrarDatosHistoricos.html", context)
-
-
-
-def mostrarDatosPeriodo(request, id):
-    estadisticasPeriodo = EstadisticaPeriodo.objects.filter(idCiclo__idPeriodo = id)
-    #IDEA: Mostrar todos los periodos en tabla y mostrar error en los que no tengan datos asociados
-    """if not estadisticasPeriodo.exists():
-        messages.error(request, '¡Las fechas coinciden con períodos anteriores. Revise!')
-        return redirect('/mostrarDatosHistoricos/')"""
-    return render(request, "mostrarDatosHistoricos.html",{"estadisticasPeriodo":estadisticasPeriodo})
-
-def listaSugerencias(request):
-    sugerencias = Sugerencia.objects.all()
-    return render(request, 'listaSugerencia.html', {"sugerencias": sugerencias})
-
-
-def ayuda(request):
-    return render(request, 'ayuda.html')
+def get_chart9(request):
+    listaD = [73, 66, 74, 84, 65, 65, 84, 76, 62, 73, 63, 63, 70, 47, 49, 61, 57, 71, 58, 52, 83, 65, 68, 52, 62, 69]
+    listaT = ['2023-04-29', '2020-07-24', '2022-07-02', '2022-08-28', '2021-06-15', '2022-01-03', '2022-04-17', '2022-10-02', '2022-12-31', '2022-05-25', '2021-08-24', '2021-05-14', '2020-01-28', '2022-03-08', '2022-10-05', '2020-04-19', '2023-08-19', '2023-11-08', '2021-02-26', '2020-03-02', '2021-10-22', '2023-03-11', '2023-10-16', '2022-07-01', '2023-10-06', '2020-10-27']
+    listaA = [55, 71, 61, 64, 61, 87, 67, 56, 76, 55, 70, 47, 53, 70, 75, 69, 66, 64, 52, 60, 63, 79, 71, 49, 71, 63]
+    listaR = [60, 74, 78, 77, 59, 64, 71, 78, 62, 65, 56, 55, 76, 82, 67, 78, 71, 61, 71, 84, 67, 84, 40, 76, 68, 64]
+    listaM = [60, 74, 78, 77, 59, 64, 71, 78, 62, 65, 56, 55, 76, 82, 67, 78, 71, 61, 71, 84, 67, 84, 40, 76, 68, 64]
+    listaF = [73, 66, 74, 84, 65, 65, 84, 76, 62, 73, 63, 63, 70, 47, 49, 61, 57, 71, 58, 52, 83, 65, 68, 52, 62, 69]
+    chart = generate_chart_data(listaT, listaD, listaA, listaR, listaM, listaF)
+    return JsonResponse(chart)

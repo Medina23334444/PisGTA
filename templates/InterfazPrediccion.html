@@ -22,33 +22,49 @@
                     <div>Predicción</div>
                 </div>
                 <div class="contenedor">
-                    <div class="custom-select-container" > 
-                        <select class="form-select custom-select" aria-label="Disabled select example">
-                            <option selected> Periodo </option>
-                            <option value="1">1</option>
-                            <option value="2">2</option>
-                            <option value="3">3</option>
+                    <div class="custom-select-container"> 
+                        <select id="yearSelect" class="form-select custom-select" aria-label="Disabled select example">
+                            <option selected>Seleccion Año Prediccion</option>
+                            <option value="1">2025</option>
+                            <option value="2">2026</option>
+                            <option value="3">2027</option>
+                            <option value="4">2025</option>
+                            <option value="5">2026</option>
+                            <option value="6">2027</option>
+                            <option value="7">2025</option>
+                            <option value="8">2026</option>
+                            <option value="9">2027</option>
+                            <option value="10">2028</option>
+                            <option value="11">2029</option>
+                            <option value="12">2030</option>
+                            <option value="13">2031</option>
+                            <option value="14">2032</option>
+                            <option value="15">2033</option>
+                            <option value="16">2034</option>
+                            <option value="17">2035</option>
+                            <option value="18">2036</option>
                         </select>
                     </div>
-                        <div class="grupo">
-                            <button class="btn btn-primary" type="button">Predicción</button> 
-                            <i class="bi bi-bar-chart-line-fill custom-icon"></i>
-                            <button class="btn btn-secondary custom-btm" type="button">Exportar</button>
-                            <i class="bi bi-filetype-pdf custom-icon"></i>
-                        </div>
+                    <div class="grupo">
+                        <button id="predictionButton" class="btn btn-primary" type="button">Predicción</button> 
+                        <i class="bi bi-bar-chart-line-fill custom-icon"></i>
+                        <button class="btn btn-secondary custom-btm" type="button">Exportar</button>
+                        <i class="bi bi-filetype-pdf custom-icon"></i>
+                    </div>
                 </div>
+                <button id="btnModal" class="btn btn-primary btm2" type="button">Ciclos </button>      
                 <div class="container chart-container">
                     <div class="row my-4">
                         <div class="col-sm-12 col-md-6 col-lg-6 col-xl-6 mx-auto"> 
                             <div id="chart" class="chart"> </div>
                         </div>
-            
                     </div>
                 </div>
                 <!--  Apache Echarts  -->
                 <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.1/echarts.min.js"> </script>
                 <!--  Custom js  -->
                 <script src="{% static 'js/main.js' %}"></script>
+
             </section>
             
         </div>

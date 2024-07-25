@@ -3,6 +3,7 @@
 {% block title %}Otra Página{% endblock %}
 {% load static %}
 {% block content %}
+    <link rel="stylesheet" href="{% static 'home.css' %}"/>
     <div>
         <header>
         <nav aria-label="breadcrumb">
@@ -10,9 +11,7 @@
                 <li class="breadcrumb-item active" aria-current="page">Inicio</li>
             </ol>
         </nav>
-            <br>
             <h1>Detalles del proyecto</h1>
-            <br>
         </header>
         
         <div class="card" style="width: 70rem; height: 25rem;">

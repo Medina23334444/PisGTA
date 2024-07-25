@@ -30,5 +30,7 @@ urlpatterns = [
     path('mostrarDatosHistoricos/', views.mostrarDatosHistoricos, name='mostrarDatosHistoricos'),
     path('mostrarDatosPeriodo/<id>', views.mostrarDatosPeriodo, name='mostrarDatosPeriodo'),
     path('listaSugerencias/', views.listaSugerencias, name='listaSugerencias'),
-    path('ayuda', views.ayuda, name='ayuda'),
+    path('ayuda/', views.ayuda, name='ayuda'),
+    path('ayudaAdministrador/', views.ayudaAdmin, name='ayudaAdministrador'),
+    path('perfilPersonal/', views.perfilPersonal, name='perfilPersonal'),
 ]

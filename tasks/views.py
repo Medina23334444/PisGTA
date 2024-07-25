@@ -327,12 +327,12 @@ def prediccionCiclos(request):
     return render(request, 'InterfazCiclos.html')
 
 
-def generate_chart_data(listaT, listaD, listaA, listaR, listaM, listaF):
+def generate_chart_data(listaT, listaD, listaA, listaR, listaM, listaF, listaTNombres):
     chart = {
         'xAxis': [
             {
                 'type': 'category',
-                'data': listaT,
+                'data': listaTNombres,
                 'name': 'tiempo'
             }
         ],
@@ -440,14 +440,21 @@ def get_chart(request):
         listaF = r.lista_foraneos_prediccion()
     else:
         logger.info("Recibida solicitud GET")
-        listaD =[73, 66, 74, 84, 65, 65, 84, 76, 62, 73, 63, 63, 70, 47, 49, 61, 57, 71, 58, 52, 83, 65, 68, 52, 62, 69]
-        listaT = ['2023-04-29', '2020-07-24', '2022-07-02', '2022-08-28', '2021-06-15', '2022-01-03', '2022-04-17', '2022-10-02', '2022-12-31', '2022-05-25', '2021-08-24', '2021-05-14', '2020-01-28', '2022-03-08', '2022-10-05', '2020-04-19', '2023-08-19', '2023-11-08', '2021-02-26', '2020-03-02', '2021-10-22', '2023-03-11', '2023-10-16', '2022-07-01', '2023-10-06', '2020-10-27']
-        listaA =[55, 71, 61, 64, 61, 87, 67, 56, 76, 55, 70, 47, 53, 70, 75, 69, 66, 64, 52, 60, 63, 79, 71, 49, 71, 63]
-        listaR =[60, 74, 78, 77, 59, 64, 71, 78, 62, 65, 56, 55, 76, 82, 67, 78, 71, 61, 71, 84, 67, 84, 40, 76, 68, 64]
-        listaM =[60, 74, 78, 77, 59, 64, 71, 78, 62, 65, 56, 55, 76, 82, 67, 78, 71, 61, 71, 84, 67, 84, 40, 76, 68, 64]
-        listaF =[73, 66, 74, 84, 65, 65, 84, 76, 62, 73, 63, 63, 70, 47, 49, 61, 57, 71, 58, 52, 83, 65, 68, 52, 62, 69]
-    chart = generate_chart_data(listaT, listaD, listaA, listaR, listaM, listaF)
+        estadisticasPeriodos= EstadisticaPeriodo.objects.filter(idCiclo__isnull=True)
+        listaD = list(estadisticasPeriodos.values_list('numDesertores', flat=True))
+        listaT = list(PeriodoAcademico.objects.values_list('fechaFin', flat=True))
+        listaA = list(estadisticasPeriodos.values_list('numAprobados', flat=True))
+        listaR = list(estadisticasPeriodos.values_list('numReprobados', flat=True))
+        listaM = list(estadisticasPeriodos.values_list('numMatriculados', flat=True))
+        listaF = list(estadisticasPeriodos.values_list('numForaneos', flat=True))
+        print(f"En getcfart1 {listaD}, {listaT}, {listaA}, {listaR}, {listaM}, {listaF}")
+    listaTNombres = list(PeriodoAcademico.objects.values_list('nombre', flat=True))
+    chart = generate_chart_data(listaT, listaD, listaA, listaR, listaM, listaF, listaTNombres)
     return JsonResponse(chart)
+
+
+def validarPeriodo(lista):
+    len(lista)
 
 def get_chart1(request):
     listaD = [73, 66, 74, 84, 65, 65, 84, 76, 62, 73, 63, 63, 70, 47, 49, 61, 57, 71, 58, 52, 83, 65, 68, 52, 62, 69]
@@ -666,3 +673,16 @@ def agregarDatos(request):
         periodos = PeriodoAcademico.objects.all()
         print(periodos)
         return render(request, 'agregarDatos.html', {'periodos': periodos})
+
+
+def ayudaAdmin(request):
+    return render(request, 'ayudaAdministrador.html')
+
+
+@login_required
+def perfilPersonal(request):
+    usuario = request.user
+    perfil = get_object_or_404(Perfil, usuario=usuario)
+    return render(request, 'perfilPersonal.html', {'usuario': usuario, 'perfil': perfil})
+
+8

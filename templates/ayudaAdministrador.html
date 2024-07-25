@@ -1,0 +1,51 @@
+{% extends "base_init.html" %}
+{% block title %}Otra Página{% endblock %}
+{% load static %}
+{% block content %}
+    <link rel="stylesheet" href="{% static 'styleAyuda.css' %}"/>
+    <div class="container">
+        <header>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/homeAdministrador">Inicio</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Ayuda</li>
+                </ol>
+            </nav>
+            <h1>Sección de Ayuda</h1>
+        </header>
+         <div class="content">
+            <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" class="box" target="_blank">
+                <h2>Cambiar Contraseña</h2>
+                <p>Aquí encontrarás un tutorial paso a paso sobre cómo cambiar tu contraseña de forma segura.</p>
+            </a>
+            <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" class="box" target="_blank">
+                <h2>Agregar Usuarios</h2>
+                <p>Descubre el proceso para agregar nuevos usuarios a tu sistema y gestionar sus permisos.</p>
+            </a>
+            <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" class="box" target="_blank">
+                <h2>Modificar Usuarios</h2>
+                <p>Aprende cómo editar los detalles de los usuarios existentes y actualizar sus datos.</p>
+            </a>
+            <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" class="box" target="_blank">
+                <h2>Dar de Baja Usuarios</h2>
+                <p>Guía para eliminar usuarios del sistema y manejar las solicitudes de baja de manera efectiva.</p>
+            </a>
+            <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" class="box" target="_blank">
+                <h2>Agregar Períodos</h2>
+                <p>Instrucciones sobre cómo añadir nuevos períodos de tiempo para análisis o reportes.</p>
+            </a>
+            <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" class="box" target="_blank">
+                <h2>Modificar Períodos</h2>
+                <p>Aprende a actualizar o ajustar períodos existentes para mantener tus datos organizados.</p>
+            </a>
+            <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" class="box" target="_blank">
+                <h2>Agregar Datos Históricos con Archivo Excel</h2>
+                <p>Descubre cómo importar datos históricos utilizando archivos Excel para enriquecer tu base de datos.</p>
+            </a>
+            <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" class="box" target="_blank">
+                <h2>Modificar Perfil</h2>
+                <p>Guía completa para actualizar y gestionar la información de tu perfil personal.</p>
+            </a>
+        </div>
+    </div>
+{% endblock %}

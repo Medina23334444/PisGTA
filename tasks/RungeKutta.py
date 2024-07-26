@@ -1,10 +1,10 @@
 import numpy as np
 from sklearn.linear_model import LinearRegression
 from sklearn.utils import resample
+
 import datetime
 import pandas as panda
-
-
+    
 def GeneracionCoeficientes(listaY, numSimulaciones):
     listaX = np.arange(1, len(listaY) + 1).reshape(-1, 1)
     coeficientes = []
@@ -14,32 +14,75 @@ def GeneracionCoeficientes(listaY, numSimulaciones):
         coeficientes.append(modelo.coef_[0])
     promedioCoeficientes = np.mean(coeficientes)     
     return promedioCoeficientes
-         
+
+'''         
 Di = [4, 5, 7, 8, 7, 5]   
 Mi = [50, 51, 52, 52, 53, 53] #
 Ri = [20, 19, 20, 19, 19, 20]
 Ai = [32, 33, 34, 35, 35, 37]
 Fi = [7, 8, 8, 10, 11, 9]
+
+
+'''
+
+Di = [23, 33]   
+Mi = [270, 233] #
+Ri = [35, 30]
+Ai = [210, 142]
+Fi = [19, 51]
+'''
 TAI = [12, 13, 12, 13, 12, 13]
 RFI = [2, 3, 4, 3, 3, 3]
 MFI = [13, 14, 15, 16, 14, 14]
-
+'''
+TAI = [12, 13]
+RFI = [2, 3]
+MFI = [13, 14]
+'''
 tasa_d = GeneracionCoeficientes(Di, 500)   
 tasa_r = GeneracionCoeficientes(Ri, 500) 
+tasa_ap = GeneracionCoeficientes(Ai, 500)
+tasa_m = GeneracionCoeficientes(Mi, 500)
 tasa_ab = GeneracionCoeficientes(TAI, 500) 
 tasa_rf = GeneracionCoeficientes(RFI, 500)
-tasa_ap = GeneracionCoeficientes(Ai, 500)
 tasa_mf = GeneracionCoeficientes(MFI, 500)
-tasa_m = GeneracionCoeficientes(Mi, 500)
+'''
+'''
+tasa_m = tasa_m/150
+tasa_d = tasa_d/150
+tasa_r = tasa_r/150
+tasa_ap = tasa_ap/150
+tasa_ab = tasa_ab/150
+tasa_mf = tasa_mf/150
+tasa_rf = tasa_rf/150
+'''
+'''
+tasa_m = tasa_d/tasa_m
+tasa_d = tasa_ab/tasa_m
+tasa_ap = tasa_ap/tasa_m    
+tasa_r = tasa_r/tasa_m + tasa_mf
+tasa_ab = tasa_ab/tasa_r
+tasa_m = tasa_d/tasa_m
+'''
 
-#tasa_d = 0.23
-#tasa_r = 0.1  # ajustado
-#tasa_ab = 0.5  # ajustado
-#tasa_rf = 0.2  # ajustado
-#tasa_ap = 0.6  # ajustado
-#tasa_mf = 0.15  # ajustado
-#tasa_m = 0.5  # ajustado
 
+
+
+tasa_d = 0.23
+tasa_r = 0.1  # ajustado
+tasa_ab = 0.5  # ajustado
+tasa_rf = 0.2  # ajustado
+tasa_ap = 0.6  # ajustado
+tasa_mf = 0.15  # ajustado
+tasa_m = 0.5  # ajustado
+
+print(f"tasa_d: {tasa_d}")
+print(f"tasa_m: {tasa_m}")
+print(f"tasa_r: {tasa_r}")
+print(f"tasa_ap: {tasa_ap}")
+print(f"tasa_ab: {tasa_ab}")
+print(f"tasa_rf: {tasa_rf}")
+print(f"tasa_mf: {tasa_mf}")
 
 def funcionM(M, R, D, A, F):
     #tasa_d = 0.23
@@ -192,85 +235,57 @@ def funcionF_1(M, R, D, A, F, h):
     fF_1 = F + h/6 * (k51+2*k52+2*k53+k54)
     return fF_1
 
-
-   #prueba del primer valor
-DH = [4, 5, 7, 8, 7, 7]
-MH = [50, 51, 52, 52, 53, 53]
-RH = [20, 19, 20, 19, 19, 20]
-AH = [32, 33, 34, 35, 35, 37]
-FH = [7, 8, 8, 10, 11, 9]
-
-tiempoD = ['2020-05-11', '2020-09-01', '2021-02-27', '2021-08-18', '2022-01-11', '2022-06-11'] 
-
-M1 = 60
-A1 = 45 #313
-D1 = 8
-R1 = 13
-F1 = 7
-dias_aumentar = 15
-tp = '2024-02-27'
-datesS = panda.to_datetime(tiempoD)
-dates = datesS.to_numpy()
-t = panda.to_datetime(tp)
-M = [M1]
-R = [R1]
-A = [A1] 
-F = [F1]
-D = [D1]
-for a in range (20):
-#    tiempo.append(t)
-#    tiempoD.append(t)
-    M1 = funcionM_1(M1, R1, D1, A1, F1, 0.1)
-    R1 = funcionR_1(M1, R1, D1, A1, F1, 0.1)
-    D1 = funcionD_1(M1, R1, D1, A1, F1, 0.1)
-    A1 = funcionA_1(M1, R1, D1, A1, F1, 0.1)
-    F1 = funcionF_1(M1, R1, D1, A1, F1, 0.1)
-    t += datetime.timedelta(days=dias_aumentar)
-    M.append(M1)
-    R.append(R1)
-    D.append(D1)
-    A.append(A1)
-    F.append(F1)
-    
-    AH.append(A1)
-    MH.append(M1)
-    FH.append(F1)
-    RH.append(R1)
-    DH.append(D1)
-    tiempoD.append(t)
     #t = t+0.25  #cada 0.25 unidad representa un cuarto de año
 
+def realizarPrediccion(listaD, listaT, listaR, listaA, listaM, listaF, anioPrediccion):
+    anioP = panda.to_datetime(f'{2024 + anioPrediccion}-01-01')
+    tPrediccion = listaT[-1]
+    t = panda.to_datetime(tPrediccion)
+    dias_aumentar = 15
+    M1 = listaM[-1] 
+    A1 = listaA[-1]
+    D1 = listaD[-1]
+    R1 = listaR[-1]
+    F1 = listaF[-1]
+    listaTotal = []
+    while t < anioP:
+        M1 = funcionM_1(M1, R1, D1, A1, F1, 0.1)
+        R1 = funcionR_1(M1, R1, D1, A1, F1, 0.1)
+        D1 = funcionD_1(M1, R1, D1, A1, F1, 0.1)
+        A1 = funcionA_1(M1, R1, D1, A1, F1, 0.1)
+        F1 = funcionF_1(M1, R1, D1, A1, F1, 0.1)  
+        t += datetime.timedelta(days=dias_aumentar)      
+        listaD.append(round(D1))
+        listaT.append(t)
+        listaR.append(round(R1))
+        listaA.append(round(A1))
+        listaM.append(round(M1))
+        listaF.append(round(F1))
+    listaTotal.append(listaD)
+    listaTotal.append(listaT)
+    listaTotal.append(listaR)
+    listaTotal.append(listaA)
+    listaTotal.append(listaM)
+    listaTotal.append(listaF)      
+    return listaTotal
+
+def obtener_periodos(periodos, anio):
+    anioDato = 24 + anio
+    ultimoPeriodo = periodos[-1]
+    nuevoAnio = int(ultimoPeriodo[-2:])
+    while nuevoAnio < anioDato:
+        if ultimoPeriodo[:3] == 'ABR':
+            nuevoPeriodo = 'OCT' + str(nuevoAnio) + '-FEB' + str(nuevoAnio+1)
+            periodos.append(nuevoPeriodo)
+            ultimoPeriodo = nuevoPeriodo
+            nuevoAnio += 1
+        else:
+            nuevoPeriodo = 'ABR' + str(nuevoAnio).zfill(2) + '-AGO' + str(nuevoAnio).zfill(2)
+            periodos.append(nuevoPeriodo)
+            ultimoPeriodo = nuevoPeriodo
+    return periodos
 
 
-def lista_desertores_prediccion():
-    ValoresD = [round(valor) for valor in DH]
-    return ValoresD
-
-def lista_tiempo_prediccion():
-    tiempoD_format = [fecha.strftime('%Y-%m-%d') if isinstance(fecha, panda.Timestamp) else fecha for fecha in tiempoD]
-    return tiempoD_format
-
-def lista_aprobados_prediccion():
-    valoresA = [round(valor) for valor in AH]
-    return valoresA
-
-def lista_matriculados_prediccion():
-    valoresM = [round(valor) for valor in MH]
-    return valoresM    
-
-
-def lista_reprobados_prediccion():
-    valoresR = [round(valor) for valor in RH]
-    return valoresR
-
-
-def lista_foraneos_prediccion():
-    valoresF = [round(valor) for valor in FH]
-    return valoresF
-
-
-def tiempo_final_historico():
-    return '2024-02-27'
 
 #Cambiar el valor de x de unidades a fecha con la funcion pandas, y como el t, no tiene demasiado impacto
 #controlar su aumento para que se ejecute correctamente - luego pasar todo el codigo a una grafica dinamica

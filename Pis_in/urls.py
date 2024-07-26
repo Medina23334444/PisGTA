@@ -21,7 +21,7 @@ urlpatterns = [
     path('cerrar_sesion', views.cerrarSesion, name='cerrar_sesion'),
     path('Prediccion/', views.graficaPrediccion, name='GraficaPrediccion'),
     path('api/', include('tasks.urls')),
-    path('datosHistoricos/', views.datosHistoricos, name='datosHistoricos'),
+    #path('datosHistoricos/', views.datosHistoricos, name='datosHistoricos'),
     path('variableModelo/', views.variablesModelo, name="variablesModelo"),
     path('prediccionCiclos/', views.prediccionCiclos, name="prediccionCiclos"),
     path('sugerencia/', views.sugerenciaPersonal, name='sugerenciaPersonal'),

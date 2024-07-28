@@ -21,7 +21,7 @@ urlpatterns = [
     path('cerrar_sesion', views.cerrarSesion, name='cerrar_sesion'),
     path('Prediccion/', views.graficaPrediccion, name='GraficaPrediccion'),
     path('api/', include('tasks.urls')),
-    path('datosHistoricos/', views.datosHistoricos, name='datosHistoricos'),
+    #path('datosHistoricos/', views.datosHistoricos, name='datosHistoricos'),
     path('variableModelo/', views.variablesModelo, name="variablesModelo"),
     path('prediccionCiclos/', views.prediccionCiclos, name="prediccionCiclos"),
     path('sugerencia/', views.sugerenciaPersonal, name='sugerenciaPersonal'),
@@ -30,5 +30,7 @@ urlpatterns = [
     path('mostrarDatosHistoricos/', views.mostrarDatosHistoricos, name='mostrarDatosHistoricos'),
     path('mostrarDatosPeriodo/<id>', views.mostrarDatosPeriodo, name='mostrarDatosPeriodo'),
     path('listaSugerencias/', views.listaSugerencias, name='listaSugerencias'),
-    path('ayuda', views.ayuda, name='ayuda'),
+    path('ayuda/', views.ayuda, name='ayuda'),
+    path('ayudaAdministrador/', views.ayudaAdmin, name='ayudaAdministrador'),
+    path('perfilPersonal/', views.perfilPersonal, name='perfilPersonal'),
 ]

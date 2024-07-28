@@ -128,7 +128,7 @@ section.prediccion {
 
 dialog{
     width: 44%;
-    height: 80%;   
+    height: 80%;
     position: fixed;
     top: 50%;
     left: 50%;
@@ -281,4 +281,21 @@ dialog{
 .custom-select option {
     padding: 10px;
 }
+
+.breadcrumb {
+    background-color: #eaeef3;
+    border-radius: 5px;
+    padding: 10px;
+}
+
+
+.breadcrumb-item.active {
+    color: #6c757d;
+}
+
+h1 {
+    color: #333;
+    margin-bottom: 20px;
+}
+
 

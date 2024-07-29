@@ -100,48 +100,6 @@
                                                 <div class="chartCloned" id="chartImageContainer"></div>
                                             </div>
 
-                                            <!-- Tabla Clonado en el Modal -->
-                                            <div class="datosHistoricos" style="width: 650px;">
-                                                <section>
-                                                    <div class="alert alert-warning d-flex align-items-center color-detalle tall-alert"
-                                                         role="alert">
-                                                        <i class="bi bi-table"> </i>
-                                                        <div>Detalle de la gráfica</div>
-                                                    </div>
-                                                    <section class="section tabla">
-                                                        <div class="contenedorTablas">
-                                                            <table class="table">
-                                                                <thead>
-                                                                <tr>
-                                                                    <th scope="col">Fecha</th>
-                                                                    <th scope="col">Matriculados</th>
-                                                                    <th scope="col">Aprobados</th>
-                                                                    <th scope="col">Reprobados</th>
-                                                                    <th scope="col">Desertores</th>
-                                                                    <th scope="col">Foraneos</th>
-                                                                </tr>
-                                                                </thead>
-                                                                <tbody>
-                                                                {% for fecha in tiempo|slice:"7" %}
-                                                                    <tr>
-                                                                        <td> {{ fecha }}</td>
-                                                                        <td> {{ matriculados|slice:forloop.counter|last }}
-                                                                        </td>
-                                                                        <td> {{ aprobados|slice:forloop.counter|last }}</td>
-                                                                        <td> {{ reprobados|slice:forloop.counter|last }}
-                                                                        </td>
-                                                                        <td> {{ desertores|slice:forloop.counter|last }}
-                                                                        </td>
-                                                                        <td> {{ foraneos|slice:forloop.counter|last }}</td>
-                                                                    </tr>
-                                                                {% endfor %}
-                                                                </tbody>
-                                                            </table>
-                                                        </div>
-                                                    </section>
-                                                </section>
-                                            </div>
-
                                             <div class="piePagina">
                                                 <p><strong>Todos los derechos reservados @UNL Predict</strong></p>
                                             </div>

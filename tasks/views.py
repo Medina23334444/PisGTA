@@ -792,6 +792,38 @@ def mostrarDatosHistoricos(request):
 
     return render(request, "mostrarDatosHistoricos.html", context)
 
+@login_required
+def mostrarDatosHAuditoria(request):
+    periodos = PeriodoAcademico.objects.all()
+
+    # Arreglo para almacenar los periodos con sus estadísticas
+    datos = []
+
+    for periodo in periodos:
+        estadisticas_ciclo = EstadisticaPeriodo.objects.filter(idCiclo__idPeriodo=periodo)# Estadísticas asociadas con ciclos específicos
+
+        # Estadística total del periodo, sin asociación con ciclos
+        estadistica_general = EstadisticaPeriodo.objects.filter(idPeriodo=periodo, idCiclo=None).first()
+
+        administrador = None
+        if estadistica_general:
+            administrador = estadistica_general.idAdministrador.str()
+        else:
+            administrador = 'Ninguno'
+
+        datos.append({
+            'periodo': periodo,
+            'estadisticas_ciclo': estadisticas_ciclo,
+            'estadistica_general': estadistica_general,
+            'administrador': administrador
+        })
+
+    context = {
+        'datos': datos
+    }
+
+    return render(request, "auditoríaDatosHReporte.html", context)
+
 
 @login_required
 def mostrarDatosPeriodo(request, id):

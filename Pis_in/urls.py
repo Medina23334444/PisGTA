@@ -36,4 +36,5 @@ urlpatterns = [
     path('perfilPersonal/', views.perfilPersonal, name='perfilPersonal'),
     path('editarPerfilAdmi/', views.editarPerfilAdmi, name='editarPerfilAdmi'),
     path('editarPerfilPersonal/', views.editarPerfilPersonal, name='editarPerfilPersonal'),
+    path('mostrarDatosHAuditoria/', views.mostrarDatosHAuditoria, name='mostrarDatosHAuditoria'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

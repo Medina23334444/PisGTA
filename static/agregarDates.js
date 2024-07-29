@@ -4,39 +4,37 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const selectPeriodo = document.getElementById('selectPeriodo');
     const btnSeleccionarPeriodo = document.getElementById('btnSeleccionarPeriodo');
-    const tablaDatos = document.getElementById('tablaDatos');
     const btnGuardarCambios = document.getElementById('btnGuardarCambios');
+    const alertContainer = document.getElementById('alert-container');
 
-    // Función para cargar datos del periodo seleccionado
+    // Función para cargar los datos del periodo seleccionado
     btnSeleccionarPeriodo.addEventListener('click', async () => {
         const periodoId = selectPeriodo.value;
-        if (periodoId) {
-            try {
-                const response = await fetch(`/cargarDatos/${periodoId}/`);
-                if (response.ok) {
-                    const data = await response.json();
-                    populateTable(data);
-                } else {
-                    console.error('Error status:', response.status);
-                    alert('Error al cargar los datos.');
-                }
-            } catch (error) {
-                console.error('Fetch error:', error);
-                alert('Error al cargar los datos.');
+
+        // Primero verifica si se ha seleccionado un periodo
+        if (!periodoId) {
+            mostrarMensaje('Por favor, selecciona un periodo.', 'alert-danger');
+            return; // Termina la ejecución para evitar errores adicionales
+        }
+
+        // Si hay un periodo seleccionado, intenta cargar los datos
+        try {
+            const response = await fetch(`/cargarDatos/${periodoId}/`);
+            if (response.ok) {
+                const data = await response.json();
+                populateTable(data);
+            } else {
+                console.error('Error status:', response.status);
+                mostrarMensaje('Por favor, selecciona un periodo.', 'alert-danger');
             }
-        } else {
-            alert('Por favor, selecciona un periodo.');
+        } catch (error) {
+            console.error('Fetch error:', error);
+            mostrarMensaje('Por favor, selecciona un periodo.', 'alert-danger');
         }
     });
 
-    // Función para llenar la tabla con los datos obtenidos
+    // Función para llenar la tabla con los datos recibidos del servidor
     function populateTable(data) {
-        const tableBody = document.getElementById('tablaDatos');
-        if (!tableBody) {
-            console.error('Element with ID "tablaDatos" not found.');
-            return;
-        }
-
         const dataFields = ['matriculados', 'aprobados', 'reprobados', 'desertores', 'foraneos'];
 
         // Llenar los totales del periodo
@@ -45,47 +43,58 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         // Llenar los datos de cada ciclo
-        for (let i = 1; i <= 8; i++) {
-            dataFields.forEach(field => {
-                const input = document.querySelector(`input[data-field="${field}_${i}"]`);
-                if (input) {
-                    input.value = data[`ciclo_${i}`][field];
-                }
-            });
-        }
+        Object.keys(data).forEach(key => {
+            if (key.startsWith('ciclo_')) {
+                const cicloData = data[key];
+                const cicloNumero = key.split('_')[1];
+
+                dataFields.forEach(field => {
+                    const input = document.querySelector(`input[data-field="${field}_${cicloNumero}"]`);
+                    if (input) {
+                        input.value = cicloData[field] || 0;
+                    }
+                });
+            }
+        });
     }
 
-    // Función para guardar los cambios
-    btnGuardarCambios.addEventListener('click', async () => {
+
+
+
+
+
+
+    btnGuardarCambios.addEventListener('click', async (event) => {
+        event.preventDefault(); // Previene la recarga de la página
+
         const periodoId = selectPeriodo.value;
         if (!periodoId) {
-            alert('Por favor, selecciona un periodo.');
+            mostrarMensaje('Por favor, selecciona un periodo.', 'alert-danger');
             return;
         }
 
         const data = {
-            periodo_id: periodoId,
-            total_matriculados: document.getElementById('total_matriculados').textContent,
-            total_aprobados: document.getElementById('total_aprobados').textContent,
-            total_reprobados: document.getElementById('total_reprobados').textContent,
-            total_desertores: document.getElementById('total_desertores').textContent,
-            total_foraneos: document.getElementById('total_foraneos').textContent,
+            total_matriculados: parseInt(document.getElementById('total_matriculados').textContent) || 0,
+            total_aprobados: parseInt(document.getElementById('total_aprobados').textContent) || 0,
+            total_reprobados: parseInt(document.getElementById('total_reprobados').textContent) || 0,
+            total_desertores: parseInt(document.getElementById('total_desertores').textContent) || 0,
+            total_foraneos: parseInt(document.getElementById('total_foraneos').textContent) || 0,
             ciclos: []
         };
 
-        for (let i = 1; i <= 8; i++) {
+        for (let i = 1; i <= 9; i++) {
             data.ciclos.push({
-                ciclo: i,
-                matriculados: document.querySelector(`input[data-field="matriculados_${i}"]`).value,
-                aprobados: document.querySelector(`input[data-field="aprobados_${i}"]`).value,
-                reprobados: document.querySelector(`input[data-field="reprobados_${i}"]`).value,
-                desertores: document.querySelector(`input[data-field="desertores_${i}"]`).value,
-                foraneos: document.querySelector(`input[data-field="foraneos_${i}"]`).value
+                numero: i,
+                matriculados: parseInt(document.querySelector(`input[data-field="matriculados_${i}"]`).value) || 0,
+                aprobados: parseInt(document.querySelector(`input[data-field="aprobados_${i}"]`).value) || 0,
+                reprobados: parseInt(document.querySelector(`input[data-field="reprobados_${i}"]`).value) || 0,
+                desertores: parseInt(document.querySelector(`input[data-field="desertores_${i}"]`).value) || 0,
+                foraneos: parseInt(document.querySelector(`input[data-field="foraneos_${i}"]`).value) || 0
             });
         }
 
         try {
-            const response = await fetch(`/guardarDatos/${periodoId}/`, {
+            const response = await fetch(`/guardarcambiosDatos/${periodoId}/`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -96,23 +105,54 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (response.ok) {
                 const result = await response.json();
-                if (result.success) {
-                    alert('Datos guardados exitosamente.');
-                    window.location.reload();
-                } else {
-                    alert('Error al guardar los datos.');
-                }
+                mostrarMensaje(result.message || 'Datos guardados correctamente.', 'alert-success');
+                vaciarModal();
             } else {
-                console.error('Error status:', response.status);
-                alert('Error al guardar los datos.');
+                mostrarMensaje('Error al guardar los datos.', 'alert-danger');
             }
         } catch (error) {
             console.error('Fetch error:', error);
-            alert('Error al guardar los datos.');
+            mostrarMensaje('Error al guardar los datos.', 'alert-danger');
         }
     });
 
-    // Obtener el CSRF token para las peticiones POST
+    function mostrarMensaje(mensaje, tipo) {
+        const alertDiv = document.createElement('div');
+        alertDiv.className = `alert ${tipo} alert-dismissible fade show`;
+        alertDiv.role = 'alert';
+        alertDiv.innerHTML = `
+            ${mensaje}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        `;
+        alertContainer.appendChild(alertDiv);
+
+        setTimeout(() => {
+            alertDiv.classList.remove('show');
+            alertDiv.addEventListener('transitionend', () => alertDiv.remove());
+        }, 3000);
+    }
+
+    function vaciarModal() {
+        // Solo resetea los campos de la tabla, no elimina la estructura de la tabla
+    const dataFields = ['matriculados', 'aprobados', 'reprobados', 'desertores', 'foraneos'];
+
+    dataFields.forEach(field => {
+        document.getElementById(`total_${field}`).textContent = '0'; // Restablecer los totales
+    });
+
+    for (let i = 1; i <= 9; i++) {
+        const fields = ['matriculados', 'aprobados', 'reprobados', 'desertores', 'foraneos'];
+        fields.forEach(field => {
+            const input = document.querySelector(`input[data-field="${field}_${i}"]`);
+            if (input) {
+                input.value = ''; // Vaciar los valores de cada ciclo
+            }
+        });
+    }
+
+    selectPeriodo.selectedIndex = 0; // Resetea el combobox a "Seleccione un periodo"
+    }
+
     function getCookie(name) {
         let cookieValue = null;
         if (document.cookie && document.cookie !== '') {
@@ -127,6 +167,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         return cookieValue;
     }
+
+    document.getElementById('modificarModal').addEventListener('hidden.bs.modal', vaciarModal);
 
 
     function capitalizeFirstLetter(string) {

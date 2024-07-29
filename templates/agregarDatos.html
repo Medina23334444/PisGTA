@@ -47,6 +47,7 @@
                                     <th class="cycle-col" data-cycle="6">6</th>
                                     <th class="cycle-col" data-cycle="7">7</th>
                                     <th class="cycle-col" data-cycle="8">8</th>
+                                    <th class="cycle-col" data-cycle="9">9</th>
                                     <th>Total</th>
                                 </tr>
                             </thead>
@@ -61,6 +62,7 @@
                                     <td><input type="text" name="matriculados_6" class="form-control cycle" data-type="matriculados" data-cycle="6"></td>
                                     <td><input type="text" name="matriculados_7" class="form-control cycle" data-type="matriculados" data-cycle="7"></td>
                                     <td><input type="text" name="matriculados_8" class="form-control cycle" data-type="matriculados" data-cycle="8"></td>
+                                    <td><input type="text" name="matriculados_9" class="form-control cycle" data-type="matriculados" data-cycle="9"></td>
                                     <td><input type="text" class="total" data-type="matriculados" readonly></td>
                                 </tr>
                                 <tr>
@@ -73,6 +75,7 @@
                                     <td><input type="text" name="aprobados_6" class="form-control cycle" data-type="aprobados" data-cycle="6"></td>
                                     <td><input type="text" name="aprobados_7" class="form-control cycle" data-type="aprobados" data-cycle="7"></td>
                                     <td><input type="text" name="aprobados_8" class="form-control cycle" data-type="aprobados" data-cycle="8"></td>
+                                    <td><input type="text" name="aprobados_9" class="form-control cycle" data-type="aprobados" data-cycle="9"></td>
                                     <td><input type="text" class="total" data-type="aprobados" readonly></td>
                                 </tr>
                                 <tr>
@@ -85,6 +88,7 @@
                                     <td><input type="text" name="reprobados_6" class="form-control cycle" data-type="reprobados" data-cycle="6"></td>
                                     <td><input type="text" name="reprobados_7" class="form-control cycle" data-type="reprobados" data-cycle="7"></td>
                                     <td><input type="text" name="reprobados_8" class="form-control cycle" data-type="reprobados" data-cycle="8"></td>
+                                    <td><input type="text" name="reprobados_9" class="form-control cycle" data-type="reprobados" data-cycle="9"></td>
                                     <td><input type="text" class="total" data-type="reprobados" readonly></td>
                                 </tr>
                                 <tr>
@@ -97,6 +101,7 @@
                                     <td><input type="text" name="desertores_6" class="form-control cycle" data-type="desertores" data-cycle="6"></td>
                                     <td><input type="text" name="desertores_7" class="form-control cycle" data-type="desertores" data-cycle="7"></td>
                                     <td><input type="text" name="desertores_8" class="form-control cycle" data-type="desertores" data-cycle="8"></td>
+                                    <td><input type="text" name="desertores_9" class="form-control cycle" data-type="desertores" data-cycle="9"></td>
                                     <td><input type="text" class="total" data-type="desertores" readonly></td>
                                 </tr>
                                 <tr>
@@ -109,6 +114,7 @@
                                     <td><input type="text" name="foraneos_6" class="form-control cycle" data-type="foraneos" data-cycle="6"></td>
                                     <td><input type="text" name="foraneos_7" class="form-control cycle" data-type="foraneos" data-cycle="7"></td>
                                     <td><input type="text" name="foraneos_8" class="form-control cycle" data-type="foraneos" data-cycle="8"></td>
+                                    <td><input type="text" name="foraneos_9" class="form-control cycle" data-type="foraneos" data-cycle="9"></td>
                                     <td><input type="text" class="total" data-type="foraneos" readonly></td>
                                 </tr>
                             </tbody>
@@ -124,7 +130,7 @@
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.min.js" integrity="sha384-w1Q4orYjBQndcko6MimVbzY0tgp4pWB4lZ7lr30WKz0vr/aWKhXdBNmNb5D92v7s" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.2/xlsx.full.min.js"></script>
-    <script src="{% static '/agregarDatosH.js' %}"></script>
+    <script src="{% static '/agregarDates.js' %}"></script>
     <script>
         document.querySelectorAll('input[type="text"]').forEach(function(input) {
             input.addEventListener('input', function() {
@@ -132,6 +138,8 @@
             });
         });
     </script>
+
+
 <!-- Modal -->
 <div class="modal fade" id="modificarModal" tabindex="-1" aria-labelledby="modificarModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
@@ -141,6 +149,9 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
+        <!-- Contenedor de mensajes -->
+        <div id="alert-container"></div>
+
         <!-- Formulario dentro del modal -->
         <div class="mb-3">
           <label for="selectPeriodo" class="form-label">Seleccionar Periodo Académico</label>
@@ -166,68 +177,74 @@
               <th>6</th>
               <th>7</th>
               <th>8</th>
+              <th>9</th>
               <th>Total</th>
             </tr>
           </thead>
           <tbody id="tablaDatos">
             <tr>
               <td>Matriculados</td>
-              <td><input type="number" class="form-control" data-field="matriculados_1" /></td>
-              <td><input type="number" class="form-control" data-field="matriculados_2" /></td>
-              <td><input type="number" class="form-control" data-field="matriculados_3" /></td>
-              <td><input type="number" class="form-control" data-field="matriculados_4" /></td>
-              <td><input type="number" class="form-control" data-field="matriculados_5" /></td>
-              <td><input type="number" class="form-control" data-field="matriculados_6" /></td>
-              <td><input type="number" class="form-control" data-field="matriculados_7" /></td>
-              <td><input type="number" class="form-control" data-field="matriculados_8" /></td>
+              <td><input type="text" class="form-control" data-field="matriculados_1" /></td>
+              <td><input type="text" class="form-control" data-field="matriculados_2" /></td>
+              <td><input type="text" class="form-control" data-field="matriculados_3" /></td>
+              <td><input type="text" class="form-control" data-field="matriculados_4" /></td>
+              <td><input type="text" class="form-control" data-field="matriculados_5" /></td>
+              <td><input type="text" class="form-control" data-field="matriculados_6" /></td>
+              <td><input type="text" class="form-control" data-field="matriculados_7" /></td>
+              <td><input type="text" class="form-control" data-field="matriculados_8" /></td>
+              <td><input type="text" class="form-control" data-field="matriculados_9" /></td>
               <td id="total_matriculados">0</td>
             </tr>
             <tr>
               <td>Aprobados</td>
-              <td><input type="number" class="form-control" data-field="aprobados_1" /></td>
-              <td><input type="number" class="form-control" data-field="aprobados_2" /></td>
-              <td><input type="number" class="form-control" data-field="aprobados_3" /></td>
-              <td><input type="number" class="form-control" data-field="aprobados_4" /></td>
-              <td><input type="number" class="form-control" data-field="aprobados_5" /></td>
-              <td><input type="number" class="form-control" data-field="aprobados_6" /></td>
-              <td><input type="number" class="form-control" data-field="aprobados_7" /></td>
-              <td><input type="number" class="form-control" data-field="aprobados_8" /></td>
+              <td><input type="text" class="form-control" data-field="aprobados_1" /></td>
+              <td><input type="text" class="form-control" data-field="aprobados_2" /></td>
+              <td><input type="text" class="form-control" data-field="aprobados_3" /></td>
+              <td><input type="text" class="form-control" data-field="aprobados_4" /></td>
+              <td><input type="text" class="form-control" data-field="aprobados_5" /></td>
+              <td><input type="text" class="form-control" data-field="aprobados_6" /></td>
+              <td><input type="text" class="form-control" data-field="aprobados_7" /></td>
+              <td><input type="text" class="form-control" data-field="aprobados_8" /></td>
+              <td><input type="text" class="form-control" data-field="aprobados_9" /></td>
               <td id="total_aprobados">0</td>
             </tr>
             <tr>
               <td>Reprobados</td>
-              <td><input type="number" class="form-control" data-field="reprobados_1" /></td>
-              <td><input type="number" class="form-control" data-field="reprobados_2" /></td>
-              <td><input type="number" class="form-control" data-field="reprobados_3" /></td>
-              <td><input type="number" class="form-control" data-field="reprobados_4" /></td>
-              <td><input type="number" class="form-control" data-field="reprobados_5" /></td>
-              <td><input type="number" class="form-control" data-field="reprobados_6" /></td>
-              <td><input type="number" class="form-control" data-field="reprobados_7" /></td>
-              <td><input type="number" class="form-control" data-field="reprobados_8" /></td>
+              <td><input type="text" class="form-control" data-field="reprobados_1" /></td>
+              <td><input type="text" class="form-control" data-field="reprobados_2" /></td>
+              <td><input type="text" class="form-control" data-field="reprobados_3" /></td>
+              <td><input type="text" class="form-control" data-field="reprobados_4" /></td>
+              <td><input type="text" class="form-control" data-field="reprobados_5" /></td>
+              <td><input type="text" class="form-control" data-field="reprobados_6" /></td>
+              <td><input type="text" class="form-control" data-field="reprobados_7" /></td>
+              <td><input type="text" class="form-control" data-field="reprobados_8" /></td>
+              <td><input type="text" class="form-control" data-field="reprobados_9" /></td>
               <td id="total_reprobados">0</td>
             </tr>
             <tr>
               <td>Desertores</td>
-              <td><input type="number" class="form-control" data-field="desertores_1" /></td>
-              <td><input type="number" class="form-control" data-field="desertores_2" /></td>
-              <td><input type="number" class="form-control" data-field="desertores_3" /></td>
-              <td><input type="number" class="form-control" data-field="desertores_4" /></td>
-              <td><input type="number" class="form-control" data-field="desertores_5" /></td>
-              <td><input type="number" class="form-control" data-field="desertores_6" /></td>
-              <td><input type="number" class="form-control" data-field="desertores_7" /></td>
-              <td><input type="number" class="form-control" data-field="desertores_8" /></td>
+              <td><input type="text" class="form-control" data-field="desertores_1" /></td>
+              <td><input type="text" class="form-control" data-field="desertores_2" /></td>
+              <td><input type="text" class="form-control" data-field="desertores_3" /></td>
+              <td><input type="text" class="form-control" data-field="desertores_4" /></td>
+              <td><input type="text" class="form-control" data-field="desertores_5" /></td>
+              <td><input type="text" class="form-control" data-field="desertores_6" /></td>
+              <td><input type="text" class="form-control" data-field="desertores_7" /></td>
+              <td><input type="text" class="form-control" data-field="desertores_8" /></td>
+              <td><input type="text" class="form-control" data-field="desertores_9" /></td>
               <td id="total_desertores">0</td>
             </tr>
             <tr>
               <td>Foráneos</td>
-              <td><input type="number" class="form-control" data-field="foraneos_1" /></td>
-              <td><input type="number" class="form-control" data-field="foraneos_2" /></td>
-              <td><input type="number" class="form-control" data-field="foraneos_3" /></td>
-              <td><input type="number" class="form-control" data-field="foraneos_4" /></td>
-              <td><input type="number" class="form-control" data-field="foraneos_5" /></td>
-              <td><input type="number" class="form-control" data-field="foraneos_6" /></td>
-              <td><input type="number" class="form-control" data-field="foraneos_7" /></td>
-              <td><input type="number" class="form-control" data-field="foraneos_8" /></td>
+              <td><input type="text" class="form-control" data-field="foraneos_1" /></td>
+              <td><input type="text" class="form-control" data-field="foraneos_2" /></td>
+              <td><input type="text" class="form-control" data-field="foraneos_3" /></td>
+              <td><input type="text" class="form-control" data-field="foraneos_4" /></td>
+              <td><input type="text" class="form-control" data-field="foraneos_5" /></td>
+              <td><input type="text" class="form-control" data-field="foraneos_6" /></td>
+              <td><input type="text" class="form-control" data-field="foraneos_7" /></td>
+              <td><input type="text" class="form-control" data-field="foraneos_8" /></td>
+              <td><input type="text" class="form-control" data-field="foraneos_9" /></td>
               <td id="total_foraneos">0</td>
             </tr>
           </tbody>
@@ -240,4 +257,35 @@
     </div>
   </div>
 </div>
+<script>
+        document.querySelectorAll('input[type="text"]').forEach(function(input) {
+            input.addEventListener('input', function() {
+                this.value = this.value.replace(/[^0-9]/g, '');
+            });
+        });
+    </script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    // Seleccionar todos los inputs
+    const inputs = document.querySelectorAll('input[data-field]');
+
+    // Función para actualizar el total de una fila
+    function updateTotal(rowId) {
+      const rowInputs = document.querySelectorAll(`input[data-field^="${rowId}_"]`);
+      let total = 0;
+      rowInputs.forEach(input => {
+        total += parseInt(input.value) || 0;
+      });
+      document.getElementById(`total_${rowId}`).textContent = total;
+    }
+
+    // Añadir event listener a cada input para actualizar el total correspondiente
+    inputs.forEach(input => {
+      input.addEventListener('input', () => {
+        const rowId = input.getAttribute('data-field').split('_')[0];
+        updateTotal(rowId);
+      });
+    });
+  });
+</script>
 {% endblock %}

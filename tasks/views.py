@@ -16,14 +16,42 @@ import logging
 logger = logging.getLogger(__name__)
 
 
+def rol_requerido(*roles):
+    def decorator(view_func):
+        def _wrapped_view(request, *args, **kwargs):
+            if request.user.is_authenticated:
+                # Obtener los roles del usuario
+                roles_persona = RolPersona.objects.filter(usuario=request.user)
+                user_roles = [rp.rol.nombre for rp in roles_persona]
+
+                # Verificar si el usuario tiene alguno de los roles requeridos
+                if any(role in user_roles for role in roles):
+                    return view_func(request, *args, **kwargs)
+                else:
+                    return redirect('home')
+            else:
+                return redirect('iniciarSesion')
+
+        return _wrapped_view
+
+    return decorator
+
+
 def home(request):
     return render(request, 'landingPage.html')
 
 
 def iniciarSesion(request):
     if request.user.is_authenticated:
+        # Mensaje de depuración
+        print(f"Usuario autenticado: {request.user.username}")
+
         roles_persona = RolPersona.objects.filter(usuario=request.user)
         roles = [rp.rol for rp in roles_persona]
+
+        # Mensaje de depuración
+        print(f"Roles del usuario: {[rol.nombre for rol in roles]}")
+
         if any(rol.nombre == 'Personal' for rol in roles):
             return redirect('homePersonal')
         elif any(rol.nombre == 'Administrador' for rol in roles):
@@ -34,28 +62,38 @@ def iniciarSesion(request):
     if request.method == "POST":
         correo = request.POST.get('username')
         password = request.POST.get('password')
-        try:
-            user = authenticate(request, username=correo, password=password)
-            if user is not None:
-                login(request, user)
-                roles_persona = RolPersona.objects.filter(usuario=user)
-                roles = [rp.rol for rp in roles_persona]
-                if any(rol.nombre == 'Personal' for rol in roles):
-                    return redirect('homePersonal')
-                elif any(rol.nombre == 'Administrador' for rol in roles):
-                    return redirect('homeAdministrador')
-                else:
-                    return redirect('homeDefault')
-            else:
-                if Usuario.objects.filter(username=correo).exists():
-                    error = 'Contraseña incorrecta'
-                else:
-                    error = 'La cuenta no existe'
-                messages.error(request, error)
-                return render(request, 'iniciarSesion.html')
+        user = authenticate(request, username=correo, password=password)
 
-        except Exception as e:
-            error = f'Error: {str(e)}'
+        # Mensaje de depuración
+        print(f"Intento de autenticación: {correo}")
+
+        if user is not None:
+            login(request, user)
+
+            # Mensaje de depuración
+            print(f"Usuario autenticado: {user.username}")
+
+            roles_persona = RolPersona.objects.filter(usuario=user)
+            roles = [rp.rol for rp in roles_persona]
+
+            # Mensaje de depuración
+            print(f"Roles del usuario: {[rol.nombre for rol in roles]}")
+
+            if any(rol.nombre == 'Personal' for rol in roles):
+                return redirect('homePersonal')
+            elif any(rol.nombre == 'Administrador' for rol in roles):
+                return redirect('homeAdministrador')
+            else:
+                return redirect('')
+        else:
+            if Usuario.objects.filter(username=correo).exists():
+                error = 'Contraseña incorrecta'
+            else:
+                error = 'La cuenta no existe'
+
+            # Mensaje de depuración
+            print(f"Error: {error}")
+
             messages.error(request, error)
             return render(request, 'iniciarSesion.html')
 
@@ -68,6 +106,7 @@ def cerrarSesion(request):
     return redirect('home')
 
 
+@rol_requerido('Administrador')
 @login_required
 def registrarUsuario(request):
     if request.method == 'POST':
@@ -158,6 +197,7 @@ def validar_cedula(cedula):
     return digito_verificador == digitos_cedula[9]
 
 
+@rol_requerido('Administrador')
 @login_required
 def editarPersonalAdmi(request, id):
     usuario = get_object_or_404(Usuario, id=id)
@@ -177,6 +217,7 @@ def editarPersonalAdmi(request, id):
                   {'form': form, 'personalAdministrativo': Usuario.objects.all()})
 
 
+@rol_requerido('Administrador')
 @login_required
 def eliminarUsuario(request, id):
     usuario = Usuario.objects.get(id=id)
@@ -184,6 +225,7 @@ def eliminarUsuario(request, id):
     return redirect('admiManage')
 
 
+@rol_requerido('Administrador')
 @login_required
 def admiManage(request):
     usuario = request.user
@@ -193,6 +235,7 @@ def admiManage(request):
                   {"personalAdministrativo": personalAdministrativo, 'usuario': usuario, 'perfil': perfil})
 
 
+@rol_requerido('Administrador')
 @login_required
 def homeAdministrador(request):
     usuario = request.user
@@ -200,6 +243,7 @@ def homeAdministrador(request):
     return render(request, 'homeAdministrador.html', {'usuario': usuario, 'perfil': perfil})
 
 
+@rol_requerido('Administrador')
 @login_required
 def perfilAdministrador(request):
     usuario = request.user
@@ -207,6 +251,7 @@ def perfilAdministrador(request):
     return render(request, 'perfilAdministrador.html', {'usuario': usuario, 'perfil': perfil})
 
 
+@rol_requerido('Administrador')
 @login_required
 def editarPerfilAdmi(request):
     usuario = request.user
@@ -225,6 +270,7 @@ def editarPerfilAdmi(request):
     return render(request, 'perfilAdministrador.html', {'usuario': usuario, 'perfil': perfil})
 
 
+@rol_requerido('Personal')
 @login_required
 def homePersonal(request):
     usuario = request.user
@@ -232,6 +278,7 @@ def homePersonal(request):
     return render(request, 'homePersonal.html', {'usuario': usuario, 'perfil': perfil})
 
 
+@rol_requerido('Administrador')
 @login_required
 def mostrarPeriodos(request):  # Vista general de Periodos
     usuario = request.user
@@ -241,6 +288,7 @@ def mostrarPeriodos(request):  # Vista general de Periodos
     return render(request, "gestionPeriodoHome.html", {"periodos": periodos, 'usuario': usuario, 'perfil': perfil})
 
 
+@rol_requerido('Administrador')
 @login_required
 def guardar_editar_Periodos(request):  # Vista para editar o agregar
     periodos = PeriodoAcademico.objects.all()
@@ -248,10 +296,12 @@ def guardar_editar_Periodos(request):  # Vista para editar o agregar
     return render(request, "gestionPeriodo.html", {"periodos": periodos})
 
 
+@rol_requerido('Administrador')
 @login_required
 def obtener_eventos(request):  # Método para cargar los periodos registrados en calendar
     periodos = PeriodoAcademico.objects.all()
     eventos = []
+
 
     for periodo in periodos:
         eventos.append({
@@ -264,6 +314,7 @@ def obtener_eventos(request):  # Método para cargar los periodos registrados en
     return JsonResponse(eventos, safe=False)
 
 
+@rol_requerido('Administrador')
 @login_required
 def registrarPeriodo(request):
     # Se los recibe como strings
@@ -301,13 +352,14 @@ def registrarPeriodo(request):
                     return redirect('/mostrarPeriodos/')
 
         periodo = PeriodoAcademico.objects.create(fechaInicio=fechaI, fechaFin=fechaF, nombre=nombreP)
-        for i in range(1, 9):
+        for i in range(1, 10):
             ciclo = Ciclo.objects.create(idPeriodo=periodo, numero=i)
 
     messages.success(request, '¡Período registrado correctamente!')
     return redirect('/mostrarPeriodos/')
 
 
+@rol_requerido('Personal')
 @login_required
 def sugerenciaPersonal(request):
     usuario = request.user
@@ -329,6 +381,7 @@ def sugerenciaPersonal(request):
     return render(request, 'sugerencia.html', {'usuario': usuario, 'perfil': perfil})
 
 
+@rol_requerido('Personal')
 @login_required
 def graficaPrediccion(request):
     usuario = request.user
@@ -350,6 +403,7 @@ def index1(request):
     return render(request, 'InterfazCiclos.html', {'usuario': usuario, 'perfil': perfil})
 
 
+@rol_requerido('Personal')
 @login_required
 def prediccionCiclos(request):
     usuario = request.user
@@ -740,6 +794,7 @@ def get_chart9(request):
     return JsonResponse(chart)
 
 
+@rol_requerido('Personal')
 @login_required
 def modeloMatematico(request):
     usuario = request.user
@@ -747,6 +802,7 @@ def modeloMatematico(request):
     return render(request, 'modeloMatematicoInfo.html', {'usuario': usuario, 'perfil': perfil})
 
 
+@rol_requerido('Administrador')
 @login_required
 def variablesAdministrador(request):
     usuario = request.user
@@ -754,6 +810,7 @@ def variablesAdministrador(request):
     return render(request, 'agregarDatos.html', {'usuario': usuario, 'perfil': perfil})
 
 
+@rol_requerido('Administrador')
 @login_required
 def listaSugerencias(request):
     usuario = request.user
@@ -762,6 +819,7 @@ def listaSugerencias(request):
     return render(request, 'listaSugerencia.html', {"sugerencias": sugerencias, 'usuario': usuario, 'perfil': perfil})
 
 
+@rol_requerido('Personal')
 @login_required
 def mostrarDatosHistoricos(request):
     usuario = request.user
@@ -792,6 +850,8 @@ def mostrarDatosHistoricos(request):
 
     return render(request, "mostrarDatosHistoricos.html", context)
 
+
+@rol_requerido('Administrador')
 @login_required
 def mostrarDatosHAuditoria(request):
     periodos = PeriodoAcademico.objects.all()
@@ -800,7 +860,8 @@ def mostrarDatosHAuditoria(request):
     datos = []
 
     for periodo in periodos:
-        estadisticas_ciclo = EstadisticaPeriodo.objects.filter(idCiclo__idPeriodo=periodo)# Estadísticas asociadas con ciclos específicos
+        estadisticas_ciclo = EstadisticaPeriodo.objects.filter(
+            idCiclo__idPeriodo=periodo)  # Estadísticas asociadas con ciclos específicos
 
         # Estadística total del periodo, sin asociación con ciclos
         estadistica_general = EstadisticaPeriodo.objects.filter(idPeriodo=periodo, idCiclo=None).first()
@@ -838,6 +899,7 @@ def mostrarDatosPeriodo(request, id):
                   {"estadisticasPeriodo": estadisticasPeriodo, 'usuario': usuario, 'perfil': perfil})
 
 
+@rol_requerido('Personal')
 @login_required
 def ayuda(request):
     usuario = request.user
@@ -845,6 +907,7 @@ def ayuda(request):
     return render(request, 'ayuda.html', {'usuario': usuario, 'perfil': perfil})
 
 
+@rol_requerido('Administrador')
 @login_required
 def agregarDatos(request):
     usuario = request.user
@@ -861,7 +924,7 @@ def agregarDatos(request):
         # Validar que todos los campos no estén vacíos
         all_filled = True
         for tipo in ['matriculados', 'aprobados', 'reprobados', 'desertores', 'foraneos']:
-            for i in range(1, 9):
+            for i in range(1, 10):
                 if not request.POST.get(f'{tipo}_{i}', ''):
                     all_filled = False
                     break
@@ -873,11 +936,11 @@ def agregarDatos(request):
             return redirect('agregarDatos')
 
         # Guardar el registro con los datos totales asociados al idPeriodo
-        total_matriculados = sum(int(request.POST.get(f'matriculados_{i}', 0)) for i in range(1, 9))
-        total_aprobados = sum(int(request.POST.get(f'aprobados_{i}', 0)) for i in range(1, 9))
-        total_reprobados = sum(int(request.POST.get(f'reprobados_{i}', 0)) for i in range(1, 9))
-        total_desertores = sum(int(request.POST.get(f'desertores_{i}', 0)) for i in range(1, 9))
-        total_foraneos = sum(int(request.POST.get(f'foraneos_{i}', 0)) for i in range(1, 9))
+        total_matriculados = sum(int(request.POST.get(f'matriculados_{i}', 0)) for i in range(1, 10))
+        total_aprobados = sum(int(request.POST.get(f'aprobados_{i}', 0)) for i in range(1, 10))
+        total_reprobados = sum(int(request.POST.get(f'reprobados_{i}', 0)) for i in range(1, 10))
+        total_desertores = sum(int(request.POST.get(f'desertores_{i}', 0)) for i in range(1, 10))
+        total_foraneos = sum(int(request.POST.get(f'foraneos_{i}', 0)) for i in range(1, 10))
 
         estadistica_total = EstadisticaPeriodo(
             numMatriculados=total_matriculados,
@@ -920,7 +983,104 @@ def agregarDatos(request):
         print(periodos)
         return render(request, 'agregarDatos.html', {'periodos': periodos, 'usuario': usuario, 'perfil': perfil})
 
+@login_required
+def cargar_datos(request, periodo_id):
+    try:
+        # Obtener el registro del periodo
+        periodo_data = EstadisticaPeriodo.objects.get(idPeriodo_id=periodo_id)
 
+        # Obtener los ciclos asociados al periodo
+        ciclos = Ciclo.objects.filter(idPeriodo_id=periodo_id)
+        print(ciclos)
+        # Obtener los registros de estadística para los ciclos
+        ciclos_data = {ciclo_data.idCiclo.numero: ciclo_data for ciclo_data in
+                       EstadisticaPeriodo.objects.filter(idCiclo_id__in=ciclos)}
+
+        # Preparar la respuesta
+        response_data = {
+            "total_matriculados": periodo_data.numMatriculados,
+            "total_aprobados": periodo_data.numAprobados,
+            "total_reprobados": periodo_data.numReprobados,
+            "total_desertores": periodo_data.numDesertores,
+            "total_foraneos": periodo_data.numForaneos,
+            **{
+                f"ciclo_{ciclo.numero}": {
+                    "matriculados": ciclos_data[ciclo.numero].numMatriculados if ciclo.numero in ciclos_data else 0,
+                    "aprobados": ciclos_data[ciclo.numero].numAprobados if ciclo.numero in ciclos_data else 0,
+                    "reprobados": ciclos_data[ciclo.numero].numReprobados if ciclo.numero in ciclos_data else 0,
+                    "desertores": ciclos_data[ciclo.numero].numDesertores if ciclo.numero in ciclos_data else 0,
+                    "foraneos": ciclos_data[ciclo.numero].numForaneos if ciclo.numero in ciclos_data else 0,
+                } for ciclo in ciclos
+            }
+        }
+
+        return JsonResponse(response_data, safe=False)
+    except EstadisticaPeriodo.DoesNotExist:
+        return JsonResponse({"error": "No data found"}, status=404)
+
+@login_required
+def guardarcambios_datos(request, periodo_id):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            print("Datos recibidos:", data)
+
+            total_matriculados = data.get('total_matriculados', 0)
+            total_aprobados = data.get('total_aprobados', 0)
+            total_reprobados = data.get('total_reprobados', 0)
+            total_desertores = data.get('total_desertores', 0)
+            total_foraneos = data.get('total_foraneos', 0)
+
+            print("Totales:", total_matriculados, total_aprobados, total_reprobados, total_desertores, total_foraneos)
+
+            periodo_academico = get_object_or_404(PeriodoAcademico, pk=periodo_id)
+
+            # Actualizar o crear el registro del periodo
+            EstadisticaPeriodo.objects.update_or_create(
+                idPeriodo_id=periodo_academico.id,
+                idCiclo_id=None,
+                defaults={
+                    'numMatriculados': total_matriculados,
+                    'numAprobados': total_aprobados,
+                    'numReprobados': total_reprobados,
+                    'numDesertores': total_desertores,
+                    'numForaneos': total_foraneos,
+                    'idAdministrador_id': request.user.id
+                }
+            )
+
+            ciclos = data.get('ciclos', [])
+            print("Ciclos recibidos:", ciclos)
+
+            for ciclo_data in ciclos:
+                ciclo_numero = ciclo_data.get('numero')
+                print(f"Procesando ciclo {ciclo_numero}: {ciclo_data}")
+
+                ciclo = get_object_or_404(Ciclo, idPeriodo_id=periodo_academico.id, numero=ciclo_numero)
+
+                EstadisticaPeriodo.objects.update_or_create(
+                    idCiclo_id=ciclo.id,
+                    idPeriodo_id=None,
+                    defaults={
+                        'numMatriculados': ciclo_data.get('matriculados', 0),
+                        'numAprobados': ciclo_data.get('aprobados', 0),
+                        'numReprobados': ciclo_data.get('reprobados', 0),
+                        'numDesertores': ciclo_data.get('desertores', 0),
+                        'numForaneos': ciclo_data.get('foraneos', 0),
+                        'idAdministrador_id': request.user.id
+                    }
+                )
+
+            return JsonResponse({'message': 'Datos guardados correctamente.', 'status': 'success'})
+        except Exception as e:
+            print("Error al guardarrr los datos:", str(e))
+            return JsonResponse({'error': str(e)}, status=500)
+    else:
+        return JsonResponse({'error': 'Método no permitido'}, status=405)
+
+
+
+@rol_requerido('Administrador')
 @login_required
 def ayudaAdmin(request):
     usuario = request.user
@@ -928,12 +1088,15 @@ def ayudaAdmin(request):
     return render(request, 'ayudaAdministrador.html', {'usuario': usuario, 'perfil': perfil})
 
 
+@rol_requerido('Personal')
 @login_required
 def perfilPersonal(request):
     usuario = request.user
     perfil = get_object_or_404(Perfil, usuario=usuario)
     return render(request, 'perfilPersonal.html', {'usuario': usuario, 'perfil': perfil})
 
+
+@rol_requerido('Administrador')
 @login_required
 def editarPerfilPersonal(request):
     usuario = request.user

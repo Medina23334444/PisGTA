@@ -1,6 +1,6 @@
-.chart-container2{
-    margin-top: 10px; 
-    margin-left: 200px; 
+.chart-container2 {
+    margin-top: 10px;
+    margin-left: 200px;
 }
 
 .row.d-flex {
@@ -66,4 +66,21 @@
     .button-container {
         margin-bottom: 10px;
     }
+}
+
+
+.breadcrumb {
+    background-color: #eaeef3;
+    border-radius: 5px;
+    padding: 10px;
+}
+
+
+.breadcrumb-item.active {
+    color: #6c757d;
+}
+
+h1 {
+    color: #333;
+    margin-bottom: 20px;
 }

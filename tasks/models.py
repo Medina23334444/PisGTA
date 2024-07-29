@@ -109,7 +109,7 @@ class EstadisticaPeriodo(models.Model):
 
 class Perfil(models.Model):
     fechaNacimiento = models.DateField(default=date.today)
-    fotoPerfil = models.ImageField(upload_to='fotos/%Y/%m/%d', blank=True, null=True)
+    fotoPerfil = models.ImageField(upload_to='imagenes', blank=True, null=True)
     descripcion = models.TextField(blank=True, default='')
     usuarioInstagram = models.CharField(max_length=30, blank=True, default='')
     usuarioFacebook = models.CharField(max_length=30, blank=True, default='')

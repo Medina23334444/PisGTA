@@ -375,7 +375,7 @@ def generate_chart_data(listaT, listaD, listaA, listaR, listaM, listaF, listaTNo
             }
         },
         'tooltip': {
-            'trigger': 'item',
+            'trigger': 'axis',
             'axisPointer': {
                 'type': 'cross',
                 'label': {

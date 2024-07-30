@@ -1,42 +1,55 @@
 (function () {
     'use strict';
 
-    function validarNombres() {
-        const nombresInput = document.getElementById('nombres');
-        const feedbackVacio = document.getElementById('feedback-vacio');
-        const feedbackInvalido = document.getElementById('feedback-invalido');
-        const nombres = nombresInput.value.trim();
-        const regex = /^[a-zA-ZÀ-ÿ\s]{1,40}$/;
+    function validateInput(event) {
+        const input = event.target;
+        const pattern = new RegExp(input.pattern);
+        if (!pattern.test(input.value)) {
+            input.classList.add('is-invalid');
+        } else {
+            input.classList.remove('is-invalid');
+        }
+    }
+
+    function handleFormSubmission(event) {
+        const form = event.target;
         let isValid = true;
 
-        feedbackVacio.style.display = 'none';
-        feedbackInvalido.style.display = 'none';
-        nombresInput.classList.remove('is-invalid');
+        // Recorre todos los campos con el atributo pattern
+        const inputs = form.querySelectorAll('input[pattern]');
+        inputs.forEach(function (input) {
+            const pattern = new RegExp(input.pattern);
+            if (!pattern.test(input.value)) {
+                input.classList.add('is-invalid');
+                isValid = false;
+            } else {
+                input.classList.remove('is-invalid');
+            }
+        });
 
-        if (nombres === '') {
-            nombresInput.classList.add('is-invalid');
-            feedbackVacio.style.display = 'block';
-            isValid = false;
-        } else if (!regex.test(nombres)) {
-            nombresInput.classList.add('is-invalid');
-            feedbackInvalido.style.display = 'block';
-            isValid = false;
+        // Añade la clase was-validated para mostrar los estilos de validación
+        form.classList.add('was-validated');
+
+        // Evita el envío del formulario si hay campos inválidos
+        if (!isValid) {
+            event.preventDefault();
+            event.stopPropagation();
         }
-
-        return isValid;
     }
 
     window.addEventListener('load', function () {
-        var forms = document.getElementsByClassName('needs-validation');
+        const forms = document.getElementsByClassName('needs-validation');
         Array.prototype.forEach.call(forms, function (form) {
-            form.addEventListener('submit', function (event) {
-                if (!form.checkValidity() || !validarNombres()) {
-                    event.preventDefault();
-                    event.stopPropagation();
-                }
-                form.classList.add('was-validated');
-            }, false);
+            form.addEventListener('submit', handleFormSubmission, false);
+
+            // Añade eventos de validación en tiempo real a los campos de entrada
+            const inputs = form.querySelectorAll('input[pattern]');
+            inputs.forEach(function (input) {
+                input.addEventListener('input', validateInput);
+            });
         });
     }, false);
 })();
+
+
 

@@ -2,9 +2,10 @@
 {% block title %}Otra Página{% endblock %}
 {% load static %}
 {% block content %}
-     <link rel="stylesheet" href="{% static 'styleSugerencia.css' %}" />
+    <link rel="stylesheet" href="{% static 'styleSugerencia.css' %}"/>
+    <script src="{% static 'tablas.js' %}"></script>
     <div class="container">
-          <header>
+        <header>
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="/homePersonal">Inicio</a></li>
@@ -12,75 +13,90 @@
                 </ol>
             </nav>
             <h1> Agregar Sugerencias</h1>
-          </header>
-          <div class="d-flex justify-content-end">
-            <button type="button" class="btn btn-dark ms-2" data-bs-toggle="modal" data-bs-target="#modal1"><i class="bi bi-folder-plus"></i> Agregar Sugerencia</button>
-          </div>
-          <br>
-          <section class="section">
-              <div class="row row-cols-1 row-cols-md-3 g-3">
-                  <div class="col">
-                      <div class="card justify" style="width: 20rem; border-top: 3px solid #8ab5ea;" >
-                          <img src="{% static 'sugerencia.jpg' %}" class="card-img-top">
-                          <div class="card-body">
-                              <h5 class="card-title">Espacios Sugerencias</h5>
-                              <p class="card-text"> En este espacio, puedes agregar tus sugerencias para mejorar nuestra aplicación. 
-                                  Valoramos tus comentarios y trabajamos constantemente para ofrecer una mejor experiencia. 
-                                  ¡Tu opinión es muy importante para nosotros!</p>
-                          </div>
-                      </div>
-                  </div>
-                  <div class="col">
-                      <div class="card justify" style="width: 20rem; border-top: 3px solid #8ab5ea">
-                          <img src="{% static 'EjemploSugerencia.jpg' %}" class="card-img-top">
-                          <div class="card-body">
-                              <h5 class="card-title">Ejemplo de Sugerencia</h5>
-                              <h6 class="card-subtitle">Asunto: Notificaciones</h6>
-                              <p class="card-text"> Sería genial si la aplicación pudiera enviar notificaciones automáticas cuando se 
-                                  detecten problemas con los datos históricos. Esto ayudaría a responder rápidamente y mantener la 
-                                  integridad de los datos.</p>
-                          </div>
-                      </div>
-                  </div>
-                  <div class="col">
-                      <div class="card justify" style="width: 20rem; border-top: 3px solid #8ab5ea">
-                          <img src="{% static 'EjemploSugerencia.jpg' %}" class="card-img-top">
-                          <div class="card-body">
-                              <h5 class="card-title">Ejemplo de Sugerencia</h5>
-                              <h6 class="card-subtitle">Asunto: Mejora de la Interfaz de Usuario</h6>
-                              <p class="card-text"> Sería útil incluir un panel de control personalizable donde los usuarios puedan ver
-                                  métricas clave y alertas en tiempo real. Esto permitiría un monitoreo más efectivo y una toma de
-                                  decisiones más informada</p>
-                          </div>
-                      </div>
-                  </div>
-              </div>
-          </section>
-          <div class="modal fade" id="modal1" tabindex="-1" aria-labelledby="modal1Label" aria-hidden="true">
-              <div class="modal-dialog modal-dialog-centered">
-                  <div class="modal-content">
-                      <div class="modal-header">
-                          <h5 class="modal-title" id="modal1Label" style="font-size: 30px;">Registro nueva Sugerencia</h5>
-                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                      </div>
-                      <div class="modal-body" style="border-top: 3px solid #8ab5ea;">
-                          <form action="{% url 'sugerenciaPersonal' %}" method="POST">
-                              {% csrf_token %}
-                              <div class="mb-3">
-                        <label for="asunto" class="form-label">Asunto</label>
-                        <input type="text" class="form-control1" id="asunto" name="asunto" placeholder="Ingrese aquí el asunto..." required>
+        </header>
+        <div class="d-flex justify-content-end">
+            <button type="button" class="btn btn-dark ms-2" data-bs-toggle="modal" data-bs-target="#modal1"><i
+                    class="bi bi-folder-plus"></i> Agregar Sugerencia
+            </button>
+        </div>
+        <br>
+        <section class="section">
+            <div class="row row-cols-1 row-cols-md-3 g-3">
+                <div class="col">
+                    <div class="card justify" style="width: 20rem; border-top: 3px solid #8ab5ea;">
+                        <img src="{% static 'sugerencia.jpg' %}" class="card-img-top">
+                        <div class="card-body">
+                            <h5 class="card-title">Espacios Sugerencias</h5>
+                            <p class="card-text"> En este espacio, puedes agregar tus sugerencias para mejorar nuestra
+                                aplicación.
+                                Valoramos tus comentarios y trabajamos constantemente para ofrecer una mejor
+                                experiencia.
+                                ¡Tu opinión es muy importante para nosotros!</p>
+                        </div>
                     </div>
-                    <div class="mb-3">
-                        <label for="descripcion" class="form-label">Descripción</label>
-                        <textarea class="form-control2" id="descripcion" name="descripcion" placeholder="Ingrese aquí la descripción..." required></textarea>
+                </div>
+                <div class="col">
+                    <div class="card justify" style="width: 20rem; border-top: 3px solid #8ab5ea">
+                        <img src="{% static 'EjemploSugerencia.jpg' %}" class="card-img-top">
+                        <div class="card-body">
+                            <h5 class="card-title">Ejemplo de Sugerencia</h5>
+                            <h6 class="card-subtitle">Asunto: Notificaciones</h6>
+                            <p class="card-text"> Sería genial si la aplicación pudiera enviar notificaciones
+                                automáticas cuando se
+                                detecten problemas con los datos históricos. Esto ayudaría a responder rápidamente y
+                                mantener la
+                                integridad de los datos.</p>
+                        </div>
                     </div>
-                    <div class="modal-footer">
-                        <button type="submit" class="btn btn-dark">Guardar</button>
+                </div>
+                <div class="col">
+                    <div class="card justify" style="width: 20rem; border-top: 3px solid #8ab5ea">
+                        <img src="{% static 'EjemploSugerencia.jpg' %}" class="card-img-top">
+                        <div class="card-body">
+                            <h5 class="card-title">Ejemplo de Sugerencia</h5>
+                            <h6 class="card-subtitle">Asunto: Mejora de la Interfaz de Usuario</h6>
+                            <p class="card-text"> Sería útil incluir un panel de control personalizable donde los
+                                usuarios puedan ver
+                                métricas clave y alertas en tiempo real. Esto permitiría un monitoreo más efectivo y una
+                                toma de
+                                decisiones más informada</p>
+                        </div>
                     </div>
-                </form>
+                </div>
+            </div>
+        </section>
+        <div class="modal fade" id="modal1" tabindex="-1" aria-labelledby="modal1Label" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="modal1Label" style="font-size: 30px;">Registro nueva Sugerencia</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body" style="border-top: 3px solid #8ab5ea;">
+                        <form id="sugerenciaForm" action="{% url 'sugerenciaPersonal' %}" method="POST"
+                              class="needs-validation" novalidate>
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <label for="asunto" class="form-label">Asunto</label>
+                                <input type="text" class="form-control" id="asunto" name="asunto"
+                                       placeholder="Ingrese aquí el asunto..." required pattern=".{1,100}">
+                                <div class="invalid-feedback">Por favor, ingrese un asunto (1-100 caracteres).</div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="descripcion" class="form-label">Descripción</label>
+                                <textarea class="form-control" id="descripcion" name="descripcion"
+                                          placeholder="Ingrese aquí la descripción..." required
+                                          pattern=".{1,500}" rows="6" cols="50"></textarea>
+                                <div class="invalid-feedback">Por favor, ingrese una descripción (1-500 caracteres).
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="submit" class="btn btn-dark">Guardar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-</div>
-      </div>
 {% endblock %}

@@ -1,5 +1,4 @@
 {% extends "base_init.html" %}
-
 {% block title %}Otra Página{% endblock %}
 {% load static %}
 {% block content %}
@@ -15,7 +14,7 @@
             </nav>
             <h1 class="mt-4">Agregar Usuarios</h1>
         </header>
-    
+
         <div class="d-flex align-items-center mb-3">
             <button class="btn">
                 <i class="bi bi-search"></i>
@@ -45,21 +44,23 @@
                                 <div class="col-md-6">
                                     <div class="mb-3">
                                         <label for="nombres" class="form-label">Nombres</label>
-                                        <input type="text" class="form-control1" id="nombres" name="nombres"
-                                               placeholder="Ejemplo: Luis Alberto" style="width: 350px;" required>
+                                        <input type="text" class="form-control" id="nombres" name="nombres"
+                                               placeholder="Ejemplo: Luis Alberto" style="width: 350px;" required
+                                               pattern="[a-zA-ZÀ-ÿ\s]{1,40}">
                                         <div class="invalid-feedback" id="feedback-invalido">Por favor, ingrese un
                                             nombre válido (solo letras y espacios).
                                         </div>
                                     </div>
                                     <div class="mb-3">
                                         <label for="direccion" class="form-label">Dirección</label>
-                                        <input type="text" class="form-control1" id="direccion" name="direccion"
-                                               placeholder="Ejemplo: Loja" style="width: 350px;" required>
+                                        <input type="text" class="form-control" id="direccion" name="direccion"
+                                               placeholder="Ejemplo: Loja" style="width: 350px;" required
+                                               pattern="[a-zA-ZÀ-ÿ\s]{1,40}">
                                         <div class="invalid-feedback">Por favor, ingrese su dirección.</div>
                                     </div>
                                     <div class="mb-3">
                                         <label for="correo" class="form-label">Correo electrónico</label>
-                                        <input type="text" class="form-control1" id="correo" name="correo"
+                                        <input type="email" class="form-control" id="correo" name="correo"
                                                placeholder="Ejemplo: luis.a.medina.c@unl.edu.ec" style="width: 350px;"
                                                required>
                                         <div class="invalid-feedback">Por favor, ingrese un correo electrónico válido
@@ -68,7 +69,7 @@
                                     <div class="form-wrapper">
                                         <label for="tipo_cargo">Cargo</label>
                                         <div>
-                                            <select name="tipo_cargo" id="tipo_cargo" class="form-control1"
+                                            <select name="tipo_cargo" id="tipo_cargo" class="form-control"
                                                     style="width: 350px;" required>
                                                 <option value="Personal">Personal Administrativo</option>
                                                 <option value="Administrador">Administrador</option>
@@ -80,7 +81,7 @@
                                 <div class="col-md-6">
                                     <div class="mb-3">
                                         <label for="dni" class="form-label">DNI</label>
-                                        <input type="text" class="form-control1" id="dni" name="dni"
+                                        <input type="text" class="form-control" id="dni" name="dni"
                                                placeholder="Ejemplo: 1105585184" style="width: 350px;" required
                                                pattern="\d{10}">
                                         <div class="invalid-feedback">Por favor, ingrese un DNI válido (10 dígitos).
@@ -88,13 +89,14 @@
                                     </div>
                                     <div class="mb-3">
                                         <label for="apellidos" class="form-label">Apellidos</label>
-                                        <input type="text" class="form-control1" id="apellidos" name="apellidos"
-                                               placeholder="Ejemplo: Medina Chamba" style="width: 350px;" required>
+                                        <input type="text" class="form-control" id="apellidos" name="apellidos"
+                                               placeholder="Ejemplo: Medina Chamba" style="width: 350px;" required
+                                               pattern="[a-zA-ZÀ-ÿ\s]{1,40}">
                                         <div class="invalid-feedback">Por favor, ingrese sus apellidos.</div>
                                     </div>
                                     <div class="mb-3">
                                         <label for="telefono" class="form-label">Teléfono</label>
-                                        <input type="text" class="form-control1" id="telefono" name="telefono"
+                                        <input type="text" class="form-control" id="telefono" name="telefono"
                                                placeholder="Ejemplo: 0960749867" style="width: 350px;" required
                                                pattern="\d{10}">
                                         <div class="invalid-feedback">Por favor, ingrese un número de teléfono válido
@@ -137,15 +139,32 @@
                             <td>{{ us.telefono }}</td>
                             <td><a href="#modal2-{{ forloop.counter }}" class="edit" data-bs-toggle="modal"> <i
                                     class="bi bi-pencil-square"></i></a></td>
-                            <td><a href="{% url 'eliminarUsuario' us.id %}" class="btn"><i class="bi bi-trash"></i></a>
-                            </td>
+                            <td><a href="#" class="btn" onclick="handleDelete('{{ us.id }}'); return false;"><i
+                                    class="bi bi-trash"></i></a></td>
                         </tr>
                     {% endfor %}
                     </tbody>
                 </table>
             </div>
+            <script>
+                function handleDelete(userId) {
+                    Swal.fire({
+                        title: '¿Estas seguro de eliminar el usuario?',
+                        text: "No podras revertir esta acción!",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#070303',
+                        cancelButtonColor: '#a30a0a',
+                        cancelButtonText: 'Cancelar',
+                        confirmButtonText: 'Confirmar'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = "{% url 'eliminarUsuario' 'PLACEHOLDER_ID' %}".replace('PLACEHOLDER_ID', userId);
+                        }
+                    });
+                }
+            </script>
         </section>
-
         {% for us in personalAdministrativo %}
             <div class="modal fade" id="modal2-{{ forloop.counter }}" tabindex="-1" aria-labelledby="modal1Label"
                  aria-hidden="true">
@@ -158,7 +177,7 @@
                         </div>
                         <div class="modal-body" style="border-top: 3px solid #8ab5ea;">
                             <form id="editPersonalForm-{{ forloop.counter }}" action="/editarPersonalAdmi/{{ us.id }}/"
-                                  method="POST">
+                                  method="POST" class="needs-validation" novalidate>
                                 {% csrf_token %}
                                 {{ form.as_p }}
                                 <div class="row">
@@ -167,34 +186,46 @@
                                             <label for="nombres-{{ forloop.counter }}"
                                                    class="form-label">Nombres</label>
                                             <input type="text" class="form-control" name="nombres"
-                                                   value="{{ us.nombres }}" style="width: 350px;">
+                                                   id="nombres-{{ forloop.counter }}" value="{{ us.nombres }}"
+                                                   style="width: 350px;" required pattern="[a-zA-ZÀ-ÿ\s]{1,40}">
+                                            <div class="invalid-feedback">Por favor, ingrese un nombre válido (solo
+                                                letras y espacios).
+                                            </div>
                                         </div>
                                         <div class="mb-3">
                                             <label for="direccion-{{ forloop.counter }}"
                                                    class="form-label">Dirección</label>
-                                            <input type="text" class="form-control" name="direccion"
-                                                   value="{{ us.direccion }}" style="width: 350px;">
+                                            <input type="text" class="form-control" id="direccion-{{ forloop.counter }}"
+                                                   name="direccion" value="{{ us.direccion }}" style="width: 350px;"
+                                                   pattern="[a-zA-ZÀ-ÿ\s]{1,40}">
+                                            <div class="invalid-feedback">Por favor, ingrese su dirección.</div>
                                         </div>
                                         <div class="mb-3">
                                             <label for="telefono-{{ forloop.counter }}"
                                                    class="form-label">Teléfono</label>
                                             <input type="text" class="form-control" name="telefono"
-                                                   value="{{ us.telefono }}" style="width: 350px;">
+                                                   id="telefono-{{ forloop.counter }}" value="{{ us.telefono }}"
+                                                   style="width: 350px;" pattern="\d{10}">
+                                            <div class="invalid-feedback">Por favor, ingrese un número de teléfono
+                                                válido (10 dígitos).
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="col-md-6">
                                         <div class="mb-3">
                                             <label for="dni-{{ forloop.counter }}" class="form-label">DNI</label>
-                                            <input type="text" class="form-control" name="dni" value="{{ us.dni }}"
+                                            <input type="text" class="form-control" name="dni"
+                                                   id="dni-{{ forloop.counter }}" value="{{ us.dni }}"
                                                    style="width: 350px;" disabled>
                                         </div>
                                         <div class="mb-3">
                                             <label for="apellidos-{{ forloop.counter }}"
                                                    class="form-label">Apellidos</label>
                                             <input type="text" class="form-control" name="apellidos"
-                                                   value="{{ us.apellidos }}" style="width: 350px;">
+                                                   id="apellidos-{{ forloop.counter }}" value="{{ us.apellidos }}"
+                                                   style="width: 350px;" required pattern="[a-zA-ZÀ-ÿ\s]{1,40}">
+                                            <div class="invalid-feedback">Por favor, ingrese sus apellidos.</div>
                                         </div>
-
                                     </div>
                                 </div>
                                 <div class="modal-footer">
@@ -205,6 +236,6 @@
                     </div>
                 </div>
             </div>
-            </section>
         {% endfor %}
+    </section>
 {% endblock %}

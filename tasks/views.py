@@ -4,7 +4,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from datetime import datetime, timedelta
 
-from .forms import UsuarioForm
+from .forms import UsuarioForm, PerfilForm
 from .models import Usuario, Rol, RolPersona, Sugerencia, PeriodoAcademico, Ciclo, Perfil, EstadisticaPeriodo
 from django.contrib import messages
 import tasks.RungeKutta as r
@@ -12,6 +12,7 @@ from django.http.response import JsonResponse
 import json
 from django.views.decorators.http import require_http_methods
 import logging
+
 logger = logging.getLogger(__name__)
 
 
@@ -20,6 +21,16 @@ def home(request):
 
 
 def iniciarSesion(request):
+    if request.user.is_authenticated:
+        roles_persona = RolPersona.objects.filter(usuario=request.user)
+        roles = [rp.rol for rp in roles_persona]
+        if any(rol.nombre == 'Personal' for rol in roles):
+            return redirect('homePersonal')
+        elif any(rol.nombre == 'Administrador' for rol in roles):
+            return redirect('homeAdministrador')
+        else:
+            return redirect('')
+
     if request.method == "POST":
         correo = request.POST.get('username')
         password = request.POST.get('password')
@@ -57,6 +68,7 @@ def cerrarSesion(request):
     return redirect('home')
 
 
+@login_required
 def registrarUsuario(request):
     if request.method == 'POST':
         data = request.POST
@@ -65,7 +77,6 @@ def registrarUsuario(request):
         if not validar_cedula(dni):
             messages.error(request, 'La cédula ingresada no es válida.')
             return redirect('admiManage')
-
 
         try:
             with transaction.atomic():
@@ -90,7 +101,6 @@ def registrarUsuario(request):
                     return redirect('admiManage')
 
                 RolPersona.objects.create(rol=rol, usuario=usuario)
-
                 messages.success(request, 'Usuario registrado correctamente!')
                 return redirect('admiManage')
 
@@ -103,34 +113,35 @@ def registrarUsuario(request):
             return redirect('admiManage')
 
         except Exception as e:
-            messages.error(request, f'Error al registrar usuario: {e}')
+            messages.error(request, f'Error al registrar usuario')
             return redirect('admiManage')
 
     return render(request, 'admiManage.html')
 
+
 def validar_cedula(cedula):
     if len(cedula) != 10:
         return False
-    
+
     try:
         digitos_cedula = [int(d) for d in cedula]
     except ValueError:
         return False
-    
-    cod_provincia = int(cedula[:2])#Validar código de provincia
+
+    cod_provincia = int(cedula[:2])  # Validar código de provincia
     if cod_provincia < 1 or cod_provincia > 24:
         return False
-    
-    digito_3 = digitos_cedula[2] #Validar digito 3, este entre 0 y 6
+
+    digito_3 = digitos_cedula[2]  # Validar digito 3, este entre 0 y 6
     if digito_3 < 0 or digito_3 > 6:
         return False
-    
-    #coefficients = [2, 1, 2, 1, 2, 1, 2, 1, 2]
+
+    # coefficients = [2, 1, 2, 1, 2, 1, 2, 1, 2]
     total = 0
-    
-    for i in range(0,9):
+
+    for i in range(0, 9):
         x = digitos_cedula[i]
-        if i%2 == 0:
+        if i % 2 == 0:
             x = x * 2
             if x > 9:
                 x -= 9
@@ -139,12 +150,13 @@ def validar_cedula(cedula):
         if product >= 10:
             product -= 9
         total += product"""
-    
+
     digito_verificador = 10 - (total % 10)
     if digito_verificador == 10:
         digito_verificador = 0
-    
+
     return digito_verificador == digitos_cedula[9]
+
 
 @login_required
 def editarPersonalAdmi(request, id):
@@ -172,14 +184,20 @@ def eliminarUsuario(request, id):
     return redirect('admiManage')
 
 
+@login_required
 def admiManage(request):
+    usuario = request.user
+    perfil = get_object_or_404(Perfil, usuario=usuario)
     personalAdministrativo = Usuario.objects.all()
-    return render(request, 'admiManage.html', {"personalAdministrativo": personalAdministrativo})
+    return render(request, 'admiManage.html',
+                  {"personalAdministrativo": personalAdministrativo, 'usuario': usuario, 'perfil': perfil})
 
 
 @login_required
 def homeAdministrador(request):
-    return render(request, 'homeAdministrador.html')
+    usuario = request.user
+    perfil = get_object_or_404(Perfil, usuario=usuario)
+    return render(request, 'homeAdministrador.html', {'usuario': usuario, 'perfil': perfil})
 
 
 @login_required
@@ -190,26 +208,48 @@ def perfilAdministrador(request):
 
 
 @login_required
+def editarPerfilAdmi(request):
+    usuario = request.user
+    perfil = get_object_or_404(Perfil, usuario=usuario)
+    if request.method == 'POST':
+        form = PerfilForm(request.POST, request.FILES, instance=perfil)
+        if form.is_valid():
+            form.save()
+            messages.success(request, '¡El perfil actualizado correctamente!')
+            return redirect('perfilAdministrador')
+        else:
+            messages.error(request, 'Error al actualizar el perfil. Por favor, revisa el formulario.')
+        return redirect('perfilAdministrador')
+    else:
+        form = PerfilForm(request.POST, instance=perfil)
+    return render(request, 'perfilAdministrador.html', {'usuario': usuario, 'perfil': perfil})
+
+
+@login_required
 def homePersonal(request):
-    return render(request, 'homePersonal.html')
+    usuario = request.user
+    perfil = get_object_or_404(Perfil, usuario=usuario)
+    return render(request, 'homePersonal.html', {'usuario': usuario, 'perfil': perfil})
 
 
 @login_required
-def mostrarPeriodos(request):#Vista general de Periodos
+def mostrarPeriodos(request):  # Vista general de Periodos
+    usuario = request.user
+    perfil = get_object_or_404(Perfil, usuario=usuario)
     periodos = PeriodoAcademico.objects.all()
-    #messages.success(request, '!Lista actualizada!')
-    return render(request, "gestionPeriodoHome.html",{"periodos": periodos})
+    # messages.success(request, '!Lista actualizada!')
+    return render(request, "gestionPeriodoHome.html", {"periodos": periodos, 'usuario': usuario, 'perfil': perfil})
 
 
 @login_required
-def guardar_editar_Periodos(request):#Vista para editar o agregar
+def guardar_editar_Periodos(request):  # Vista para editar o agregar
     periodos = PeriodoAcademico.objects.all()
     messages.success(request, '!Lista actualizada!')
-    return render(request, "gestionPeriodo.html",{"periodos":periodos})
+    return render(request, "gestionPeriodo.html", {"periodos": periodos})
 
 
 @login_required
-def obtener_eventos(request):#Método para cargar los periodos registrados en calendar
+def obtener_eventos(request):  # Método para cargar los periodos registrados en calendar
     periodos = PeriodoAcademico.objects.all()
     eventos = []
 
@@ -268,7 +308,10 @@ def registrarPeriodo(request):
     return redirect('/mostrarPeriodos/')
 
 
+@login_required
 def sugerenciaPersonal(request):
+    usuario = request.user
+    perfil = get_object_or_404(Perfil, usuario=usuario)
     if request.method == 'POST':
         try:
             sugerencia = Sugerencia.objects.create(
@@ -283,39 +326,35 @@ def sugerenciaPersonal(request):
             messages.error(request, f'Ocurrió un error: {str(e)}')
             return redirect('sugerenciaPersonal')
 
-    return render(request, 'sugerencia.html')
+    return render(request, 'sugerencia.html', {'usuario': usuario, 'perfil': perfil})
 
+
+@login_required
 def graficaPrediccion(request):
-    return render(request, 'InterfazPrediccion.html')
+    usuario = request.user
+    perfil = get_object_or_404(Perfil, usuario=usuario)
+    return render(request, 'InterfazPrediccion.html', {'usuario': usuario, 'perfil': perfil})
+
 
 @login_required
 def index(request):
-    return render(request,'InterfazPrediccion.html')
-
-@login_required
-def index1(request):   
-    return render(request,'InterfazCiclos.html')
+    usuario = request.user
+    perfil = get_object_or_404(Perfil, usuario=usuario)
+    return render(request, 'InterfazPrediccion.html', {'usuario': usuario, 'perfil': perfil})
 
 
 @login_required
-def variablesModelo(request):
-    return render(request, 'variablesModelo.html')
-
-'''
-def datosHistoricos(request):
-    tiempo = r.lista_tiempo_prediccion()
-    matriculados = r.lista_matriculados_prediccion()
-    aprobados = r.lista_aprobados_prediccion()
-    reprobados = r.lista_reprobados_prediccion()
-    desertores = r.lista_desertores_prediccion()
-    foraneos = r.lista_foraneos_prediccion()
-    contexto = {'tiempo': tiempo, 'matriculados': matriculados, 'aprobados': aprobados, 'reprobados': reprobados, 'desertores': desertores, 'foraneos': foraneos}
-    return render(request, 'datosHistoricos.html', contexto)
-'''
+def index1(request):
+    usuario = request.user
+    perfil = get_object_or_404(Perfil, usuario=usuario)
+    return render(request, 'InterfazCiclos.html', {'usuario': usuario, 'perfil': perfil})
 
 
+@login_required
 def prediccionCiclos(request):
-    return render(request, 'InterfazCiclos.html')
+    usuario = request.user
+    perfil = get_object_or_404(Perfil, usuario=usuario)
+    return render(request, 'InterfazCiclos.html', {'usuario': usuario, 'perfil': perfil})
 
 
 def generate_chart_data(listaT, listaD, listaA, listaR, listaM, listaF, listaTNombres, valorFinalHistorico):
@@ -431,10 +470,9 @@ def generate_chart_data(listaT, listaD, listaA, listaR, listaM, listaF, listaTNo
     return chart
 
 
-
 @require_http_methods(["GET", "POST"])
 def get_chart(request):
-    estadisticasPeriodos= EstadisticaPeriodo.objects.filter(idCiclo__isnull=True)
+    estadisticasPeriodos = EstadisticaPeriodo.objects.filter(idCiclo__isnull=True)
     listaD = list(estadisticasPeriodos.values_list('numDesertores', flat=True))
     listaT = list(PeriodoAcademico.objects.values_list('fechaFin', flat=True))
     listaA = list(estadisticasPeriodos.values_list('numAprobados', flat=True))
@@ -448,18 +486,22 @@ def get_chart(request):
         data = json.loads(request.body)
         selected_year = int(data.get('year'))
         logger.info(f"Año seleccionado: {selected_year}")
-        listaDesetores, listaTiempo, listaReprobados, listaAprobados,  listaMatriculados, listaForaneos = r.realizarPrediccion(listaD, listaT, listaR, listaA, listaM, listaF, selected_year)
+        listaDesetores, listaTiempo, listaReprobados, listaAprobados, listaMatriculados, listaForaneos = r.realizarPrediccion(
+            listaD, listaT, listaR, listaA, listaM, listaF, selected_year)
         listaTNombresActuales = r.obtener_periodos(listaTNombres, selected_year)
-        chart = generate_chart_data(listaTiempo, listaDesetores, listaAprobados, listaReprobados, listaMatriculados, listaForaneos, listaTNombresActuales, ultimoValorHistorico)  
+        chart = generate_chart_data(listaTiempo, listaDesetores, listaAprobados, listaReprobados, listaMatriculados,
+                                    listaForaneos, listaTNombresActuales, ultimoValorHistorico)
     else:
         logger.info("Recibida solicitud GET")
         chart = generate_chart_data(listaT, listaD, listaA, listaR, listaM, listaF, listaTNombres, ultimoValorHistorico)
     return JsonResponse(chart)
 
 
+@login_required
 def validarPeriodo(lista):
     len(lista)
-    
+
+
 @require_http_methods(["GET", "POST"])
 def get_chart1(request):
     ciclo_ids = Ciclo.objects.filter(numero=1)
@@ -469,7 +511,7 @@ def get_chart1(request):
     listaA = list(estadisticasPeriodos.values_list('numAprobados', flat=True))
     listaR = list(estadisticasPeriodos.values_list('numReprobados', flat=True))
     listaM = list(estadisticasPeriodos.values_list('numMatriculados', flat=True))
-    listaF = list(estadisticasPeriodos.values_list('numForaneos', flat=True)) 
+    listaF = list(estadisticasPeriodos.values_list('numForaneos', flat=True))
     listaTNombres = list(PeriodoAcademico.objects.values_list('nombre', flat=True))
     ultimoValorHistorico = listaTNombres[-1]
     if request.method == "POST":
@@ -477,13 +519,16 @@ def get_chart1(request):
         data = json.loads(request.body)
         selected_year = int(data.get('year'))
         logger.info(f"Año seleccionado: {selected_year}")
-        listaDesetores, listaTiempo, listaReprobados, listaAprobados,  listaMatriculados, listaForaneos = r.realizarPrediccion(listaD, listaT, listaR, listaA, listaM, listaF, selected_year)
+        listaDesetores, listaTiempo, listaReprobados, listaAprobados, listaMatriculados, listaForaneos = r.realizarPrediccion(
+            listaD, listaT, listaR, listaA, listaM, listaF, selected_year)
         listaTNombresActuales = r.obtener_periodos(listaTNombres, selected_year)
-        chart = generate_chart_data(listaTiempo, listaDesetores, listaAprobados, listaReprobados, listaMatriculados, listaForaneos, listaTNombresActuales, ultimoValorHistorico)  
+        chart = generate_chart_data(listaTiempo, listaDesetores, listaAprobados, listaReprobados, listaMatriculados,
+                                    listaForaneos, listaTNombresActuales, ultimoValorHistorico)
     else:
         logger.info("Recibida solicitud GET char1")
         chart = generate_chart_data(listaT, listaD, listaA, listaR, listaM, listaF, listaTNombres, ultimoValorHistorico)
     return JsonResponse(chart)
+
 
 @require_http_methods(["GET", "POST"])
 def get_chart2(request):
@@ -494,7 +539,7 @@ def get_chart2(request):
     listaA = list(estadisticasPeriodos.values_list('numAprobados', flat=True))
     listaR = list(estadisticasPeriodos.values_list('numReprobados', flat=True))
     listaM = list(estadisticasPeriodos.values_list('numMatriculados', flat=True))
-    listaF = list(estadisticasPeriodos.values_list('numForaneos', flat=True)) 
+    listaF = list(estadisticasPeriodos.values_list('numForaneos', flat=True))
     listaTNombres = list(PeriodoAcademico.objects.values_list('nombre', flat=True))
     ultimoValorHistorico = listaTNombres[-1]
     if request.method == "POST":
@@ -502,13 +547,16 @@ def get_chart2(request):
         data = json.loads(request.body)
         selected_year = int(data.get('year'))
         logger.info(f"Año seleccionado: {selected_year}")
-        listaDesetores, listaTiempo, listaReprobados, listaAprobados,  listaMatriculados, listaForaneos = r.realizarPrediccion(listaD, listaT, listaR, listaA, listaM, listaF, selected_year)
+        listaDesetores, listaTiempo, listaReprobados, listaAprobados, listaMatriculados, listaForaneos = r.realizarPrediccion(
+            listaD, listaT, listaR, listaA, listaM, listaF, selected_year)
         listaTNombresActuales = r.obtener_periodos(listaTNombres, selected_year)
-        chart = generate_chart_data(listaTiempo, listaDesetores, listaAprobados, listaReprobados, listaMatriculados, listaForaneos, listaTNombresActuales, ultimoValorHistorico)  
+        chart = generate_chart_data(listaTiempo, listaDesetores, listaAprobados, listaReprobados, listaMatriculados,
+                                    listaForaneos, listaTNombresActuales, ultimoValorHistorico)
     else:
         logger.info("Recibida solicitud GET char1")
         chart = generate_chart_data(listaT, listaD, listaA, listaR, listaM, listaF, listaTNombres, ultimoValorHistorico)
     return JsonResponse(chart)
+
 
 @require_http_methods(["GET", "POST"])
 def get_chart3(request):
@@ -519,7 +567,7 @@ def get_chart3(request):
     listaA = list(estadisticasPeriodos.values_list('numAprobados', flat=True))
     listaR = list(estadisticasPeriodos.values_list('numReprobados', flat=True))
     listaM = list(estadisticasPeriodos.values_list('numMatriculados', flat=True))
-    listaF = list(estadisticasPeriodos.values_list('numForaneos', flat=True)) 
+    listaF = list(estadisticasPeriodos.values_list('numForaneos', flat=True))
     listaTNombres = list(PeriodoAcademico.objects.values_list('nombre', flat=True))
     ultimoValorHistorico = listaTNombres[-1]
     if request.method == "POST":
@@ -527,9 +575,11 @@ def get_chart3(request):
         data = json.loads(request.body)
         selected_year = int(data.get('year'))
         logger.info(f"Año seleccionado: {selected_year}")
-        listaDesetores, listaTiempo, listaReprobados, listaAprobados,  listaMatriculados, listaForaneos = r.realizarPrediccion(listaD, listaT, listaR, listaA, listaM, listaF, selected_year)
+        listaDesetores, listaTiempo, listaReprobados, listaAprobados, listaMatriculados, listaForaneos = r.realizarPrediccion(
+            listaD, listaT, listaR, listaA, listaM, listaF, selected_year)
         listaTNombresActuales = r.obtener_periodos(listaTNombres, selected_year)
-        chart = generate_chart_data(listaTiempo, listaDesetores, listaAprobados, listaReprobados, listaMatriculados, listaForaneos, listaTNombresActuales, ultimoValorHistorico)  
+        chart = generate_chart_data(listaTiempo, listaDesetores, listaAprobados, listaReprobados, listaMatriculados,
+                                    listaForaneos, listaTNombresActuales, ultimoValorHistorico)
     else:
         logger.info("Recibida solicitud GET char1")
         chart = generate_chart_data(listaT, listaD, listaA, listaR, listaM, listaF, listaTNombres, ultimoValorHistorico)
@@ -545,7 +595,7 @@ def get_chart4(request):
     listaA = list(estadisticasPeriodos.values_list('numAprobados', flat=True))
     listaR = list(estadisticasPeriodos.values_list('numReprobados', flat=True))
     listaM = list(estadisticasPeriodos.values_list('numMatriculados', flat=True))
-    listaF = list(estadisticasPeriodos.values_list('numForaneos', flat=True)) 
+    listaF = list(estadisticasPeriodos.values_list('numForaneos', flat=True))
     listaTNombres = list(PeriodoAcademico.objects.values_list('nombre', flat=True))
     ultimoValorHistorico = listaTNombres[-1]
     if request.method == "POST":
@@ -553,13 +603,16 @@ def get_chart4(request):
         data = json.loads(request.body)
         selected_year = int(data.get('year'))
         logger.info(f"Año seleccionado: {selected_year}")
-        listaDesetores, listaTiempo, listaReprobados, listaAprobados,  listaMatriculados, listaForaneos = r.realizarPrediccion(listaD, listaT, listaR, listaA, listaM, listaF, selected_year)
+        listaDesetores, listaTiempo, listaReprobados, listaAprobados, listaMatriculados, listaForaneos = r.realizarPrediccion(
+            listaD, listaT, listaR, listaA, listaM, listaF, selected_year)
         listaTNombresActuales = r.obtener_periodos(listaTNombres, selected_year)
-        chart = generate_chart_data(listaTiempo, listaDesetores, listaAprobados, listaReprobados, listaMatriculados, listaForaneos, listaTNombresActuales, ultimoValorHistorico)  
+        chart = generate_chart_data(listaTiempo, listaDesetores, listaAprobados, listaReprobados, listaMatriculados,
+                                    listaForaneos, listaTNombresActuales, ultimoValorHistorico)
     else:
         logger.info("Recibida solicitud GET char1")
         chart = generate_chart_data(listaT, listaD, listaA, listaR, listaM, listaF, listaTNombres, ultimoValorHistorico)
     return JsonResponse(chart)
+
 
 @require_http_methods(["GET", "POST"])
 def get_chart5(request):
@@ -570,7 +623,7 @@ def get_chart5(request):
     listaA = list(estadisticasPeriodos.values_list('numAprobados', flat=True))
     listaR = list(estadisticasPeriodos.values_list('numReprobados', flat=True))
     listaM = list(estadisticasPeriodos.values_list('numMatriculados', flat=True))
-    listaF = list(estadisticasPeriodos.values_list('numForaneos', flat=True)) 
+    listaF = list(estadisticasPeriodos.values_list('numForaneos', flat=True))
     listaTNombres = list(PeriodoAcademico.objects.values_list('nombre', flat=True))
     ultimoValorHistorico = listaTNombres[-1]
     if request.method == "POST":
@@ -578,13 +631,16 @@ def get_chart5(request):
         data = json.loads(request.body)
         selected_year = int(data.get('year'))
         logger.info(f"Año seleccionado: {selected_year}")
-        listaDesetores, listaTiempo, listaReprobados, listaAprobados,  listaMatriculados, listaForaneos = r.realizarPrediccion(listaD, listaT, listaR, listaA, listaM, listaF, selected_year)
+        listaDesetores, listaTiempo, listaReprobados, listaAprobados, listaMatriculados, listaForaneos = r.realizarPrediccion(
+            listaD, listaT, listaR, listaA, listaM, listaF, selected_year)
         listaTNombresActuales = r.obtener_periodos(listaTNombres, selected_year)
-        chart = generate_chart_data(listaTiempo, listaDesetores, listaAprobados, listaReprobados, listaMatriculados, listaForaneos, listaTNombresActuales, ultimoValorHistorico)  
+        chart = generate_chart_data(listaTiempo, listaDesetores, listaAprobados, listaReprobados, listaMatriculados,
+                                    listaForaneos, listaTNombresActuales, ultimoValorHistorico)
     else:
         logger.info("Recibida solicitud GET char1")
         chart = generate_chart_data(listaT, listaD, listaA, listaR, listaM, listaF, listaTNombres, ultimoValorHistorico)
     return JsonResponse(chart)
+
 
 @require_http_methods(["GET", "POST"])
 def get_chart6(request):
@@ -595,7 +651,7 @@ def get_chart6(request):
     listaA = list(estadisticasPeriodos.values_list('numAprobados', flat=True))
     listaR = list(estadisticasPeriodos.values_list('numReprobados', flat=True))
     listaM = list(estadisticasPeriodos.values_list('numMatriculados', flat=True))
-    listaF = list(estadisticasPeriodos.values_list('numForaneos', flat=True)) 
+    listaF = list(estadisticasPeriodos.values_list('numForaneos', flat=True))
     listaTNombres = list(PeriodoAcademico.objects.values_list('nombre', flat=True))
     ultimoValorHistorico = listaTNombres[-1]
     if request.method == "POST":
@@ -603,13 +659,16 @@ def get_chart6(request):
         data = json.loads(request.body)
         selected_year = int(data.get('year'))
         logger.info(f"Año seleccionado: {selected_year}")
-        listaDesetores, listaTiempo, listaReprobados, listaAprobados,  listaMatriculados, listaForaneos = r.realizarPrediccion(listaD, listaT, listaR, listaA, listaM, listaF, selected_year)
+        listaDesetores, listaTiempo, listaReprobados, listaAprobados, listaMatriculados, listaForaneos = r.realizarPrediccion(
+            listaD, listaT, listaR, listaA, listaM, listaF, selected_year)
         listaTNombresActuales = r.obtener_periodos(listaTNombres, selected_year)
-        chart = generate_chart_data(listaTiempo, listaDesetores, listaAprobados, listaReprobados, listaMatriculados, listaForaneos, listaTNombresActuales, ultimoValorHistorico)  
+        chart = generate_chart_data(listaTiempo, listaDesetores, listaAprobados, listaReprobados, listaMatriculados,
+                                    listaForaneos, listaTNombresActuales, ultimoValorHistorico)
     else:
         logger.info("Recibida solicitud GET char1")
         chart = generate_chart_data(listaT, listaD, listaA, listaR, listaM, listaF, listaTNombres, ultimoValorHistorico)
     return JsonResponse(chart)
+
 
 @require_http_methods(["GET", "POST"])
 def get_chart7(request):
@@ -620,7 +679,7 @@ def get_chart7(request):
     listaA = list(estadisticasPeriodos.values_list('numAprobados', flat=True))
     listaR = list(estadisticasPeriodos.values_list('numReprobados', flat=True))
     listaM = list(estadisticasPeriodos.values_list('numMatriculados', flat=True))
-    listaF = list(estadisticasPeriodos.values_list('numForaneos', flat=True)) 
+    listaF = list(estadisticasPeriodos.values_list('numForaneos', flat=True))
     listaTNombres = list(PeriodoAcademico.objects.values_list('nombre', flat=True))
     ultimoValorHistorico = listaTNombres[-1]
     if request.method == "POST":
@@ -628,13 +687,16 @@ def get_chart7(request):
         data = json.loads(request.body)
         selected_year = int(data.get('year'))
         logger.info(f"Año seleccionado: {selected_year}")
-        listaDesetores, listaTiempo, listaReprobados, listaAprobados,  listaMatriculados, listaForaneos = r.realizarPrediccion(listaD, listaT, listaR, listaA, listaM, listaF, selected_year)
+        listaDesetores, listaTiempo, listaReprobados, listaAprobados, listaMatriculados, listaForaneos = r.realizarPrediccion(
+            listaD, listaT, listaR, listaA, listaM, listaF, selected_year)
         listaTNombresActuales = r.obtener_periodos(listaTNombres, selected_year)
-        chart = generate_chart_data(listaTiempo, listaDesetores, listaAprobados, listaReprobados, listaMatriculados, listaForaneos, listaTNombresActuales, ultimoValorHistorico)  
+        chart = generate_chart_data(listaTiempo, listaDesetores, listaAprobados, listaReprobados, listaMatriculados,
+                                    listaForaneos, listaTNombresActuales, ultimoValorHistorico)
     else:
         logger.info("Recibida solicitud GET char1")
         chart = generate_chart_data(listaT, listaD, listaA, listaR, listaM, listaF, listaTNombres, ultimoValorHistorico)
     return JsonResponse(chart)
+
 
 @require_http_methods(["GET", "POST"])
 def get_chart8(request):
@@ -645,7 +707,7 @@ def get_chart8(request):
     listaA = list(estadisticasPeriodos.values_list('numAprobados', flat=True))
     listaR = list(estadisticasPeriodos.values_list('numReprobados', flat=True))
     listaM = list(estadisticasPeriodos.values_list('numMatriculados', flat=True))
-    listaF = list(estadisticasPeriodos.values_list('numForaneos', flat=True)) 
+    listaF = list(estadisticasPeriodos.values_list('numForaneos', flat=True))
     listaTNombres = list(PeriodoAcademico.objects.values_list('nombre', flat=True))
     ultimoValorHistorico = listaTNombres[-1]
     if request.method == "POST":
@@ -653,17 +715,23 @@ def get_chart8(request):
         data = json.loads(request.body)
         selected_year = int(data.get('year'))
         logger.info(f"Año seleccionado: {selected_year}")
-        listaDesetores, listaTiempo, listaReprobados, listaAprobados,  listaMatriculados, listaForaneos = r.realizarPrediccion(listaD, listaT, listaR, listaA, listaM, listaF, selected_year)
+        listaDesetores, listaTiempo, listaReprobados, listaAprobados, listaMatriculados, listaForaneos = r.realizarPrediccion(
+            listaD, listaT, listaR, listaA, listaM, listaF, selected_year)
         listaTNombresActuales = r.obtener_periodos(listaTNombres, selected_year)
-        chart = generate_chart_data(listaTiempo, listaDesetores, listaAprobados, listaReprobados, listaMatriculados, listaForaneos, listaTNombresActuales, ultimoValorHistorico)  
+        chart = generate_chart_data(listaTiempo, listaDesetores, listaAprobados, listaReprobados, listaMatriculados,
+                                    listaForaneos, listaTNombresActuales, ultimoValorHistorico)
     else:
         logger.info("Recibida solicitud GET char1")
         chart = generate_chart_data(listaT, listaD, listaA, listaR, listaM, listaF, listaTNombres, ultimoValorHistorico)
     return JsonResponse(chart)
 
+
 def get_chart9(request):
     listaD = [73, 66, 74, 84, 65, 65, 84, 76, 62, 73, 63, 63, 70, 47, 49, 61, 57, 71, 58, 52, 83, 65, 68, 52, 62, 69]
-    listaT = ['2023-04-29', '2020-07-24', '2022-07-02', '2022-08-28', '2021-06-15', '2022-01-03', '2022-04-17', '2022-10-02', '2022-12-31', '2022-05-25', '2021-08-24', '2021-05-14', '2020-01-28', '2022-03-08', '2022-10-05', '2020-04-19', '2023-08-19', '2023-11-08', '2021-02-26', '2020-03-02', '2021-10-22', '2023-03-11', '2023-10-16', '2022-07-01', '2023-10-06', '2020-10-27']
+    listaT = ['2023-04-29', '2020-07-24', '2022-07-02', '2022-08-28', '2021-06-15', '2022-01-03', '2022-04-17',
+              '2022-10-02', '2022-12-31', '2022-05-25', '2021-08-24', '2021-05-14', '2020-01-28', '2022-03-08',
+              '2022-10-05', '2020-04-19', '2023-08-19', '2023-11-08', '2021-02-26', '2020-03-02', '2021-10-22',
+              '2023-03-11', '2023-10-16', '2022-07-01', '2023-10-06', '2020-10-27']
     listaA = [55, 71, 61, 64, 61, 87, 67, 56, 76, 55, 70, 47, 53, 70, 75, 69, 66, 64, 52, 60, 63, 79, 71, 49, 71, 63]
     listaR = [60, 74, 78, 77, 59, 64, 71, 78, 62, 65, 56, 55, 76, 82, 67, 78, 71, 61, 71, 84, 67, 84, 40, 76, 68, 64]
     listaM = [60, 74, 78, 77, 59, 64, 71, 78, 62, 65, 56, 55, 76, 82, 67, 78, 71, 61, 71, 84, 67, 84, 40, 76, 68, 64]
@@ -672,30 +740,40 @@ def get_chart9(request):
     return JsonResponse(chart)
 
 
-
 @login_required
 def modeloMatematico(request):
-    return render(request, 'modeloMatematicoInfo.html')
+    usuario = request.user
+    perfil = get_object_or_404(Perfil, usuario=usuario)
+    return render(request, 'modeloMatematicoInfo.html', {'usuario': usuario, 'perfil': perfil})
 
 
 @login_required
 def variablesAdministrador(request):
-    return render(request, 'agregarDatos.html')
+    usuario = request.user
+    perfil = get_object_or_404(Perfil, usuario=usuario)
+    return render(request, 'agregarDatos.html', {'usuario': usuario, 'perfil': perfil})
 
 
+@login_required
 def listaSugerencias(request):
+    usuario = request.user
+    perfil = get_object_or_404(Perfil, usuario=usuario)
     sugerencias = Sugerencia.objects.all()
-    return render(request, 'listaSugerencia.html', {"sugerencias": sugerencias})
+    return render(request, 'listaSugerencia.html', {"sugerencias": sugerencias, 'usuario': usuario, 'perfil': perfil})
 
 
+@login_required
 def mostrarDatosHistoricos(request):
+    usuario = request.user
+    perfil = get_object_or_404(Perfil, usuario=usuario)
     periodos = PeriodoAcademico.objects.all()
 
     # Arreglo para almacenar los periodos con sus estadísticas
     datos = []
 
     for periodo in periodos:
-        estadisticas_ciclo = EstadisticaPeriodo.objects.filter(idCiclo__idPeriodo=periodo)# Estadísticas asociadas con ciclos específicos
+        estadisticas_ciclo = EstadisticaPeriodo.objects.filter(
+            idCiclo__idPeriodo=periodo)  # Estadísticas asociadas con ciclos específicos
 
         # Estadística total del periodo, sin asociación con ciclos
         estadistica_general = EstadisticaPeriodo.objects.filter(idPeriodo=periodo, idCiclo=None).first()
@@ -707,27 +785,70 @@ def mostrarDatosHistoricos(request):
         })
 
     context = {
-        'datos': datos
+        'datos': datos,
+        'usuario': usuario,
+        'perfil': perfil
     }
 
     return render(request, "mostrarDatosHistoricos.html", context)
 
+@login_required
+def mostrarDatosHAuditoria(request):
+    periodos = PeriodoAcademico.objects.all()
 
+    # Arreglo para almacenar los periodos con sus estadísticas
+    datos = []
+
+    for periodo in periodos:
+        estadisticas_ciclo = EstadisticaPeriodo.objects.filter(idCiclo__idPeriodo=periodo)# Estadísticas asociadas con ciclos específicos
+
+        # Estadística total del periodo, sin asociación con ciclos
+        estadistica_general = EstadisticaPeriodo.objects.filter(idPeriodo=periodo, idCiclo=None).first()
+
+        administrador = None
+        if estadistica_general:
+            administrador = estadistica_general.idAdministrador.str()
+        else:
+            administrador = 'Ninguno'
+
+        datos.append({
+            'periodo': periodo,
+            'estadisticas_ciclo': estadisticas_ciclo,
+            'estadistica_general': estadistica_general,
+            'administrador': administrador
+        })
+
+    context = {
+        'datos': datos
+    }
+
+    return render(request, "auditoríaDatosHReporte.html", context)
+
+
+@login_required
 def mostrarDatosPeriodo(request, id):
-    estadisticasPeriodo = EstadisticaPeriodo.objects.filter(idCiclo__idPeriodo = id)
-    #IDEA: Mostrar todos los periodos en tabla y mostrar error en los que no tengan datos asociados
+    usuario = request.user
+    perfil = get_object_or_404(Perfil, usuario=usuario)
+    estadisticasPeriodo = EstadisticaPeriodo.objects.filter(idCiclo__idPeriodo=id)
+    # IDEA: Mostrar todos los periodos en tabla y mostrar error en los que no tengan datos asociados
     """if not estadisticasPeriodo.exists():
         messages.error(request, '¡Las fechas coinciden con períodos anteriores. Revise!')
         return redirect('/mostrarDatosHistoricos/')"""
-    return render(request, "mostrarDatosHistoricos.html",{"estadisticasPeriodo":estadisticasPeriodo})
+    return render(request, "mostrarDatosHistoricos.html",
+                  {"estadisticasPeriodo": estadisticasPeriodo, 'usuario': usuario, 'perfil': perfil})
 
 
+@login_required
 def ayuda(request):
-    return render(request, 'ayuda.html')
+    usuario = request.user
+    perfil = get_object_or_404(Perfil, usuario=usuario)
+    return render(request, 'ayuda.html', {'usuario': usuario, 'perfil': perfil})
 
 
 @login_required
 def agregarDatos(request):
+    usuario = request.user
+    perfil = get_object_or_404(Perfil, usuario=usuario)
     if request.method == 'POST':
         id_periodo = request.POST.get('idPeriodo')
 
@@ -797,11 +918,14 @@ def agregarDatos(request):
     else:
         periodos = PeriodoAcademico.objects.all()
         print(periodos)
-        return render(request, 'agregarDatos.html', {'periodos': periodos})
+        return render(request, 'agregarDatos.html', {'periodos': periodos, 'usuario': usuario, 'perfil': perfil})
 
 
+@login_required
 def ayudaAdmin(request):
-    return render(request, 'ayudaAdministrador.html')
+    usuario = request.user
+    perfil = get_object_or_404(Perfil, usuario=usuario)
+    return render(request, 'ayudaAdministrador.html', {'usuario': usuario, 'perfil': perfil})
 
 
 @login_required
@@ -810,4 +934,19 @@ def perfilPersonal(request):
     perfil = get_object_or_404(Perfil, usuario=usuario)
     return render(request, 'perfilPersonal.html', {'usuario': usuario, 'perfil': perfil})
 
-8
+@login_required
+def editarPerfilPersonal(request):
+    usuario = request.user
+    perfil = get_object_or_404(Perfil, usuario=usuario)
+    if request.method == 'POST':
+        form = PerfilForm(request.POST, request.FILES, instance=perfil)
+        if form.is_valid():
+            form.save()
+            messages.success(request, '¡El perfil actualizado correctamente!')
+            return redirect('perfilPersonal')
+        else:
+            messages.error(request, 'Error al actualizar el perfil. Por favor, revisa el formulario.')
+        return redirect('perfilPersonal')
+    else:
+        form = PerfilForm(request.POST, instance=perfil)
+    return render(request, 'perfilPersonal.html', {'usuario': usuario, 'perfil': perfil})

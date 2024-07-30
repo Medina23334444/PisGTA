@@ -2,7 +2,8 @@
 {% block title %}Otra Página{% endblock %}
 {% load static %}
 {% block content %}
-    <link rel="stylesheet" href="{% static 'perfil.css' %}"/>
+    <link rel="stylesheet" href="{% static 'stylePorfile.css' %}"/>
+    <script src="{% static 'tablas.js' %}"></script>
     <div class="container">
         <header>
             <nav aria-label="breadcrumb">
@@ -13,56 +14,131 @@
             </nav>
             <h1 class="mt-4">Perfil Personal Administrativo</h1>
         </header>
-
-        <div class="card mt-4">
-            <div class="card-body">
+        <div class="d-flex justify-content-end">
+            <button type="button" class="btn btn-dark ms-2" data-bs-toggle="modal" data-bs-target="#modal1"><i
+                    class="bi bi-folder-plus"></i> Modificar Perfil
+            </button>
+        </div>
+        <br>
+        <div class="row">
+            <div class="col-md-3">
+                <div class="profile-picture-container">
+                    {% if perfil.fotoPerfil %}
+                        <img src="{{ perfil.fotoPerfil.url }}" alt="Foto de Perfil" class="profile-picture">
+                    {% else %}
+                        <img src="{% static 'perfil.jpg' %}" alt="Foto de Perfil" class="profile-picture">
+                    {% endif %}
+                </div>
+                <div class="desc-container">
+                    <h3 class="text-center"> Acerca de mi</h3>
+                    <p class="text-justify">{{ perfil.descripcion|default:"No disponible" }}
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-9">
                 <div class="row">
-                    <div class="col-md-6">
-                        <ul class="list-unstyled">
-                            <p><strong>Nombres:</strong> {{ usuario.nombres }}</p>
-                            <p><strong>Apellidos:</strong> {{ usuario.apellidos }}</p>
-                            <p><strong>DNI:</strong> {{ usuario.dni }}</p>
-                            <p><strong>Correo:</strong> {{ usuario.email }}</p>
-                            <p><strong>Dirección:</strong> {{ usuario.direccion }}</p>
-                            <p><strong>Teléfono:</strong> {{ usuario.telefono }}</p>
-                        </ul>
+                    <div class="col-md-4 mb-3 ">
+                        <div class="card h-100 p-4">
+                            <div class="card-body">
+                                <h5>Información Personal</h5>
+                                <ul class="list-unstyled">
+                                    <p><strong>Nombre:</strong> {{ usuario.nombres }} {{ usuario.apellidos }}</p>
+                                    <p><strong>DNI:</strong> {{ usuario.dni }}</p>
+                                    <p><strong>Fecha de
+                                        Nacimiento:</strong> {{ perfil.fechaNacimiento|default:"No disponible" }}</p>
+                                </ul>
+                            </div>
+                        </div>
                     </div>
-                    <div class="col-md-6">
-                        <ul class="list-unstyled">
-                            {% if perfil.fechaNacimiento %}
-                                <p><strong>Fecha de Nacimiento:</strong> {{ perfil.fechaNacimiento }}</p>
-                            {% else %}
-                                <p><strong>Fecha de Nacimiento:</strong> No disponible</p>
-                            {% endif %}
-
-                            {% if perfil.descripcion %}
-                                <p><strong>Descripción:</strong> {{ perfil.descripcion }}</p>
-                            {% else %}
-                                <p><strong>Descripción:</strong> No disponible</p>
-                            {% endif %}
-
-                            {% if perfil.usuarioInstagram %}
-                                <p><strong>Instagram:</strong> {{ perfil.usuarioInstagram }}</p>
-                            {% else %}
-                                <p><strong>Instagram:</strong> No disponible</p>
-                            {% endif %}
-
-                            {% if perfil.usuarioFacebook %}
-                                <p><strong>Facebook:</strong> {{ perfil.usuarioFacebook }}</p>
-                            {% else %}
-                                <p><strong>Facebook:</strong> No disponible</p>
-                            {% endif %}
-
-                            {% if perfil.usuarioTwitter %}
-                                <p><strong>Twitter:</strong> {{ perfil.usuarioTwitter }}</p>
-                            {% else %}
-                                <p><strong>Twitter:</strong> No disponible</p>
-                            {% endif %}
-                        </ul>
+                    <div class="col-md-4 mb-3 mr3">
+                        <div class="card h-100 p-4">
+                            <div class="card-body">
+                                <h5>Redes Sociales</h5>
+                                <ul class="list-unstyled">
+                                    <p><strong>Instagram:</strong> {{ perfil.usuarioInstagram|default:"No disponible" }}
+                                    </p>
+                                    <p><strong>Facebook:</strong> {{ perfil.usuarioFacebook|default:"No disponible" }}
+                                    </p>
+                                    <p><strong>Twitter:</strong> {{ perfil.usuarioTwitter|default:"No disponible" }}</p>
+                                </ul>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
+        <div class="modal fade" id="modal1" tabindex="-1" aria-labelledby="modal1Label" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="modal1Label" style="font-size: 30px;">Modificar Perfil</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body" style="border-top: 3px solid #8ab5ea;">
+                        <form id="editPersonalForm" action="/editarPerfilPersonal/" method="POST"
+                              enctype="multipart/form-data" class="needs-validation" novalidate>
+                            {% csrf_token %}
+                            {{ form.as_p }}
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="fechaNacimiento" class="form-label">Fecha Nacimiento</label>
+                                        <input class="form-control" name="fechaNacimiento"
+                                               value="{{ perfil.fechaNacimiento }}"
+                                               placeholder="Ingrese aquí la fecha de nacimiento..."
+                                               style="width: 350px;" required>
+                                        <div class="invalid-feedback">Por favor, ingrese una fecha válida.</div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="descripcion" class="form-label">Descripción</label>
+                                        <textarea class="form-control" name="descripcion" rows="6" cols="50"
+                                                  placeholder="Ingrese aquí la descripción..." style="width: 350px; "
+                                                  required>{{ perfil.descripcion }}</textarea>
+                                        <div class="invalid-feedback">Por favor, ingrese una descripción.</div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="fotoPerfil" class="form-label">Foto</label>
+                                        <input type="file" class="form-control" name="fotoPerfil" style="width: 350px;">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="usuarioFacebook" class="form-label">Facebook</label>
+                                        <input type="text" class="form-control" value="{{ perfil.usuarioFacebook }}"
+                                               name="usuarioFacebook" placeholder="Ingrese aquí su Facebook..."
+                                               style="width: 350px;" required>
+                                        <div class="invalid-feedback">Por favor, ingrese un usuario de Facebook
+                                            válido.
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="usuarioTwitter" class="form-label">Twitter</label>
+                                        <input type="text" class="form-control" value="{{ perfil.usuarioTwitter }}"
+                                               name="usuarioTwitter" placeholder="Ingrese aquí su Twitter..."
+                                               style="width: 350px;" pattern="^[a-zA-Z0-9_]{1,15}$" required>
+                                        <div class="invalid-feedback">Por favor, ingrese un usuario de Twitter válido
+                                            (solo letras, números y guiones bajos, máximo 15 caracteres).
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="usuarioInstagram" class="form-label">Instagram</label>
+                                        <input type="text" class="form-control" value="{{ perfil.usuarioInstagram }}"
+                                               name="usuarioInstagram" placeholder="Ingrese aquí su Instagram..."
+                                               style="width: 350px;" pattern="^[a-zA-Z0-9_]{1,15}$" required>
+                                        <div class="invalid-feedback">Por favor, ingrese un usuario de Instagram válido
+                                            (solo letras, números y guiones bajos, máximo 15 caracteres).
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="submit" class="btn btn-dark">Guardar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
 
+    </div>
 {% endblock %}

@@ -1,6 +1,9 @@
 
 from django.contrib import admin
+from django.conf.urls.static import static
 from django.urls import path, include
+
+from Pis_in import settings
 from tasks import views
 
 urlpatterns = [
@@ -21,8 +24,6 @@ urlpatterns = [
     path('cerrar_sesion', views.cerrarSesion, name='cerrar_sesion'),
     path('Prediccion/', views.graficaPrediccion, name='GraficaPrediccion'),
     path('api/', include('tasks.urls')),
-    #path('datosHistoricos/', views.datosHistoricos, name='datosHistoricos'),
-    path('variableModelo/', views.variablesModelo, name="variablesModelo"),
     path('prediccionCiclos/', views.prediccionCiclos, name="prediccionCiclos"),
     path('sugerencia/', views.sugerenciaPersonal, name='sugerenciaPersonal'),
     path('modeloMatematico/', views.modeloMatematico, name='modeloMatematico'),
@@ -33,4 +34,7 @@ urlpatterns = [
     path('ayuda/', views.ayuda, name='ayuda'),
     path('ayudaAdministrador/', views.ayudaAdmin, name='ayudaAdministrador'),
     path('perfilPersonal/', views.perfilPersonal, name='perfilPersonal'),
-]
+    path('editarPerfilAdmi/', views.editarPerfilAdmi, name='editarPerfilAdmi'),
+    path('editarPerfilPersonal/', views.editarPerfilPersonal, name='editarPerfilPersonal'),
+    path('mostrarDatosHAuditoria/', views.mostrarDatosHAuditoria, name='mostrarDatosHAuditoria'),
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

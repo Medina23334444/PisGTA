@@ -43,14 +43,9 @@ def home(request):
 
 def iniciarSesion(request):
     if request.user.is_authenticated:
-        # Mensaje de depuración
-        print(f"Usuario autenticado: {request.user.username}")
 
         roles_persona = RolPersona.objects.filter(usuario=request.user)
         roles = [rp.rol for rp in roles_persona]
-
-        # Mensaje de depuración
-        print(f"Roles del usuario: {[rol.nombre for rol in roles]}")
 
         if any(rol.nombre == 'Personal' for rol in roles):
             return redirect('homePersonal')
@@ -64,20 +59,11 @@ def iniciarSesion(request):
         password = request.POST.get('password')
         user = authenticate(request, username=correo, password=password)
 
-        # Mensaje de depuración
-        print(f"Intento de autenticación: {correo}")
-
         if user is not None:
             login(request, user)
 
-            # Mensaje de depuración
-            print(f"Usuario autenticado: {user.username}")
-
             roles_persona = RolPersona.objects.filter(usuario=user)
             roles = [rp.rol for rp in roles_persona]
-
-            # Mensaje de depuración
-            print(f"Roles del usuario: {[rol.nombre for rol in roles]}")
 
             if any(rol.nombre == 'Personal' for rol in roles):
                 return redirect('homePersonal')
@@ -90,9 +76,6 @@ def iniciarSesion(request):
                 error = 'Contraseña incorrecta'
             else:
                 error = 'La cuenta no existe'
-
-            # Mensaje de depuración
-            print(f"Error: {error}")
 
             messages.error(request, error)
             return render(request, 'iniciarSesion.html')
@@ -301,7 +284,6 @@ def guardar_editar_Periodos(request):  # Vista para editar o agregar
 def obtener_eventos(request):  # Método para cargar los periodos registrados en calendar
     periodos = PeriodoAcademico.objects.all()
     eventos = []
-
 
     for periodo in periodos:
         eventos.append({
@@ -854,6 +836,8 @@ def mostrarDatosHistoricos(request):
 @rol_requerido('Administrador')
 @login_required
 def mostrarDatosHAuditoria(request):
+    usuario = request.user
+    perfil = get_object_or_404(Perfil, usuario=usuario)
     periodos = PeriodoAcademico.objects.all()
 
     # Arreglo para almacenar los periodos con sus estadísticas
@@ -880,7 +864,9 @@ def mostrarDatosHAuditoria(request):
         })
 
     context = {
-        'datos': datos
+        'datos': datos,
+        'usuario': usuario,
+        'perfil': perfil,
     }
 
     return render(request, "auditoríaDatosHReporte.html", context)
@@ -983,6 +969,7 @@ def agregarDatos(request):
         print(periodos)
         return render(request, 'agregarDatos.html', {'periodos': periodos, 'usuario': usuario, 'perfil': perfil})
 
+
 @login_required
 def cargar_datos(request, periodo_id):
     try:
@@ -1017,6 +1004,7 @@ def cargar_datos(request, periodo_id):
         return JsonResponse(response_data, safe=False)
     except EstadisticaPeriodo.DoesNotExist:
         return JsonResponse({"error": "No data found"}, status=404)
+
 
 @login_required
 def guardarcambios_datos(request, periodo_id):
@@ -1077,7 +1065,6 @@ def guardarcambios_datos(request, periodo_id):
             return JsonResponse({'error': str(e)}, status=500)
     else:
         return JsonResponse({'error': 'Método no permitido'}, status=405)
-
 
 
 @rol_requerido('Administrador')

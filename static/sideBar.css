@@ -6,7 +6,7 @@
     --color-texto-menu: rgb(134, 136, 144);
     --color-menu-hover: rgb(255, 255, 255);
     --color-menu-hover-texto: rgb(0, 0, 0);
-    --color-boton: rgb(193, 41, 41);
+    --color-boton: #eaeef3;
     --color-boton-texto: rgb(255, 255, 255);
     --color-linea: rgb(180, 180, 180);
 }
@@ -72,11 +72,18 @@
     text-align: left;
     opacity: 1;
     transition: opacity 0.5s ease, width 0.5s ease;
+
 }
 
 .barra-lateral .nombre-pagina span {
     margin-left: 5px;
     font-size: 25px;
+}
+
+.barra-lateral .nombre-carrera span {
+    margin-left: 5px;
+    font-size: 15px;
+    transition: font-size 0.5s ease, opacity 0.5s ease;
 }
 
 
@@ -106,7 +113,7 @@
 
 .barra-lateral .boton ion-icon {
     min-width: 50px;
-    font-size: 25px;
+    font-size: 18px;
 }
 
 .barra-lateral .navegacion {
@@ -246,5 +253,6 @@
 .barra-lateral .usuario .icon-icon {
     font-size: 20px;
 }
+
 
 

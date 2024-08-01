@@ -1,0 +1,83 @@
+{% extends "base_initPersonal.html" %}
+{% block title %}Prediccion{% endblock %}
+{% load static %}   
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Custom css-->
+    <link rel="stylesheet" href="{% static 'style_variable.css' %}" /> 
+    <title>Document</title>
+</head>
+<body>
+    <header>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/homePersonal">Inicio</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Variables</li>
+            </ol>
+        </nav>
+    <br>  </br>
+    <h1> Variables </h1>
+    </header>
+
+    <section>
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+            <div class="col">
+              <div class="card">
+                <img src="https://cdn-icons-png.flaticon.com/512/950/950108.png" class="card-img-top" alt="...">
+                <div class="card-body">
+                  <h5 class="card-title">Matriculados</h5>
+                  <p class="card-text"> M(t): Número de estudiantes matriculados en el tiempo t </p>
+                </div>
+              </div>
+            </div>
+            <div class="col">
+              <div class="card">
+                <img src="https://static.vecteezy.com/system/resources/thumbnails/000/350/111/small_2x/Education__28193_29.jpg" class="card-img-top" alt="...">
+                <div class="card-body">
+                  <h5 class="card-title">Aprobados</h5>
+                  <p class="card-text">A(t): Número de estudiantes aprobados en el tiempo t</p>
+                </div>
+              </div>
+            </div>
+            <div class="col">
+              <div class="card">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQkOwMfuDmRiBL8n8GyYT70rU6Uur4Bp6eYw_u_NszwmIC3Z9jLMehuQpN2jlFRTkfMBns&usqp=CAU.png" class="card-img-top" alt="...">
+                <div class="card-body">
+                  <h5 class="card-title">Reprobados</h5>
+                  <p class="card-text">R(t): Número de estudiantes reprobados en el tiempo t</p>
+                </div>
+              </div>
+            </div>
+            <div class="col">
+              <div class="card">
+                <img src="https://static-00.iconduck.com/assets.00/student-cancel-icon-1975x2048-ttd6ww43.png" class="card-img-top" alt="...">
+                <div class="card-body">
+                  <h5 class="card-title">Desertores</h5>
+                  <p class="card-text">D(t): Número de estudiantes desertores en el tiempo t</p>
+                </div>
+              </div>
+            </div>
+            <div class="col">
+                <div class="card">
+                  <img src="https://cdn-icons-png.flaticon.com/512/3429/3429376.png" class="card-img-top" alt="...">
+                  <div class="card-body">
+                    <h5 class="card-title">Foraneo</h5>
+                    <p class="card-text"> F(t): Número de estudiantes foráneos en el tiempo t </p>
+                  </div>
+                </div>
+              </div>
+        </div>
+
+
+    </section>
+</body>
+
+
+</html>
+
+{% endblock %}

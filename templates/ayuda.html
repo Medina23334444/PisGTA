@@ -1,0 +1,39 @@
+{% extends "base_initPersonal.html" %}
+{% block title %}Otra Página{% endblock %}
+{% load static %}
+{% block content %}
+    <link rel="stylesheet" href="{% static 'styleAyuda.css' %}"/>
+    <div class="container">
+        <header>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/homePersonal">Inicio</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Ayuda</li>
+                </ol>
+            </nav>
+            <h1>Sección de Ayuda Personal Administrativo</h1>
+        </header>
+        <div class="content">
+            <a href="https://youtu.be/G00VRkK4eKg" class="box" target="_blank">
+                <h2>Realizar Predicción</h2>
+                <p>Aprende cómo realizar predicciones utilizando nuestros modelos y herramientas de análisis.</p>
+            </a>
+            <a href="https://youtu.be/nwNQNI65q6Q" class="box" target="_blank">
+                <h2>Realizar Predicción por ciclos</h2>
+                <p>Guía paso a paso para realizar predicciones basadas en ciclos de datos.</p>
+            </a>
+            <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" class="box" target="_blank">
+                <h2>Visualizar Períodos</h2>
+                <p>Instrucciones sobre cómo visualizar y analizar diferentes períodos de tiempo en los datos.</p>
+            </a>
+            <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" class="box" target="_blank">
+                <h2>Realizar Sugerencias</h2>
+                <p>Descubre cómo usar nuestra plataforma para generar sugerencias personalizadas.</p>
+            </a>
+            <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" class="box" target="_blank">
+                <h2>Modificar Perfil</h2>
+                <p>Guía para actualizar y modificar la información de tu perfil personal.</p>
+            </a>
+        </div>
+    </div>
+{% endblock %}

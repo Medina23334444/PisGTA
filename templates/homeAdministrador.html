@@ -3,17 +3,18 @@
 {% block title %}Otra Página{% endblock %}
 {% load static %}
 {% block content %}
+    <link rel="stylesheet" href="{% static 'home.css' %}"/>
     <div>
-        <br>
+        <header>
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
                 <li class="breadcrumb-item active" aria-current="page">Inicio</li>
             </ol>
         </nav>
-        <br><br><br>
-        <h1>Detalles del proyecto</h1>
-        <br>
-        <div class="card" style="width: 75rem; height: 30rem;">
+            <h1>Detalles del proyecto</h1>
+        </header>
+        
+        <div class="card" style="width: 70rem; height: 25rem;">
             <img class="card-img-top" src="{% static 'unlbanner.jpg' %}" alt="Card image cap">
             <div class="card-body">
                 <h5 class="card-title">Acerca del proyecto</h5>

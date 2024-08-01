@@ -1,0 +1,124 @@
+{% extends "base_initPersonal.html" %}
+{% block title %}Datos Históricos{% endblock %}
+{% load static %}
+{% block content %}
+<link rel="stylesheet" href="{% static 'styleDH.css' %}" />
+
+<header>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/homePersonal">Inicio</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Datos Históricos</li>
+        </ol>
+    </nav>
+    <br>
+    <h1>Datos Históricos</h1>
+    <br>
+</header>
+
+<section>
+    <div class="alert alert-warning d-flex align-items-center color-detalle tall-alert" role="alert">
+        <i class="bi bi-table"></i>
+        <div>Estadísticas por Período</div>
+    </div>
+    {% for item in datos %}
+    {% with periodo=item.periodo estadisticas=item.estadisticas_ciclo estadistica_general=item.estadistica_general %}
+    <!-- Modal para cada periodo -->
+    <div class="modal fade" id="modal-{{ periodo.id }}" tabindex="-1" aria-labelledby="modalLabel-{{ periodo.id }}"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalLabel-{{ periodo.id }}" style="font-size: 30px;">
+                        Detalles del Período Académico: {{ periodo.nombre }}
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" style="border-top: 3px solid #8ab5ea;">
+                            <table id="estadisticaPeriodo-{{ periodo.id }}" class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Ciclo</th>
+                                        <th>Matriculados</th>
+                                        <th>Aprobados</th>
+                                        <th>Reprobados</th>
+                                        <th>Desertores</th>
+                                        <th>Foráneos</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                        {% if estadisticas %}
+                                        {% for ep in estadisticas %}
+                                        <tr>
+                                            <td>{{ ep.idCiclo.numero }}</td>
+                                            <td>{{ ep.numMatriculados }}</td>
+                                            <td>{{ ep.numAprobados }}</td>
+                                            <td>{{ ep.numReprobados }}</td>
+                                            <td>{{ ep.numDesertores }}</td>
+                                            <td>{{ ep.numForaneos }}</td>
+                                            <td></td> <!-- Celda vacía para separar las estadísticas generales -->
+                                        </tr>
+                                        {% empty %}
+                                        <tr>
+                                            <td colspan="7" class="text-center">No hay datos disponibles para este periodo.</td>
+                                        </tr>
+                                        {% endfor %}
+                                        <tr>
+                                            {% if estadistica_general %}
+                                            <td style="font-weight: bold;"> Total </td>
+                                            <td> {{ estadistica_general.numMatriculados }}  </td>
+                                            <td> {{ estadistica_general.numAprobados }}</td>
+                                            <td> {{ estadistica_general.numReprobados }}</td>
+                                            <td> {{ estadistica_general.numDesertores }}</td>
+                                            <td> {{ estadistica_general.numForaneos }}</td>
+                                            {% else %}
+                                                No hay datos generales disponibles.
+                                            {% endif %}
+                                        </tr>
+    
+                                        {% else %}
+                                        <tr>
+                                            <td colspan="7" class="text-center">No hay datos disponibles para este periodo.</td>
+                                        </tr>
+                                        {% endif %}
+                                    
+                                </tbody>
+                            </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endwith %}
+    {% endfor %}
+
+    <!-- Tabla resumen -->
+    <section class="section tabla">
+        <div class="contenedorTablas">
+            <table id="estadisticaTable" class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Período Académico</th>
+                        <th>Operación</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in datos %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ item.periodo.nombre }}</td>
+                        <td>
+                            <!-- Botón de operación para abrir el modal -->
+                            <a href="#" class="edit" data-bs-toggle="modal" data-bs-target="#modal-{{ item.periodo.id }}">
+                                <i class="bi bi-info-square-fill"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+</section>
+
+{% endblock %}

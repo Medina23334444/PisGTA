@@ -1,0 +1,220 @@
+{% extends "base_initPersonal.html" %}
+{% load static %}
+{% block content %}
+    <link rel="stylesheet" href="{% static 'stylePRED.css' %}"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.2.1/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{% static 'styleExportarPDF.css' %}">
+    <header>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/homePersonal">Inicio</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Predicción General</li>
+            </ol>
+        </nav>
+        <h1>Predicción de deserción estudiantil de la Carrera de Electricidad</h1>
+    </header>
+    <main>
+        <div class="container">
+            <section class="prediccion">
+                <div class="alert alert-primary d-flex align-items-center" role="alert">
+                    <i class="bi bi-pencil"></i>
+                    <div>Gráfica de Predicción de los estudiantes desertores en la carrera de Electricidad </div>
+                </div>
+                <div class="contenedor">
+                    <div class="custom-select-container">
+                        <select id="yearSelect" class="form-select custom-select" aria-label="Disabled select example">
+                            <option selected>Seleccion Año Predicción</option>
+                            <option value="1">2025</option>
+                            <option value="2">2026</option>
+                            <option value="3">2027</option>
+                            <option value="4">2028</option>
+                            <option value="5">2029</option>
+                            <option value="6">2030</option>
+                            <option value="7">2031</option>
+                            <option value="8">2032</option>
+                            <option value="9">2033</option>
+                            <option value="10">2034</option>
+                            <option value="11">2035</option>
+                        </select>
+                    </div>
+                    <div class="grupo">
+                        <button id="predictionButton" class="btn btn-dark" type="button">Predicción</button>
+                        <i class="bi bi-bar-chart-line-fill custom-icon"></i>
+                        <button type="button" class="btn btn-dark" id="btnExport" data-toggle="modal"
+                                data-target=".bd-example-modal-lg">
+                            Exportar
+                        </button>
+                        <i class="bi bi-filetype-pdf custom-icon"></i>
+                    </div>
+                </div>
+                <button id="btnModal" class="btn btn-dark btm2" type="button">Ciclos</button>
+                <div class="container chart-container">
+                    <div class="row my-4">
+                        <div class="col-sm-12 col-md-6 col-lg-6 col-xl-6 mx-auto">
+                            <div id="chart" class="chart"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <div class="modal fade bd-example-modal-lg" id="exportContainer" tabindex="-1" role="dialog"
+                 aria-labelledby="myLargeModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalCenterTitle">Exportar a PDF</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <h5>Vista previa</h5>
+                            <div class="docuemnt">
+
+                                <!-- Aquí iría la vista previa del documento -->
+                                <div class="containerPdf"
+                                     style="display: flex; justify-content: center; align-items: center; margin: 0; border: 2px solid black; overflow-y: auto; overflow-x: hidden;">
+
+                                    <div class="containerDocPDF"
+                                         style="transform: scale(0.9); height: 190px; margin-top: 240px;">
+
+                                        <!-- Aquí iría lo que se va ha exportar como documento PDF -->
+                                        <div class="pdf" id="docPDF"
+                                             style="transform: scale(0.9);">
+                                            <img src="{% static 'logo_unl copy.png' %}"
+                                                 alt="Logo de la Universidad Nacional de Loja" class="logoInf">
+                                            <h1 class="facultyNameInf"><strong>Facultad de Energía, Las Industrias y Los
+                                                Recursos Naturales No
+                                                Renovables</strong></h1>
+                                            <h2 class="careerNameInf"><strong>Carrera de Electricidad</strong></h2>
+
+                                            <!-- Gráfico Clonado en el Modal -->
+                                            <div class="grafico" style="width: 650px;">
+                                                <div class="alert alert-warning d-flex align-items-center color-detalle tall-alert"
+                                                     role="alert">
+                                                    <i class="bi bi-graph-up"></i>
+                                                    <div>Predicción Gráfica</div>
+                                                </div>
+                                                <div class="chartCloned" id="chartImageContainer"></div>
+                                            </div>
+
+                                            <!-- Tabla Clonado en el Modal -->
+                                            <div class="datosHistoricos" style="width: 650px;">
+                                                <section>
+                                                    <div class="alert alert-warning d-flex align-items-center color-detalle tall-alert"
+                                                         role="alert">
+                                                        <i class="bi bi-table"> </i>
+                                                        <div>Detalle de la gráfica</div>
+                                                    </div>
+                                                    <section class="section tabla">
+                                                        <div class="contenedorTablas">
+                                                            <table class="table">
+                                                                <thead>
+                                                                <tr>
+                                                                    <th scope="col">Fecha</th>
+                                                                    <th scope="col">Matriculados</th>
+                                                                    <th scope="col">Aprobados</th>
+                                                                    <th scope="col">Reprobados</th>
+                                                                    <th scope="col">Desertores</th>
+                                                                    <th scope="col">Foraneos</th>
+                                                                </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                {% for fecha in tiempo|slice:"7" %}
+                                                                    <tr>
+                                                                        <td> {{ fecha }}</td>
+                                                                        <td> {{ matriculados|slice:forloop.counter|last }}
+                                                                        </td>
+                                                                        <td> {{ aprobados|slice:forloop.counter|last }}</td>
+                                                                        <td> {{ reprobados|slice:forloop.counter|last }}
+                                                                        </td>
+                                                                        <td> {{ desertores|slice:forloop.counter|last }}
+                                                                        </td>
+                                                                        <td> {{ foraneos|slice:forloop.counter|last }}</td>
+                                                                    </tr>
+                                                                {% endfor %}
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </section>
+                                                </section>
+                                            </div>
+
+                                            <div class="piePagina">
+                                                <p><strong>Todos los derechos reservados @UNL Predict</strong></p>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <!---->
+                            </div>
+                            <hr>
+
+                            <div class="file-name">
+                                <label for="file-name">Nombre del archivo:</label>
+                                <input type="text" id="fileName" placeholder="Ingrese el nombre del archivo">
+                            </div>
+
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-light" data-dismiss="modal" id="cancelBtn">Cerrar
+                            </button>
+                            <button type="button" class="btn btn-dark" id="exportBtn">Exportar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <dialog id="modal" class="custom-modal">
+            <div class="modal-header">
+                <h2>Seleccione Ciclos</h2>
+                <button id="cerrarModal" class="close-modal">X</button>
+            </div>
+            <div class="modal-body">
+                <form id="ciclosForm">
+                    <div id="modalOpciones" class="modalOpciones">
+                        {% for i in "123456789" %}
+                            <div class="option-wrapper">
+                                <input type="checkbox" id="ciclo{{ i }}" name="ciclo" value="Ciclo {{ i }}">
+                                <label for="ciclo{{ i }}">Ciclo {{ i }}</label>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button id="aplicar" class="btn btn-primary btmAplicar" type="button">Aplicar Selección</button>
+            </div>
+        </dialog>
+    </main>
+
+    <script src="{% static 'js/modal.js' %}"></script>
+    <script>
+        document.getElementById('aplicar').addEventListener('click', function () {
+            const selectedCycles = [];
+            const checkboxes = document.querySelectorAll('input[name="ciclo"]:checked');
+            checkboxes.forEach((checkbox) => {
+                selectedCycles.push(checkbox.value);
+            });
+            // Almacena la lista de ciclos seleccionados en el almacenamiento local
+            localStorage.setItem('selectedCycles', JSON.stringify(selectedCycles));
+            // Redirige a la página de gráficos
+            window.location.href = "/prediccionCiclos";
+        });
+
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.1/echarts.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
+    <!--  Apache Echarts  -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <!--  Custom js  -->
+    <script src="{% static 'js/main.js' %}"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.2.1/dist/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+    <script src="{% static 'scriptExportarPDF.js' %}"></script>
+
+{% endblock %}

@@ -1083,7 +1083,7 @@ def perfilPersonal(request):
     return render(request, 'perfilPersonal.html', {'usuario': usuario, 'perfil': perfil})
 
 
-@rol_requerido('Administrador')
+@rol_requerido('Personal')
 @login_required
 def editarPerfilPersonal(request):
     usuario = request.user

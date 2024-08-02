@@ -798,6 +798,8 @@ def listaSugerencias(request):
     usuario = request.user
     perfil = get_object_or_404(Perfil, usuario=usuario)
     sugerencias = Sugerencia.objects.all()
+    if not sugerencias:
+        messages.info(request, 'Ningun usuario ha enviado sugerencias')
     return render(request, 'listaSugerencia.html', {"sugerencias": sugerencias, 'usuario': usuario, 'perfil': perfil})
 
 

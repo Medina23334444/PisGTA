@@ -6,17 +6,16 @@ document.addEventListener("DOMContentLoaded", function () {
 
     showContainerBtn.addEventListener("click", function () {
         exportContainer.style.display = "block";
-        fileName.value = ''; 
+        fileName.value = '';
         fileName.placeholder = "Ingrese el nombre del archivo";
     });
 
     closeContainerBtn.addEventListener("click", function () {
         exportContainer.style.display = "none";
-        fileName.value = ''; 
+        fileName.value = '';
         fileName.placeholder = "Ingrese el nombre del archivo";
     });
 });
-
 
 document.addEventListener('DOMContentLoaded', function () {
     const fileNameInput = document.getElementById('fileName');
@@ -24,21 +23,17 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const initChart = async () => {
         const myChart = echarts.init(document.getElementById('chart'));
-    
+
         const option = await getObtionChart();
-    
-        option.toolbox = {
-            feature: {
-                saveAsImage: {
-                    show: false 
-                }
-            }
-        };
 
         option.title = {
             show: false
         };
-    
+
+        option.toolbox = {
+            show: false
+        };
+
         myChart.setOption(option);
         myChart.resize();
     };
@@ -51,18 +46,24 @@ document.addEventListener('DOMContentLoaded', function () {
         const img = document.createElement('img');
         img.src = chartImage;
         img.style.width = '800px';
-        img.style.marginTop = '-15px';
-        img.style.marginBottom = '15px';
-        img.style.height = '400px' ;
+        img.style.marginTop = '-25px';
+        img.style.marginBottom = '25px';
+        img.style.height = '400px';
 
         const chartImageContainer = document.getElementById('chartImageContainer');
-        chartImageContainer.innerHTML = ''; 
+        chartImageContainer.innerHTML = '';
         chartImageContainer.appendChild(img);
     };
 
     $('#exportContainer').on('show.bs.modal', async function () {
         await captureChart();
     });
+
+    const dias_Semana = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
+    const fecha = new Date();
+    const dia = dias_Semana[fecha.getDay()];
+    document.getElementById("fecha_actual").innerHTML = `${dia}, ${fecha.toLocaleDateString()}`;
+
 
     exportBtn.addEventListener('click', function () {
         const fileName = fileNameInput.value.trim();
@@ -98,15 +99,16 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         };
 
-    // Generar el PDF
-    html2pdf().set(opt).from(content).save().then(function () {
-        console.log('PDF generado y guardado');
-        $('#exportContainer').modal('hide');
-        fileNameInput.value = '';
-    }).catch(function (error) {
-        console.error('Error al generar el PDF:', error);
-    });
+        // Generar el PDF
+        html2pdf().set(opt).from(content).save().then(function () {
+            console.log('PDF generado y guardado');
+            $('#exportContainer').modal('hide');
+            fileNameInput.value = '';
+        }).catch(function (error) {
+            console.error('Error al generar el PDF:', error);
+        });
     }
 
     window.addEventListener('load', initChart);
 });
+

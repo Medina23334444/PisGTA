@@ -111,9 +111,9 @@
                         </td>
                         <td>{{ item.periodo.nombre }}</td>
                         <td>{{ item.administrador }}</td>
-                        <td>
-                            <a href="#" class="edit" data-bs-toggle="modal" data-bs-target="#modal-{{ item.periodo.id }}">
-                                <i class="bi bi-info-square-fill"></i>
+                        <td>                            
+                            <a href="#" class="edit" data-bs-toggle="modal" data-bs-target="#modal-{{ item.periodo.id }}" style="align-items: right;">
+                                <i class="bi bi-info-square-fill" style="color: black;"></i>
                             </a>
                         </td>
                     </tr>
@@ -121,7 +121,8 @@
                 </tbody>
             </table>
             <div class="align-right">
-                <button type="button" class="btn btn-primary" id="btnExport" data-toggle="modal" data-target=".bd-example-modal-lg" disabled>
+                <button type="button" class="btn btn-dark" id="btnExport"
+                data-toggle="modal" data-target=".bd-example-modal-lg" disabled>
                     Exportar Reporte
                 </button>
                 <i class="bi bi-filetype-pdf custom-icon"></i>
@@ -156,15 +157,23 @@
                                             Recursos Naturales No
                                             Renovables</strong></h1>
                                     <h2 class="careerNameInf"><strong>Carrera de Electricidad</strong></h2>
+                                    <p>Reporte de datos históricos por periodo académico</p>
+                                <div>
+                                        
+                                </div>
 
-                                    <div class="datosHistoricos">
+                                    <div class="datosHistoricos">                                        
                                         <section>
+                                            <section style="padding-left: 40px;"> 
+                                                <p style="text-align: left;">Emitido por: {{ usuario.nombres }} {{ usuario.apellidos }}</p>
+                                                <p style="text-align: left;">Fecha de emisión:  <span id="fecha_actual"></span></p>
+                                            </section>
                                             <div class="alert alert-warning d-flex align-items-center color-detalle tall-alert"
                                                 role="alert">
                                                 <i class="bi bi-clipboard-data"> </i>
                                                 <div>Datos históricos registrados:</div>
                                             </div>
-
+                                            
                                             {% for item in datos %}
                                             {% with periodo=item.periodo estadisticas=item.estadisticas_ciclo estadistica_general=item.estadistica_general %}
                                             <section class="section tabla data-section" data-id="{{ periodo.id }}" style="display:none;">
@@ -234,7 +243,7 @@
 
 
                                     <div class="piePagina">
-                                        <p><strong>Todos los derechos reservados @UNL Predict</strong></p>
+                                        <p><strong>Todos los derechos reservados @UNL Predicts</strong></p>
                                     </div>
                                 </div>
 

@@ -46,25 +46,43 @@ function validarCedula(cedula) {
     function validateInput(event) {
         const input = event.target;
         const pattern = new RegExp(input.pattern);
-        if (!pattern.test(input.value)) {
+        let isValid = pattern.test(input.value);
+
+        // Validar el campo DNI
+        if (input.id === 'dni') {
+            isValid = isValid && validarCedula(input.value);
+        }
+
+        if (!isValid) {
             input.classList.add('is-invalid');
+            input.classList.remove('is-valid');
         } else {
+            input.classList.add('is-valid');
             input.classList.remove('is-invalid');
         }
     }
 
     function handleFormSubmission(event) {
         const form = event.target;
-        let isValid = true;
+        let isFormValid = true;
 
         // Recorre todos los campos con el atributo pattern
         const inputs = form.querySelectorAll('input[pattern]');
         inputs.forEach(function (input) {
             const pattern = new RegExp(input.pattern);
-            if (!pattern.test(input.value)) {
+            let isValid = pattern.test(input.value);
+
+            // Validar el campo DNI
+            if (input.id === 'dni') {
+                isValid = isValid && validarCedula(input.value);
+            }
+
+            if (!isValid) {
                 input.classList.add('is-invalid');
-                isValid = false;
+                input.classList.remove('is-valid');
+                isFormValid = false;
             } else {
+                input.classList.add('is-valid');
                 input.classList.remove('is-invalid');
             }
         });
@@ -73,7 +91,7 @@ function validarCedula(cedula) {
         form.classList.add('was-validated');
 
         // Evita el envío del formulario si hay campos inválidos
-        if (!isValid) {
+        if (!isFormValid) {
             event.preventDefault();
             event.stopPropagation();
         }
@@ -92,6 +110,3 @@ function validarCedula(cedula) {
         });
     }, false);
 })();
-
-
-

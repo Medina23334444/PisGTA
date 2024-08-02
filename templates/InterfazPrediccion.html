@@ -1,9 +1,9 @@
 {% extends "base_initPersonal.html" %}
 {% load static %}
 {% block content %}
-    <link rel="stylesheet" href="{% static 'stylePRED.css' %}"/>
+
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.2.1/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="{% static 'styleExportarPDF.css' %}">
+    <link rel="stylesheet" href="{% static 'stylePR.css' %}">
     <header>
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
@@ -18,7 +18,7 @@
             <section class="prediccion">
                 <div class="alert alert-primary d-flex align-items-center" role="alert">
                     <i class="bi bi-pencil"></i>
-                    <div>Gráfica de Predicción de los estudiantes desertores en la carrera de Electricidad </div>
+                    <div>Gráfica de Predicción de los estudiantes desertores en la carrera de Electricidad</div>
                 </div>
                 <div class="contenedor">
                     <div class="custom-select-container">
@@ -61,7 +61,8 @@
                 <div class="modal-dialog modal-lg">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h5 class="modal-title" id="exampleModalCenterTitle">Exportar a PDF</h5>
+                            <h5 class="modal-title" id="exampleModalCenterTitle" style="color: black;">Exportar a
+                                PDF</h5>
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
@@ -86,7 +87,12 @@
                                                 Recursos Naturales No
                                                 Renovables</strong></h1>
                                             <h2 class="careerNameInf"><strong>Carrera de Electricidad</strong></h2>
-
+                                            <p>Informe de Predicción Gráfica</p>
+                                            <p style="margin-right: auto;">Emitido por: <span
+                                                    class="nombre">{{ usuario.nombres }} {{ usuario.apellidos }} </span>
+                                            </p>
+                                            <P style="margin-right: auto;">Fecha de emisión: <span
+                                                    id="fecha_actual"></span></P>
                                             <!-- Gráfico Clonado en el Modal -->
                                             <div class="grafico" style="width: 650px;">
                                                 <div class="alert alert-warning d-flex align-items-center color-detalle tall-alert"
@@ -94,49 +100,8 @@
                                                     <i class="bi bi-graph-up"></i>
                                                     <div>Predicción Gráfica</div>
                                                 </div>
-                                                <div class="chartCloned" id="chartImageContainer"></div>
-                                            </div>
-
-                                            <!-- Tabla Clonado en el Modal -->
-                                            <div class="datosHistoricos" style="width: 650px;">
-                                                <section>
-                                                    <div class="alert alert-warning d-flex align-items-center color-detalle tall-alert"
-                                                         role="alert">
-                                                        <i class="bi bi-table"> </i>
-                                                        <div>Detalle de la gráfica</div>
-                                                    </div>
-                                                    <section class="section tabla">
-                                                        <div class="contenedorTablas">
-                                                            <table class="table">
-                                                                <thead>
-                                                                <tr>
-                                                                    <th scope="col">Fecha</th>
-                                                                    <th scope="col">Matriculados</th>
-                                                                    <th scope="col">Aprobados</th>
-                                                                    <th scope="col">Reprobados</th>
-                                                                    <th scope="col">Desertores</th>
-                                                                    <th scope="col">Foraneos</th>
-                                                                </tr>
-                                                                </thead>
-                                                                <tbody>
-                                                                {% for fecha in tiempo|slice:"7" %}
-                                                                    <tr>
-                                                                        <td> {{ fecha }}</td>
-                                                                        <td> {{ matriculados|slice:forloop.counter|last }}
-                                                                        </td>
-                                                                        <td> {{ aprobados|slice:forloop.counter|last }}</td>
-                                                                        <td> {{ reprobados|slice:forloop.counter|last }}
-                                                                        </td>
-                                                                        <td> {{ desertores|slice:forloop.counter|last }}
-                                                                        </td>
-                                                                        <td> {{ foraneos|slice:forloop.counter|last }}</td>
-                                                                    </tr>
-                                                                {% endfor %}
-                                                                </tbody>
-                                                            </table>
-                                                        </div>
-                                                    </section>
-                                                </section>
+                                                <div class="chartCloned" id="chartImageContainer"
+                                                     style="margin-top: 55px;"></div>
                                             </div>
 
                                             <div class="piePagina">
@@ -188,6 +153,7 @@
         </dialog>
     </main>
 
+    <script src="{% static 'ExportarPDF.js' %}"></script>
     <script src="{% static 'js/modal.js' %}"></script>
     <script>
         document.getElementById('aplicar').addEventListener('click', function () {

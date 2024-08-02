@@ -499,6 +499,9 @@ def generate_chart_data(listaT, listaD, listaA, listaR, listaM, listaF, listaTNo
                             }
                         ]
                     ]
+                },
+                'tooltip': {
+                    'show': False  # Opcional: Desactiva el tooltip para esta serie
                 }
             }
         ]

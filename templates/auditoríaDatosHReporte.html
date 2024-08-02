@@ -2,279 +2,296 @@
 {% block title %}Auditoría - Datos Históricos{% endblock %}
 {% load static %}
 {% block content %}
-<link rel="stylesheet" href="{% static 'css/styleReportePDF.css' %}">
-<header>
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="/homeAdministrador">Inicio</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Datos Históricos</li>
-        </ol>
-    </nav>
-    <br>
-    <h1>Auditoría de Datos Históricos</h1>
-    <br>
-</header>
+    <link rel="stylesheet" href="{% static 'styleReportePDF.css' %}">
+    <header>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/homeAdministrador">Inicio</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Datos Históricos</li>
+            </ol>
+        </nav>
+        <br>
+        <h1>Auditoría de Datos Históricos</h1>
+        <br>
+    </header>
 
-<section>
-    <div class="alert alert-warning d-flex align-items-center color-detalle tall-alert" role="alert">
-        <i class="bi bi-clipboard-data"></i>
-        <div>Datos históricos registrados</div>
-    </div>
-    {% for item in datos %}
-    {% with periodo=item.periodo estadisticas=item.estadisticas_ciclo estadistica_general=item.estadistica_general %}
-    <!-- Modal para cada periodo -->
-    <div class="modal fade" id="modal-{{ periodo.id }}" tabindex="-1" aria-labelledby="modalLabel-{{ periodo.id }}"
-        aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="modalLabel-{{ periodo.id }}" style="font-size: 30px;">
-                        Detalles del Período Académico: {{ periodo.nombre }}
-                    </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body" style="border-top: 3px solid #8ab5ea;">
-                    <table id="estadisticaPeriodo-{{ periodo.id }}" class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th>Ciclo</th>
-                                <th>Matriculados</th>
-                                <th>Aprobados</th>
-                                <th>Reprobados</th>
-                                <th>Desertores</th>
-                                <th>Foráneos</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% if estadisticas %}
-                            {% for ep in estadisticas %}
-                            <tr>
-                                <td>{{ ep.idCiclo.numero }}</td>
-                                <td>{{ ep.numMatriculados }}</td>
-                                <td>{{ ep.numAprobados }}</td>
-                                <td>{{ ep.numReprobados }}</td>
-                                <td>{{ ep.numDesertores }}</td>
-                                <td>{{ ep.numForaneos }}</td>
-                                <td></td> <!-- Celda vacía para separar las estadísticas generales -->
-                            </tr>
-                            {% empty %}
-                            <tr>
-                                <td colspan="7" class="text-center">No hay datos registrados para este periodo.</td>
-                            </tr>
-                            {% endfor %}
-                            <tr>
-                                {% if estadistica_general %}
-                                <td style="font-weight: bold;"> Total </td>
-                                <td> {{ estadistica_general.numMatriculados }} </td>
-                                <td> {{ estadistica_general.numAprobados }}</td>
-                                <td> {{ estadistica_general.numReprobados }}</td>
-                                <td> {{ estadistica_general.numDesertores }}</td>
-                                <td> {{ estadistica_general.numForaneos }}</td>
-                                {% else %}
-                                No hay datos generales disponibles.
-                                {% endif %}
-                            </tr>
-
-                            {% else %}
-                            <tr>
-                                <td colspan="7" class="text-center">No hay datos disponibles para este periodo.</td>
-                            </tr>
-                            {% endif %}
-
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+    <section>
+        <div class="alert alert-warning d-flex align-items-center color-detalle tall-alert" role="alert">
+            <i class="bi bi-clipboard-data"></i>
+            <div>Datos históricos registrados</div>
         </div>
-    </div>
-    {% endwith %}
-    {% endfor %}
+        {% for item in datos %}
+            {% with periodo=item.periodo estadisticas=item.estadisticas_ciclo estadistica_general=item.estadistica_general %}
+                <!-- Modal para cada periodo -->
+                <div class="modal fade" id="modal-{{ periodo.id }}" tabindex="-1"
+                     aria-labelledby="modalLabel-{{ periodo.id }}"
+                     aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="modalLabel-{{ periodo.id }}" style="font-size: 30px;">
+                                    Detalles del Período Académico: {{ periodo.nombre }}
+                                </h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body" style="border-top: 3px solid #8ab5ea;">
+                                <table id="estadisticaPeriodo-{{ periodo.id }}" class="table table-hover">
+                                    <thead>
+                                    <tr>
+                                        <th>Ciclo</th>
+                                        <th>Matriculados</th>
+                                        <th>Aprobados</th>
+                                        <th>Reprobados</th>
+                                        <th>Desertores</th>
+                                        <th>Foráneos</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% if estadisticas %}
+                                        {% for ep in estadisticas %}
+                                            <tr>
+                                                <td>{{ ep.idCiclo.numero }}</td>
+                                                <td>{{ ep.numMatriculados }}</td>
+                                                <td>{{ ep.numAprobados }}</td>
+                                                <td>{{ ep.numReprobados }}</td>
+                                                <td>{{ ep.numDesertores }}</td>
+                                                <td>{{ ep.numForaneos }}</td>
+                                                <td></td> <!-- Celda vacía para separar las estadísticas generales -->
+                                            </tr>
+                                        {% empty %}
+                                            <tr>
+                                                <td colspan="7" class="text-center">No hay datos registrados para este
+                                                    periodo.
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                        <tr>
+                                            {% if estadistica_general %}
+                                                <td style="font-weight: bold;"> Total</td>
+                                                <td> {{ estadistica_general.numMatriculados }} </td>
+                                                <td> {{ estadistica_general.numAprobados }}</td>
+                                                <td> {{ estadistica_general.numReprobados }}</td>
+                                                <td> {{ estadistica_general.numDesertores }}</td>
+                                                <td> {{ estadistica_general.numForaneos }}</td>
+                                            {% else %}
+                                                No hay datos generales disponibles.
+                                            {% endif %}
+                                        </tr>
 
-    <section class="section tabla">
-        <div class="contenedorTablas">
-            <table id="estadisticaTable" class="table table-hover" >
-                <thead>
+                                    {% else %}
+                                        <tr>
+                                            <td colspan="7" class="text-center">No hay datos disponibles para este
+                                                periodo.
+                                            </td>
+                                        </tr>
+                                    {% endif %}
+
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endwith %}
+        {% endfor %}
+
+        <section class="section tabla">
+            <div class="contenedorTablas">
+                <table id="estadisticaTable" class="table table-hover">
+                    <thead>
                     <tr>
                         <th>
-                            <input type="checkbox" id="select-all" />
+                            <input type="checkbox" id="select-all"/>
                         </th>
                         <th>Estadística</th>
                         <th>Registrado por:</th>
                         <th>Detalle</th>
                     </tr>
-                </thead>
-                <tbody>
+                    </thead>
+                    <tbody>
                     {% for item in datos %}
-                    <tr>
-                        <td>
-                            <input type="checkbox" class="row-select" data-id="{{ item.periodo.id }}" />
-                        </td>
-                        <td>{{ item.periodo.nombre }}</td>
-                        <td>{{ item.administrador }}</td>
-                        <td>                            
-                            <a href="#" class="edit" data-bs-toggle="modal" data-bs-target="#modal-{{ item.periodo.id }}" style="align-items: right;">
-                                <i class="bi bi-info-square-fill" style="color: black;"></i>
-                            </a>
-                        </td>
-                    </tr>
+                        <tr>
+                            <td>
+                                <input type="checkbox" class="row-select" data-id="{{ item.periodo.id }}"/>
+                            </td>
+                            <td>{{ item.periodo.nombre }}</td>
+                            <td>{{ item.administrador }}</td>
+                            <td>
+                                <a href="#" class="edit" data-bs-toggle="modal"
+                                   data-bs-target="#modal-{{ item.periodo.id }}" style="align-items: right;">
+                                    <i class="bi bi-info-square-fill" style="color: black;"></i>
+                                </a>
+                            </td>
+                        </tr>
                     {% endfor %}
-                </tbody>
-            </table>
-            <div class="align-right">
-                <button type="button" class="btn btn-dark" id="btnExport"
-                data-toggle="modal" data-target=".bd-example-modal-lg" disabled>
-                    Exportar Reporte
-                </button>
-                <i class="bi bi-filetype-pdf custom-icon"></i>
+                    </tbody>
+                </table>
+                <div class="align-right">
+                    <button type="button" class="btn btn-dark" id="btnExport"
+                            data-toggle="modal" data-target=".bd-example-modal-lg" disabled>
+                        Exportar Reporte
+                    </button>
+                    <i class="bi bi-filetype-pdf custom-icon"></i>
+                </div>
+            </div>
+        </section>
+
+        <div class="modal fade bd-example-modal-lg" id="exportContainer" tabindex="-1" role="dialog"
+             aria-labelledby="myLargeModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalCenterTitle">Exportar a PDF</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <h5>Vista previa</h5>
+                        <div class="document">
+
+                            <div class="containerPdf">
+
+                                <div class="containerDocPDF"
+                                     style="transform: scale(0.9); height: 170px; margin-top: 240px;">
+
+                                    <div class="pdf" id="docPDF"
+                                         style="transform: scale(0.9);">
+                                        <img src="{% static 'logo_unl copy.png' %}"
+                                             alt="Logo de la Universidad Nacional de Loja" class="logoInf">
+                                        <h1 class="facultyNameInf"><strong>Facultad de Energía, Las Industrias y Los
+                                            Recursos Naturales No
+                                            Renovables</strong></h1>
+                                        <h2 class="careerNameInf"><strong>Carrera de Electricidad</strong></h2>
+                                        <p>Reporte de datos históricos por periodo académico</p>
+                                        <div>
+
+                                        </div>
+
+                                        <div class="datosHistoricos">
+                                            <section>
+                                                <section style="padding-left: 40px;">
+                                                    <p style="text-align: left;">Emitido
+                                                        por: {{ usuario.nombres }} {{ usuario.apellidos }}</p>
+                                                    <p style="text-align: left;">Fecha de emisión: <span
+                                                            id="fecha_actual"></span></p>
+                                                </section>
+                                                <div class="alert alert-warning d-flex align-items-center color-detalle tall-alert"
+                                                     role="alert">
+                                                    <i class="bi bi-clipboard-data"> </i>
+                                                    <div>Datos históricos registrados:</div>
+                                                </div>
+
+                                                {% for item in datos %}
+                                                    {% with periodo=item.periodo estadisticas=item.estadisticas_ciclo estadistica_general=item.estadistica_general %}
+                                                        <section class="section tabla data-section"
+                                                                 data-id="{{ periodo.id }}" style="display:none;">
+                                                            <div class="contenedorTablas">
+                                                                <p style="text-align: left;"><strong>Periodo:</strong>
+                                                                    {{ item.periodo.nombre }}</p>
+                                                                <p style="text-align: left;"><strong>Responsable de
+                                                                    Regisro:</strong> {{ item.administrador }}</p>
+                                                                <table id="estadisticaPeriodo-{{ periodo.id }}"
+                                                                       class="table table-hover">
+                                                                    <thead>
+                                                                    <tr>
+                                                                        <th>Ciclo</th>
+                                                                        <th>Matriculados</th>
+                                                                        <th>Aprobados</th>
+                                                                        <th>Reprobados</th>
+                                                                        <th>Desertores</th>
+                                                                        <th>Foráneos</th>
+                                                                    </tr>
+                                                                    </thead>
+                                                                    <tbody>
+                                                                    {% if estadisticas %}
+                                                                        {% for ep in estadisticas %}
+                                                                            <tr>
+                                                                                <td>{{ ep.idCiclo.numero }}</td>
+                                                                                <td>{{ ep.numMatriculados }}</td>
+                                                                                <td>{{ ep.numAprobados }}</td>
+                                                                                <td>{{ ep.numReprobados }}</td>
+                                                                                <td>{{ ep.numDesertores }}</td>
+                                                                                <td>{{ ep.numForaneos }}</td>
+                                                                                <td></td>
+                                                                                <!-- Celda vacía para separar las estadísticas generales -->
+                                                                            </tr>
+                                                                        {% empty %}
+                                                                            <tr>
+                                                                                <td colspan="7" class="text-center">No
+                                                                                    hay datos
+                                                                                    registrados para este periodo.
+                                                                                </td>
+                                                                            </tr>
+                                                                        {% endfor %}
+                                                                        <tr>
+                                                                            {% if estadistica_general %}
+                                                                                <td style="font-weight: bold;"> Total
+                                                                                </td>
+                                                                                <td> {{ estadistica_general.numMatriculados }} </td>
+                                                                                <td> {{ estadistica_general.numAprobados }}</td>
+                                                                                <td> {{ estadistica_general.numReprobados }}</td>
+                                                                                <td> {{ estadistica_general.numDesertores }}</td>
+                                                                                <td> {{ estadistica_general.numForaneos }}</td>
+                                                                            {% else %}
+                                                                                No hay datos generales disponibles.
+                                                                            {% endif %}
+                                                                        </tr>
+
+                                                                    {% else %}
+                                                                        <tr>
+                                                                            <td colspan="7" class="text-center">No hay
+                                                                                datos
+                                                                                disponibles para este periodo.
+                                                                            </td>
+                                                                        </tr>
+                                                                    {% endif %}
+
+                                                                    </tbody>
+                                                                </table>
+                                                            </div>
+                                                        </section>
+                                                    {% endwith %}
+                                                {% endfor %}
+                                            </section>
+
+                                        </div>
+
+
+                                        <div class="piePagina">
+                                            <p><strong>Todos los derechos reservados @UNL Predicts</strong></p>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                            <!---->
+                        </div>
+                        <hr>
+
+                        <div class="file-name">
+                            <label for="file-name">Nombre del archivo:</label>
+                            <input type="text" id="fileName" placeholder="Ingrese el nombre del archivo">
+                        </div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-light" data-dismiss="modal" id="cancelBtn">Cerrar
+                        </button>
+                        <button type="button" class="btn btn-dark" id="exportBtn">Exportar</button>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
 
-    <div class="modal fade bd-example-modal-lg" id="exportContainer" tabindex="-1" role="dialog"
-        aria-labelledby="myLargeModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalCenterTitle">Exportar a PDF</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <h5>Vista previa</h5>
-                    <div class="document">
-
-                        <div class="containerPdf">
-
-                            <div class="containerDocPDF"
-                                style="transform: scale(0.9); height: 170px; margin-top: 240px;">
-
-                                <div class="pdf" id="docPDF"
-                                    style="transform: scale(0.9);">
-                                    <img src="{% static 'logo_unl copy.png' %}"
-                                        alt="Logo de la Universidad Nacional de Loja" class="logoInf">
-                                    <h1 class="facultyNameInf"><strong>Facultad de Energía, Las Industrias y Los
-                                            Recursos Naturales No
-                                            Renovables</strong></h1>
-                                    <h2 class="careerNameInf"><strong>Carrera de Electricidad</strong></h2>
-                                    <p>Reporte de datos históricos por periodo académico</p>
-                                <div>
-                                        
-                                </div>
-
-                                    <div class="datosHistoricos">                                        
-                                        <section>
-                                            <section style="padding-left: 40px;"> 
-                                                <p style="text-align: left;">Emitido por: {{ usuario.nombres }} {{ usuario.apellidos }}</p>
-                                                <p style="text-align: left;">Fecha de emisión:  <span id="fecha_actual"></span></p>
-                                            </section>
-                                            <div class="alert alert-warning d-flex align-items-center color-detalle tall-alert"
-                                                role="alert">
-                                                <i class="bi bi-clipboard-data"> </i>
-                                                <div>Datos históricos registrados:</div>
-                                            </div>
-                                            
-                                            {% for item in datos %}
-                                            {% with periodo=item.periodo estadisticas=item.estadisticas_ciclo estadistica_general=item.estadistica_general %}
-                                            <section class="section tabla data-section" data-id="{{ periodo.id }}" style="display:none;">
-                                                <div class="contenedorTablas">
-                                                    <p style="text-align: left;"><strong>Periodo:</strong>
-                                                        {{item.periodo.nombre}}</p>
-                                                    <p style="text-align: left;"><strong>Responsable de
-                                                            Regisro:</strong> {{ item.administrador }}</p>
-                                                    <table id="estadisticaPeriodo-{{ periodo.id }}" class="table table-hover">
-                                                        <thead>
-                                                            <tr>
-                                                                <th>Ciclo</th>
-                                                                <th>Matriculados</th>
-                                                                <th>Aprobados</th>
-                                                                <th>Reprobados</th>
-                                                                <th>Desertores</th>
-                                                                <th>Foráneos</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            {% if estadisticas %}
-                                                            {% for ep in estadisticas %}
-                                                            <tr>
-                                                                <td>{{ ep.idCiclo.numero }}</td>
-                                                                <td>{{ ep.numMatriculados }}</td>
-                                                                <td>{{ ep.numAprobados }}</td>
-                                                                <td>{{ ep.numReprobados }}</td>
-                                                                <td>{{ ep.numDesertores }}</td>
-                                                                <td>{{ ep.numForaneos }}</td>
-                                                                <td></td> <!-- Celda vacía para separar las estadísticas generales -->
-                                                            </tr>
-                                                            {% empty %}
-                                                            <tr>
-                                                                <td colspan="7" class="text-center">No hay datos
-                                                                    registrados para este periodo.</td>
-                                                            </tr>
-                                                            {% endfor %}
-                                                            <tr>
-                                                                {% if estadistica_general %}
-                                                                <td style="font-weight: bold;"> Total </td>
-                                                                <td> {{ estadistica_general.numMatriculados }} </td>
-                                                                <td> {{ estadistica_general.numAprobados }}</td>
-                                                                <td> {{ estadistica_general.numReprobados }}</td>
-                                                                <td> {{ estadistica_general.numDesertores }}</td>
-                                                                <td> {{ estadistica_general.numForaneos }}</td>
-                                                                {% else %}
-                                                                No hay datos generales disponibles.
-                                                                {% endif %}
-                                                            </tr>
-
-                                                            {% else %}
-                                                            <tr>
-                                                                <td colspan="7" class="text-center">No hay datos
-                                                                    disponibles para este periodo.</td>
-                                                            </tr>
-                                                            {% endif %}
-
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-                                            </section>
-                                            {% endwith %}
-                                            {% endfor %}
-                                        </section>
-
-                                    </div>
-
-
-                                    <div class="piePagina">
-                                        <p><strong>Todos los derechos reservados @UNL Predicts</strong></p>
-                                    </div>
-                                </div>
-
-                            </div>
-                        </div>
-                        <!---->
-                    </div>
-                    <hr>
-
-                    <div class="file-name">
-                        <label for="file-name">Nombre del archivo:</label>
-                        <input type="text" id="fileName" placeholder="Ingrese el nombre del archivo">
-                    </div>
-
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-light" data-dismiss="modal" id="cancelBtn">Cerrar
-                    </button>
-                    <button type="button" class="btn btn-dark" id="exportBtn">Exportar</button>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
-<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.6/dist/umd/popper.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.2.1/dist/js/bootstrap.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
-<script src="{% static 'js/scriptReportePDF.js' %}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.2.1/dist/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+    <script src="{% static 'scriptReportePDF.js' %}"></script>
 {% endblock %}

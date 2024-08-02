@@ -3,7 +3,7 @@
 {% load static %}
 {% block content %}
     <link rel="stylesheet" href="{% static 'perfil.css' %}"/>
-    <script src="{% static 'tablas.js' %}"></script>
+    <script src="{% static 'camposValidos.js' %}"></script>
     <section>
         <header>
             <nav aria-label="breadcrumb">
@@ -58,13 +58,12 @@
                                                pattern="[a-zA-ZÀ-ÿ\s]{1,40}">
                                         <div class="invalid-feedback">Por favor, ingrese su dirección.</div>
                                     </div>
-                                    <div class="mb-3">
-                                        <label for="correo" class="form-label">Correo electrónico</label>
-                                        <input type="email" class="form-control" id="correo" name="correo"
-                                               placeholder="Ejemplo: luis.a.medina.c@unl.edu.ec" style="width: 350px;"
-                                               required>
-                                        <div class="invalid-feedback">Por favor, ingrese un correo electrónico válido
-                                        </div>
+                                    <input type="email" class="form-control" id="correo" name="correo"
+                                           placeholder="Ejemplo: luis.a.medina.c@unl.edu.ec" style="width: 350px;"
+                                           required
+                                           pattern="[a-zA-Z0-9._%+-]+@unl\.edu\.ec$">
+                                    <div class="invalid-feedback">Por favor, ingrese un correo electrónico válido que
+                                        termine en @unl.edu.ec
                                     </div>
                                     <div class="form-wrapper">
                                         <label for="tipo_cargo">Cargo</label>

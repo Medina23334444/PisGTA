@@ -12,7 +12,7 @@
                 </ol>
             </nav>
             <h1>Lista de Sugerencias del Personal Administrativo</h1>
-          </header>
+        </header>
         <section class="section tabla">
             <div class="contenedorTablas">
                 <table id="tableSugerencias" class="table table-hover">
@@ -22,6 +22,7 @@
                         <th>Asunto</th>
                         <th>Descripción</th>
                         <th>Fecha</th>
+                        <th>Usuario</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -31,6 +32,7 @@
                             <td>{{ us.asunto }}</td>
                             <td>{{ us.descripcion }}</td>
                             <td>{{ us.fecha }}</td>
+                            <td>{{ us.usuario.nombres }} {{ us.usuario.apellidos }}</td>
                         </tr>
                     {% endfor %}
                     </tbody>

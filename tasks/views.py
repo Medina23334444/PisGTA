@@ -233,11 +233,9 @@ def perfilAdministrador(request):
     perfil = get_object_or_404(Perfil, usuario=usuario)
     return render(request, 'perfilAdministrador.html', {'usuario': usuario, 'perfil': perfil})
 
-<<<<<<< HEAD
 def variablesAdministrador(request):
     return render(request, 'agregarDatos.html')
 
-=======
 
 @rol_requerido('Administrador')
 @login_required
@@ -260,7 +258,6 @@ def editarPerfilAdmi(request):
 
 @rol_requerido('Personal')
 @login_required
->>>>>>> main
 def homePersonal(request):
     usuario = request.user
     perfil = get_object_or_404(Perfil, usuario=usuario)

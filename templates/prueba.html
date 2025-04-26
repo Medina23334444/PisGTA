@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ejemplo de Evento Click</title>
+</head>
+<body>
+<button id="boton">Haz clic aquí</button>
+<p id="mensaje"></p>
+<script>
+    const boton = document.getElementById('boton');
+    let cont = 0;
+    boton.addEventListener('click', () => {
+        cont++; 
+        console.log(cont); 
+    });
+</script>
+</body>
+</html>

@@ -20,11 +20,8 @@ def rol_requerido(*roles):
     def decorator(view_func):
         def _wrapped_view(request, *args, **kwargs):
             if request.user.is_authenticated:
-                # Obtener los roles del usuario
                 roles_persona = RolPersona.objects.filter(usuario=request.user)
                 user_roles = [rp.rol.nombre for rp in roles_persona]
-
-                # Verificar si el usuario tiene alguno de los roles requeridos
                 if any(role in user_roles for role in roles):
                     return view_func(request, *args, **kwargs)
                 else:

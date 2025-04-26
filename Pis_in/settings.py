@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 import os
 from pathlib import Path
+from django.contrib import messages
+from django.contrib.messages import constants as messages
 
 from django.template.context_processors import media
 

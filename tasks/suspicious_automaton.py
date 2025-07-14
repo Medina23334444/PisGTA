@@ -1,32 +1,26 @@
 class SuspiciousBehaviorAutomaton:
-    """Automaton that models suspicious behavior using deterministic transitions.
+    """Automaton specialized to detect Cross-Site Request Forgery (CSRF).
 
-    The automaton is defined by the following components:
-    - States ``S0``..``S11``.
-    - Input symbols are the various system events (``login``, ``failed_login`` ...).
-    - Transition probabilities are stored together with the deterministic next state.
-    - Accepting states ``S6``..``S10`` indicate suspicious behavior.
+    The automaton monitors the typical flow of a form protected by a CSRF token.
+    If the sequence of events deviates from the expected pattern it will end in
+    one of the suspicious states ``S3``, ``S4`` or ``S5``.
     """
 
-    # Set of accepting states
-    FINAL_STATES = {"S6", "S7", "S8", "S9", "S10"}
+    # Set of accepting states (indicating suspicious behavior)
+    FINAL_STATES = {"S3", "S4", "S5"}
 
     # Risk levels for each event
     EVENT_RISK = {
-        "login": "Bajo",
-        "failed_login": "Medio",
-        "read_file": "Bajo",
-        "write_file": "Medio",
-        "access_admin": "Alto",
-        "logout": "Bajo",
-        "upload_script": "Alto",
-        "delete_file": "Alto",
-        "create_user": "Muy Alto",
-        "change_config": "Muy Alto",
-        "open_port": "Muy Alto",
-        "download_data": "Alto",
-        "execute_binary": "Alto",
-        "scan_ports": "Muy Alto",
+        "page_load": "Bajo",
+        "form_render": "Bajo",
+        "submit_request": "Medio",
+        "missing_token": "Alto",
+        "invalid_token": "Muy Alto",
+        "valid_token": "Bajo",
+        "external_referrer": "Alto",
+        "replay_attempt": "Alto",
+        "sensitive_action": "Muy Alto",
+        "request_end": "Bajo",
     }
 
     def __init__(self):
@@ -35,25 +29,23 @@ class SuspiciousBehaviorAutomaton:
 
         # Transition table: (current_state, event) -> (next_state, probability)
         self.transitions = {
-            ("S0", "login"): ("S1", 0.95),
-            ("S0", "failed_login"): ("S5", 0.85),
-            ("S5", "failed_login"): ("S5", 0.65),
-            ("S1", "read_file"): ("S2", 0.80),
-            ("S1", "write_file"): ("S3", 0.70),
-            ("S1", "upload_script"): ("S4", 0.30),
-            ("S2", "upload_script"): ("S4", 0.30),
-            ("S3", "upload_script"): ("S4", 0.30),
-            ("S1", "execute_binary"): ("S6", 0.20),
-            ("S4", "execute_binary"): ("S6", 0.20),
-            ("S1", "access_admin"): ("S7", 0.15),
-            ("S5", "access_admin"): ("S7", 0.10),
-            ("S6", "access_admin"): ("S7", 0.15),
-            ("S7", "create_user"): ("S8", 0.10),
-            ("S8", "change_config"): ("S9", 0.05),
-            ("S9", "open_port"): ("S10", 0.03),
-            ("S1", "download_data"): ("S11", 0.40),
-            ("S1", "logout"): ("S0", 0.90),
+            ("S0", "page_load"): ("S1", 1.00),
+            ("S1", "form_render"): ("S2", 0.95),
+            ("S1", "submit_request"): ("S3", 0.05),
+            ("S2", "submit_request"): ("S2", 0.10),
+            ("S2", "missing_token"): ("S4", 0.30),
+            ("S2", "invalid_token"): ("S5", 0.20),
+            ("S2", "valid_token"): ("S1", 0.80),
+            ("S3", "external_referrer"): ("S5", 0.40),
+            ("S3", "sensitive_action"): ("S5", 0.60),
+            ("S3", "request_end"): ("S0", 0.10),
+            ("S4", "replay_attempt"): ("S5", 0.50),
+            ("S4", "valid_token"): ("S1", 0.50),
         }
+
+        # From the absorbing state S5 any event keeps the automaton in S5
+        for event in self.EVENT_RISK.keys():
+            self.transitions[("S5", event)] = ("S5", 1.0)
 
     def reset(self):
         """Return the automaton to the initial state."""
@@ -62,8 +54,8 @@ class SuspiciousBehaviorAutomaton:
     def process_event(self, event):
         """Process a single event and update the current state.
 
-        Returns a tuple ``(next_state, probability)`` if the event is valid for the
-        current state, otherwise ``(current_state, 0.0)``.
+        Returns a tuple ``(next_state, probability)`` if the event is valid for
+        the current state, otherwise ``(current_state, 0.0)``.
         """
         key = (self.state, event)
         if key not in self.transitions:
@@ -90,7 +82,7 @@ class SuspiciousBehaviorAutomaton:
         state : str
             Final state after processing all events.
         suspicious : bool
-            ``True`` if the final state is one of the accepting (suspicious) states.
+            ``True`` if the final state is one of the accepting states.
         """
         for event in events:
             self.process_event(event)
